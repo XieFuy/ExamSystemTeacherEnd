@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/">
+        <file>icons/winIcon.png</file>
+        <file>icons/loginBackground.png</file>
+        <file>icons/line.png</file>
+    </qresource>
+</RCC>

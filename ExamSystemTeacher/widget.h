@@ -2,12 +2,12 @@
 #define WIDGET_H
 
 #include <QWidget>
-
+#include <QIcon>
 QT_BEGIN_NAMESPACE
 namespace Ui { class Widget; }
 QT_END_NAMESPACE
 
-class Widget : public QWidget
+class Widget : public QWidget //该界面为教职工登录界面
 {
     Q_OBJECT
 
