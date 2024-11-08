@@ -9,10 +9,18 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    clientsocket.cpp \
+    dbhelper.cpp \
+    logincontorller.cpp \
+    loginmodel.cpp \
     main.cpp \
     widget.cpp
 
 HEADERS += \
+    clientsocket.h \
+    dbhelper.h \
+    logincontorller.h \
+    loginmodel.h \
     widget.h
 
 FORMS += \
@@ -25,3 +33,15 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 RESOURCES += \
     res.qrc
+
+LIBS += -lws2_32
+
+INCLUDEPATH += .\include
+
+
+win32: LIBS += -L$$PWD/./ -llibmysql
+
+INCLUDEPATH += $$PWD/.
+DEPENDPATH += $$PWD/.
+
+win32:!win32-g++: PRE_TARGETDEPS += $$PWD/./libmysql.lib

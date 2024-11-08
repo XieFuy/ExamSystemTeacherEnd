@@ -5,6 +5,7 @@
 #include <QIcon>
 #include <QRegularExpressionMatch>
 #include <QMessageBox>
+#include "logincontorller.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class Widget; }
@@ -13,7 +14,9 @@ QT_END_NAMESPACE
 class Widget : public QWidget //该界面为教职工登录界面
 {
     Q_OBJECT
-
+signals:
+    void initTeacherDatabase();
+    void initTeacherTable();
 public:
     Widget(QWidget *parent = nullptr);
     ~Widget();
@@ -27,6 +30,7 @@ private:
     QRegularExpression rePassword;
     bool m_isAcountOk;
     bool m_isPasswordOk;
+    CLoginContorller* m_loginContorller = nullptr;
 private:
     Ui::Widget *ui;
 };

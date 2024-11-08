@@ -9,6 +9,7 @@ Widget::Widget(QWidget *parent)
     this->setWindowTitle("在线考试系统-教师端");
     this->setWindowIcon(QIcon(":/icons/winIcon.png"));
     this->setContentsMargins(0,0,0,0);//设置布局无边界
+    this->m_loginContorller = new CLoginContorller(); //生成控制层
     this->ui->label_7->hide();
     this->ui->label_8->hide();
     this->m_isAcountOk = false;
@@ -19,7 +20,15 @@ Widget::Widget(QWidget *parent)
     this->rePassword = regex2;
     QObject::connect(this->ui->lineEdit,&QLineEdit::textChanged,this,&Widget::onAccountChange);
     QObject::connect(this->ui->lineEdit_2,&QLineEdit::textChanged,this,&Widget::onPasswordChange);
-    QObject::connect(this->ui->pushButton,&QPushButton::clicked,this,&Widget::login);
+    QObject::connect(this->ui->pushButton,&QPushButton::clicked,this,&Widget::login);   
+    QObject::connect(this,&Widget::initTeacherDatabase,[=](){ //初始化教师数据库
+        this->m_loginContorller->initTeacherDatabase();
+    });
+    QObject::connect(this,&Widget::initTeacherTable,[=](){//初始化教师数据库表
+        this->m_loginContorller->initTeacherTable();
+    });
+    emit this->initTeacherDatabase(); //注意先绑定信号槽，再进行发出信号
+    emit this->initTeacherTable();
 }
 
 void Widget::login() //执行登录逻辑
@@ -35,6 +44,25 @@ void Widget::login() //执行登录逻辑
         QMessageBox* box = new QMessageBox(QMessageBox::Warning,"错误提示","职工号或密码输入格式不正确！",QMessageBox::Ok);
         box->exec();
         delete box;
+    }else
+    {
+       //调用登录控制层
+        QString acount = this->ui->lineEdit->text();
+        QString password = this->ui->lineEdit_2->text();
+        bool ret =  this->m_loginContorller->login(acount,password);
+        if(ret)
+        {
+            //登录成功,进入到主页面
+            QMessageBox* box = new QMessageBox(QMessageBox::Information,"登录反馈","登录成功!",QMessageBox::Ok);
+            box->exec();
+            delete box;
+        }else
+        {
+            //登录失败
+            QMessageBox* box = new QMessageBox(QMessageBox::Warning,"登录反馈","登录失败，职工号或密码错误!",QMessageBox::Ok);
+            box->exec();
+            delete box;
+        }
     }
 }
 
@@ -64,6 +92,11 @@ void Widget::onPasswordChange(QString str)
 
 Widget::~Widget()
 {
+    if(this->m_loginContorller != nullptr)
+    {
+        delete this->m_loginContorller;
+        this->m_loginContorller = nullptr;
+    }
     delete ui;
 }
 
