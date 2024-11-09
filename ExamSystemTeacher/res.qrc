@@ -5,5 +5,6 @@
         <file>icons/line.png</file>
         <file>icons/acount.png</file>
         <file>icons/password.png</file>
+        <file>icons/rightPassword.png</file>
     </qresource>
 </RCC>

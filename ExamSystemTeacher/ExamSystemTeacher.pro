@@ -14,6 +14,7 @@ SOURCES += \
     logincontorller.cpp \
     loginmodel.cpp \
     main.cpp \
+    registerdlg.cpp \
     widget.cpp
 
 HEADERS += \
@@ -21,9 +22,11 @@ HEADERS += \
     dbhelper.h \
     logincontorller.h \
     loginmodel.h \
+    registerdlg.h \
     widget.h
 
 FORMS += \
+    registerdlg.ui \
     widget.ui
 
 # Default rules for deployment.

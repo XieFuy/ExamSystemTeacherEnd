@@ -7,6 +7,7 @@
 #include <QMessageBox>
 #include "logincontorller.h"
 #include<QDebug>
+#include "registerdlg.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class Widget; }
@@ -26,12 +27,14 @@ public slots:
     void onPasswordChange(QString str);//密码输入改变
 private:
     void login(); //登录函数
+    void initRegisterDlg();//初始化注册界面
 private:
     QRegularExpression reAacount;
     QRegularExpression rePassword;
     bool m_isAcountOk;
     bool m_isPasswordOk;
     CLoginContorller* m_loginContorller = nullptr;
+    RegisterDlg* m_registerDlg = nullptr; //注册界面
 private:
     Ui::Widget *ui;
 };
