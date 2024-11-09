@@ -26,7 +26,7 @@ Widget::Widget(QWidget *parent)
     });
     QObject::connect(this,&Widget::initTeacherTable,[=](){//初始化教师数据库表
         this->m_loginContorller->initTeacherTable();
-    });
+    });   
     QObject::connect(this->ui->pushButton_2,&QPushButton::clicked,this,&Widget::initRegisterDlg);
     emit this->initTeacherDatabase(); //注意先绑定信号槽，再进行发出信号
     emit this->initTeacherTable();
@@ -41,7 +41,7 @@ void Widget::initRegisterDlg()
         this->hide();
         this->m_registerDlg->show();
         QObject::connect(this->m_registerDlg,&RegisterDlg::rejected,[=](){//监听信号槽必须确保监听的对象已经生成的时刻进行绑定信号槽
-            this->setGeometry(this->m_registerDlg->x(),this->m_registerDlg->y(),this->width(),this->height());
+            this->move(this->m_registerDlg->x(),this->m_registerDlg->y());
             this->show();
             if(this->m_registerDlg != nullptr)
             {
