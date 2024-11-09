@@ -6,6 +6,7 @@
 #include <QRegularExpressionMatch>
 #include <QMessageBox>
 #include "logincontorller.h"
+#include<QDebug>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class Widget; }
