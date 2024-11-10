@@ -8,6 +8,7 @@
 #include "logincontorller.h"
 #include<QDebug>
 #include "registerdlg.h"
+#include "mainmenuedlg.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class Widget; }
@@ -35,6 +36,7 @@ private:
     bool m_isPasswordOk;
     CLoginContorller* m_loginContorller = nullptr;
     RegisterDlg* m_registerDlg = nullptr; //注册界面
+    CMainMenueDlg* m_mainMenueDlg = nullptr; //主菜单界面
 private:
     Ui::Widget *ui;
 };

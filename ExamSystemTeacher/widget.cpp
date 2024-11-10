@@ -48,6 +48,10 @@ void Widget::initRegisterDlg()
                 delete this->m_registerDlg;
                 this->m_registerDlg = nullptr;
             }
+            this->ui->lineEdit->setText("");
+            this->ui->lineEdit_2->setText("");
+            this->ui->label_7->hide();
+            this->ui->label_8->hide();
         });
     }
 }
@@ -74,9 +78,27 @@ void Widget::login() //执行登录逻辑
         if(ret)
         {
             //登录成功,进入到主页面
-            QMessageBox* box = new QMessageBox(QMessageBox::Warning,"登录反馈","登录成功!",QMessageBox::Ok);
-            box->exec();
-            delete box;
+            if(this->m_mainMenueDlg == nullptr)
+            {
+                this->m_mainMenueDlg = new CMainMenueDlg();
+                this->m_mainMenueDlg->move(20,20);
+                this->m_mainMenueDlg->show();
+                this->hide();
+                //监听主菜单页面的退出消息
+                QObject::connect(this->m_mainMenueDlg,&CMainMenueDlg::rejected,[=](){
+                    //对界面进行销毁释放内存
+                    this->show();
+                    this->ui->lineEdit->setText("");
+                    this->ui->lineEdit_2->setText("");
+                    this->ui->label_7->hide();
+                    this->ui->label_8->hide();
+                    if(this->m_mainMenueDlg != nullptr)
+                    {
+                        delete  this->m_mainMenueDlg;
+                        this->m_mainMenueDlg = nullptr;
+                    }
+                });
+            }
         }else
         {
             //登录失败
@@ -117,6 +139,11 @@ Widget::~Widget()
     {
         delete this->m_loginContorller;
         this->m_loginContorller = nullptr;
+    }
+    if(this->m_mainMenueDlg != nullptr)
+    {
+        delete this->m_mainMenueDlg;
+        this->m_mainMenueDlg = nullptr;
     }
     delete ui;
 }

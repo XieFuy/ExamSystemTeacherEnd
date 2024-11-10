@@ -6,5 +6,7 @@
         <file>icons/acount.png</file>
         <file>icons/password.png</file>
         <file>icons/rightPassword.png</file>
+        <file>icons/defaultHead.png</file>
+        <file>icons/exitLogin.png</file>
     </qresource>
 </RCC>

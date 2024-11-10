@@ -8,9 +8,8 @@ public:
     CRegisterModel();
     ~CRegisterModel();
 public:
-  void registerTeacherInfo(char* pAcount,char* pPassword);
+  int registerTeacherInfo(char* pAcount,char* pPassword);
 private:
-
 };
 
 #endif // CREGISTERMODEL_H

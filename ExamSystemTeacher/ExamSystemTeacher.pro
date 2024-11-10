@@ -11,9 +11,11 @@ CONFIG += c++11
 SOURCES += \
     clientsocket.cpp \
     dbhelper.cpp \
+    exitlogindlg.cpp \
     logincontorller.cpp \
     loginmodel.cpp \
     main.cpp \
+    mainmenuedlg.cpp \
     registercontorller.cpp \
     registerdlg.cpp \
     registermodel.cpp \
@@ -22,14 +24,18 @@ SOURCES += \
 HEADERS += \
     clientsocket.h \
     dbhelper.h \
+    exitlogindlg.h \
     logincontorller.h \
     loginmodel.h \
+    mainmenuedlg.h \
     registercontorller.h \
     registerdlg.h \
     registermodel.h \
     widget.h
 
 FORMS += \
+    exitlogindlg.ui \
+    mainmenuedlg.ui \
     registerdlg.ui \
     widget.ui
 

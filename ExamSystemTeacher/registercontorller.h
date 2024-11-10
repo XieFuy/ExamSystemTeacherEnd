@@ -9,7 +9,7 @@ class CRegisterContorller //注册控制层
 public:
     CRegisterContorller();
     ~CRegisterContorller();
-    void registerTeacherInfo(QString acount,QString password);//注册教师信息
+    int registerTeacherInfo(QString acount,QString password);//注册教师信息
 private:
     CRegisterModel* m_registerModel = nullptr;
 };

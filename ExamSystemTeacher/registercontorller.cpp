@@ -14,7 +14,7 @@ CRegisterContorller::~CRegisterContorller()
     }
 }
 
-void CRegisterContorller::registerTeacherInfo(QString acount,QString password)
+int CRegisterContorller::registerTeacherInfo(QString acount,QString password)
 {
     QByteArray acountArr = acount.toUtf8();
     QByteArray passwordArr = password.toUtf8();

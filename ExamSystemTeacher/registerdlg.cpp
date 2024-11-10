@@ -105,7 +105,15 @@ void RegisterDlg::checkRegisterInfo()
          //调用控制层进行执行注册逻辑
         QString acount = this->ui->lineEdit->text().trimmed();
         QString password = this->ui->lineEdit_2->text().trimmed();
-        this->m_registerContorller->registerTeacherInfo(acount,password);
+        int ret =  this->m_registerContorller->registerTeacherInfo(acount,password);
+        if(ret == 1)
+        {
+            //提示账号已存在不允许注册
+            QMessageBox* box = new QMessageBox(QMessageBox::Information,"注册提示","注册的职工号已被注册，请重新输入!",QMessageBox::Ok);
+            box->exec();
+            delete box;
+            return;
+        }
         //提示注册成功
         QMessageBox* box = new QMessageBox(QMessageBox::Information,"注册提示","注册成功!",QMessageBox::Ok);
         box->exec();
