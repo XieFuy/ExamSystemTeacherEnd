@@ -68,13 +68,15 @@ void Widget::login() //执行登录逻辑
     }else
     {
        //调用登录控制层
-        QString acount = this->ui->lineEdit->text();
-        QString password = this->ui->lineEdit_2->text();
+        QString acount = this->ui->lineEdit->text().trimmed();
+        QString password = this->ui->lineEdit_2->text().trimmed();
         bool ret =  this->m_loginContorller->login(acount,password);
         if(ret)
         {
             //登录成功,进入到主页面
-
+            QMessageBox* box = new QMessageBox(QMessageBox::Warning,"登录反馈","登录成功!",QMessageBox::Ok);
+            box->exec();
+            delete box;
         }else
         {
             //登录失败

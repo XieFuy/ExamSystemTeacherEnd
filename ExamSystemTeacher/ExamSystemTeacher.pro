@@ -14,7 +14,9 @@ SOURCES += \
     logincontorller.cpp \
     loginmodel.cpp \
     main.cpp \
+    registercontorller.cpp \
     registerdlg.cpp \
+    registermodel.cpp \
     widget.cpp
 
 HEADERS += \
@@ -22,7 +24,9 @@ HEADERS += \
     dbhelper.h \
     logincontorller.h \
     loginmodel.h \
+    registercontorller.h \
     registerdlg.h \
+    registermodel.h \
     widget.h
 
 FORMS += \
