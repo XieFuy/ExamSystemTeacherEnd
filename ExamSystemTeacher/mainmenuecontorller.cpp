@@ -21,5 +21,5 @@ bool CMainMenueContorller::initTeacherInfoTable()
 
 std::vector<std::vector<std::string>> CMainMenueContorller::showTeacherInfo()
 {
-    this->m_mainMenueModel->
+    //this->m_mainMenueModel->
 }
