@@ -158,3 +158,15 @@ int CDBHelper::sqlQueryCount(const std::string& sql, const std::string& database
     this->distoryMysql();
     return Count;
 }
+
+std::string CDBHelper::multiMytesChange(std::string& sql)
+{
+    int size =  MultiByteToWideChar(CP_UTF8,0,sql.c_str(),-1,nullptr,0);
+    std::wstring wStr(size,'\0');
+    MultiByteToWideChar(CP_UTF8,0,sql.c_str(),-1,&wStr[0],size);
+    //再转为正常的多字节
+    size = WideCharToMultiByte(CP_ACP,0,&wStr[0],wStr.size(),nullptr,0,nullptr,nullptr);
+    std::string ret(size,'\0');
+    WideCharToMultiByte(CP_ACP,0,&wStr[0],wStr.size(),&ret[0],size,nullptr,nullptr);
+    return ret;
+}

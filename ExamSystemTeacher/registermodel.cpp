@@ -28,6 +28,11 @@ int CRegisterModel::registerTeacherInfo(char* pAcount,char* pPassword)
     sprintf(buf,"insert into `Teacher`(`teacherId`,`password`,`role`) values('%s','%s','teacher');",pAcount,pPassword);
     sql = buf;
     bool ret =  dbHelper->sqlExcute(sql,"ExamSystem");
+    //在完成注册时候还要进行一个对教师信息表的插入
+    memset(buf,'\0',sizeof(char) * 1024);
+    sprintf(buf,"insert into `TeacherInfo` (`teacherId`) values('%s');",pAcount);
+    sql = buf;
+    ret = dbHelper->sqlExcute(sql,"ExamSystem");
     return 0;
 }
 

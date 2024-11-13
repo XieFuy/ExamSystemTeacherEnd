@@ -15,7 +15,9 @@ SOURCES += \
     logincontorller.cpp \
     loginmodel.cpp \
     main.cpp \
+    mainmenuecontorller.cpp \
     mainmenuedlg.cpp \
+    mainmenuemodel.cpp \
     registercontorller.cpp \
     registerdlg.cpp \
     registermodel.cpp \
@@ -27,7 +29,9 @@ HEADERS += \
     exitlogindlg.h \
     logincontorller.h \
     loginmodel.h \
+    mainmenuecontorller.h \
     mainmenuedlg.h \
+    mainmenuemodel.h \
     registercontorller.h \
     registerdlg.h \
     registermodel.h \
