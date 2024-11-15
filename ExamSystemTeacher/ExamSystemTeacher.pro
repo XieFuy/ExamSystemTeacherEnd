@@ -18,6 +18,8 @@ SOURCES += \
     mainmenuecontorller.cpp \
     mainmenuedlg.cpp \
     mainmenuemodel.cpp \
+    namechangedlg.cpp \
+    phonenumberchangedlg.cpp \
     registercontorller.cpp \
     registerdlg.cpp \
     registermodel.cpp \
@@ -32,6 +34,8 @@ HEADERS += \
     mainmenuecontorller.h \
     mainmenuedlg.h \
     mainmenuemodel.h \
+    namechangedlg.h \
+    phonenumberchangedlg.h \
     registercontorller.h \
     registerdlg.h \
     registermodel.h \
@@ -40,6 +44,8 @@ HEADERS += \
 FORMS += \
     exitlogindlg.ui \
     mainmenuedlg.ui \
+    namechangedlg.ui \
+    phonenumberchangedlg.ui \
     registerdlg.ui \
     widget.ui
 

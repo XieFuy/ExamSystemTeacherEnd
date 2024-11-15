@@ -11,7 +11,9 @@ public:
     ~CMainMenueContorller();
 public :
     bool initTeacherInfoTable();
-    std::vector<std::vector<std::string>> showTeacherInfo();
+    std::vector<std::vector<std::string>> showTeacherInfo(QString acount);
+    std::vector<std::vector<std::string>> showTeacherAcountInfo(QString acount);
+    void changeGender(bool isMan,QString pAcount);
 private:
     CMainMenueModel* m_mainMenueModel = nullptr;
 };

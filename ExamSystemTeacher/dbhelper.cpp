@@ -82,8 +82,14 @@ std::vector<std::vector<std::string>> CDBHelper::sqlQuery(const std::string& sql
         {
             MYSQL_ROW row =  mysql_fetch_row(result);
             std::vector<std::string> m_row;
-            for (unsigned int j = 0 ; j < nFields;j++)
+            for (unsigned int j = 0 ; j < nFields;j++)  //如果返回值为null的话就插入一个'null'的字符串
             {
+                std::cout<<row[j]<<std::endl;
+                if(row[j] == nullptr)
+                {
+                    m_row.push_back("null");
+                    continue;
+                }
                 m_row.push_back(row[j]);
             }
             m_result.push_back(m_row);

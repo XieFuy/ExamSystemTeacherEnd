@@ -180,7 +180,7 @@ color:#ffffff;
    <widget class="QLabel" name="label_3">
     <property name="geometry">
      <rect>
-      <x>90</x>
+      <x>100</x>
       <y>120</y>
       <width>91</width>
       <height>31</height>
@@ -465,7 +465,7 @@ color:#50b8f7;
     </rect>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>5</number>
    </property>
    <widget class="QWidget" name="page">
     <widget class="QWidget" name="widget_3" native="true">
@@ -2447,26 +2447,6 @@ border:none;
       </property>
       <property name="styleSheet">
        <string notr="true">#pushButton_22
-{
-color:#3b90ff;
-border:none;
-}</string>
-      </property>
-      <property name="text">
-       <string>修改</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="pushButton_23">
-      <property name="geometry">
-       <rect>
-        <x>300</x>
-        <y>180</y>
-        <width>51</width>
-        <height>28</height>
-       </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">#pushButton_23
 {
 color:#3b90ff;
 border:none;

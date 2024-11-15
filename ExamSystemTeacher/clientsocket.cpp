@@ -79,6 +79,8 @@ void CClientSocket::initSocket()
         qDebug()<<"socket Error！ errorno: "<<WSAGetLastError();
         return ;
     }
+    int size = 1024*1024*2;
+    setsockopt(this->m_clientSocket, SOL_SOCKET, SO_SNDBUF, (const char *)&size, sizeof(size));
     this->m_sockAddrClient.sin_port = htons(9527); //客户端连接9527端口
     this->m_sockAddrClient.sin_family = AF_INET;
     this->m_sockAddrClient.sin_addr.S_un.S_addr = inet_addr("120.78.122.212"); //填入服务器的地址
@@ -109,7 +111,20 @@ int CClientSocket::Recv(char* buffer)
     {
         return -1;
     }
-    return recv(this->m_clientSocket,buffer,this->m_packetSize,0);
+
+    //循环接收直到接收完毕一个数据包为止
+    long long alReadRecv = 0;
+    long long recvCount = this->m_packetSize;
+    while(true)
+    {
+        int ret =  recv(this->m_clientSocket,buffer + alReadRecv,recvCount - alReadRecv,0);
+        if(ret <= 0)
+        {
+            break;
+        }
+        alReadRecv += ret;
+    }
+    return alReadRecv;
 }
 
 void CClientSocket::closeSocket()

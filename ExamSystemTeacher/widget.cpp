@@ -83,6 +83,8 @@ void Widget::login() //执行登录逻辑
                 this->m_mainMenueDlg = new CMainMenueDlg();
                 this->m_mainMenueDlg->move(20,20);
                 this->m_mainMenueDlg->show();
+                this->m_mainMenueDlg->setLoginedAcount(acount);
+                emit this->m_mainMenueDlg->startShowTeacherInfo(acount);
                 this->hide();
                 //监听主菜单页面的退出消息
                 QObject::connect(this->m_mainMenueDlg,&CMainMenueDlg::rejected,[=](){

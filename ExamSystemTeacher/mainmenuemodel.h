@@ -12,7 +12,9 @@ public:
     ~CMainMenueModel();
 public:
     bool initTeacherInfoTable();
-    std::vector<std::vector<std::string>> showTeacherInfo();
+    std::vector<std::vector<std::string>> showTeacherInfo(char* pAcount);
+    std::vector<std::vector<std::string>> showTeacherAcountInfo(char* pAcount);
+    void changeGender(bool isMan,char* pAcount);
 };
 
 #endif // CMAINMENUEMODEL_H
