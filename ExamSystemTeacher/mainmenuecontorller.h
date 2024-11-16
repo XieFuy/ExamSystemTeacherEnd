@@ -14,6 +14,7 @@ public :
     std::vector<std::vector<std::string>> showTeacherInfo(QString acount);
     std::vector<std::vector<std::string>> showTeacherAcountInfo(QString acount);
     void changeGender(bool isMan,QString pAcount);
+    void changeHeadPicture(QString LocalFilePath,QString acount);
 private:
     CMainMenueModel* m_mainMenueModel = nullptr;
 };

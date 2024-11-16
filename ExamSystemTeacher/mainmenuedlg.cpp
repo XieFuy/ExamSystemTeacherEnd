@@ -133,7 +133,7 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
         this->ui->pushButton_10->setStyleSheet("QPushButton{border:none;border:1px solid #faa046;color:#faa046;border-radius:20;}QPushButton:hover{border:1px solid #50b8f7;color:#50b8f7;}");
     });
 
-    //进行员工职员信息回显
+    //进行员工职员姓名和头像回显
     QObject::connect(this,&CMainMenueDlg::startShowTeacherInfo,this,&CMainMenueDlg::showTeacherInfo);
     //监听头像UI更新信号
     QObject::connect(this,&CMainMenueDlg::startShowHeadImage,this,&CMainMenueDlg::showHeadImageUI);
@@ -178,6 +178,24 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
     });
     //如果选的不是男就设置为女
     QObject::connect(this->ui->radioButton_7,&QRadioButton::toggled,this,&CMainMenueDlg::changeGender);
+    QObject::connect(this->ui->pushButton_2,&QPushButton::clicked,this,&CMainMenueDlg::headPictureChange);
+}
+
+void CMainMenueDlg::headPictureChange()
+{
+    QString fileName = QFileDialog::getOpenFileName(
+         this,
+         tr("请选择PNG图片,并且单张图片不得超过2MB"),
+         QDir::homePath(),
+         tr("PNG Files (*.png);;All Files (*)")
+     );
+     if (!fileName.isEmpty()) {
+       qDebug()<<fileName;
+       this->m_mainMenueContorller->changeHeadPicture(fileName,this->m_acount);
+       emit this->startShowTeacherInfo(this->m_acount);
+     } else {
+       return;
+     }
 }
 
 void CMainMenueDlg::changeGender(bool isChecked)

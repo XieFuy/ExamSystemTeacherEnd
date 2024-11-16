@@ -14,6 +14,7 @@
 #include "clientsocket.h"
 #include "namechangedlg.h"
 #include "phonenumberchangedlg.h"
+#include <QFileDialog>
 
 namespace Ui {
 class CMainMenueDlg;  //主菜单管理页面
@@ -57,6 +58,7 @@ private:
     void showHeadImageUI(QImage image); //从服务器中请求到数据后进行UI更新
     void showTeacherAcountInfo();//显示职工账号管理信息
     void changeGender(bool isChecked); //进行更改性别
+    void headPictureChange();//进行头像更换
 private:
     Ui::CMainMenueDlg *ui;
 };

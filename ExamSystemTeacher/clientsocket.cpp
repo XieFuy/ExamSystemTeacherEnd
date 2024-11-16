@@ -96,13 +96,26 @@ bool CClientSocket::connectToServer()
     return true;
 }
 
+
+/*以后优化的点，send*/
 int CClientSocket::Send(char* pData)
 {
     if(pData == nullptr)
     {
         return -1;
     }
-    return  send(this->m_clientSocket,pData,this->m_packetSize,0);
+
+    long long alReadySend = 0;
+    long long sendCount = this->m_packetSize;
+    while (true) {
+        int ret  =  send(this->m_clientSocket,pData + alReadySend,sendCount - alReadySend,0);
+        if(ret <= 0)
+        {
+            break;
+        }
+        alReadySend += ret;
+    }
+    return  alReadySend;
 }
 
 int CClientSocket::Recv(char* buffer)
