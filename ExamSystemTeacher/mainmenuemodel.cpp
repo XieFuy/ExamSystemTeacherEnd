@@ -132,3 +132,127 @@ ENGINE=InnoDB DEFAULT CHARSET=utf8;";
    sql =  dbHelper->multiMytesChange(sql);
    return  dbHelper->sqlExcute(sql,"ExamSystem");
 }
+
+bool CMainMenueModel::initSingleChoiceTable()
+{
+    CDBHelper* dbHelper = CDBHelper::getInstance();
+    std::string sql;
+    sql = "use `ExamSystem`;";
+    dbHelper->sqlExcute(sql);
+    sql= "create table  if not exists `singleChoice`(\
+`id` integer primary key auto_increment,\
+`grade` double default 0.0 not null,\
+`question` varchar(1000)   not null default '',\
+`sessionA` varchar(1000)  not null default '',\
+`sessionB` varchar(1000)  not null default '',\
+`sessionC` varchar(1000)  not null default '',\
+`sessionD` varchar(1000) not null default '',\
+`correctOptions` varchar(2) not null,\
+`order` integer not null default  0, \
+`testPaperId` integer not null default 0,\
+foreign key(`testPaperId`) references `testPaperInfo`(`testPaperId`)\
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;";
+   sql =  dbHelper->multiMytesChange(sql);
+   return  dbHelper->sqlExcute(sql,"ExamSystem");
+}
+
+bool CMainMenueModel::initMultiChoiceTable()
+{
+    CDBHelper* dbHelper = CDBHelper::getInstance();
+    std::string sql;
+    sql = "use `ExamSystem`;";
+    dbHelper->sqlExcute(sql);
+    sql= "create table  if not exists `multiChoice`(\
+`id` integer primary key auto_increment,\
+`grade` double default 0.0 not null,\
+`question` varchar(1000)   not null default '',\
+`sessionA` varchar(1000)  not null default '',\
+`sessionB` varchar(1000)  not null default '',\
+`sessionC` varchar(1000)  not null default '',\
+`sessionD` varchar(1000) not null default '',\
+`sessionE` varchar(1000) not null default '',\
+`sessionF` varchar(1000) not null default '',\
+`correctOptions` varchar(20) not null,\
+`order` integer not null default  0, \
+`testPaperId` integer not null default 0,\
+foreign key(`testPaperId`) references `testPaperInfo`(`testPaperId`)\
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;";
+   sql =  dbHelper->multiMytesChange(sql);
+   return  dbHelper->sqlExcute(sql,"ExamSystem");
+}
+
+bool CMainMenueModel::initJudgeTable()
+{
+    CDBHelper* dbHelper = CDBHelper::getInstance();
+    std::string sql;
+    sql = "use `ExamSystem`;";
+    dbHelper->sqlExcute(sql);
+    sql= "create table  if not exists `judge`(\
+`id` integer primary key auto_increment,\
+`grade` double default 0.0 not null,\
+`question` varchar(1000)   not null default '',\
+`sessionTrue` varchar(1000)  not null default '',\
+`sessionFalse` varchar(1000)  not null default '',\
+`correctAnswer` varchar(2) not null,\
+`order` integer not null default  0, \
+`testPaperId` integer not null default 0,\
+foreign key(`testPaperId`) references `testPaperInfo`(`testPaperId`)\
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;";
+   sql =  dbHelper->multiMytesChange(sql);
+   return  dbHelper->sqlExcute(sql,"ExamSystem");
+}
+
+bool CMainMenueModel::initShortAnswerTable()
+{
+    CDBHelper* dbHelper = CDBHelper::getInstance();
+    std::string sql;
+    sql = "use `ExamSystem`;";
+    dbHelper->sqlExcute(sql);
+    sql= "create table  if not exists `shortAnswer`(\
+`id` integer primary key auto_increment,\
+`grade` double default 0.0 not null,\
+`question` varchar(1000)   not null default '',\
+`referenceAnswer` varchar(2) not null,\
+`order` integer not null default  0,  \
+`testPaperId` integer not null default 0,\
+foreign key(`testPaperId`) references `testPaperInfo`(`testPaperId`)\
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;";
+   sql =  dbHelper->multiMytesChange(sql);
+   return  dbHelper->sqlExcute(sql,"ExamSystem");
+}
+
+bool CMainMenueModel::initTestPaperTable()
+{
+    CDBHelper* dbHelper = CDBHelper::getInstance();
+    std::string sql;
+    sql = "use `ExamSystem`;";
+    dbHelper->sqlExcute(sql);
+    sql= "create table if not exists `testPaperInfo`(\
+`testPaperId` integer primary key auto_increment,\
+`teacherId` varchar(20)  not null,\
+foreign key(`teacherId`) references `Teacher`(`teacherId`)\
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;";
+   sql =  dbHelper->multiMytesChange(sql);
+   return  dbHelper->sqlExcute(sql,"ExamSystem");
+}
+
+bool CMainMenueModel::addSignalChoiceInfo(double grade,const char* question,const char* sessionA,
+                         const char* sessionB,const char* sessionC,const char* sessionD,
+                         const char* correctOptions,int order)
+{
+    if(question == nullptr||question == nullptr || sessionA == nullptr||
+            sessionB == nullptr || sessionC == nullptr
+            ||sessionD == nullptr||correctOptions == nullptr)
+    {
+        return false;
+    }
+    CDBHelper* dbHelper = CDBHelper::getInstance();
+    char sqlBuf[1024];
+    memset(sqlBuf,'\0',sizeof(char) * 1024);
+    sprintf(sqlBuf,"insert into  `singleChoice` \
+(`grade`,`question`,`sessionA`,`sessionB`,`sessionC`,`sessionD`,`correctOptions`,`order`)\
+ values('%lf','%s','%s','%s','%s','%s','%s','%d');",grade,question,sessionA,
+            sessionB,sessionC,sessionD,correctOptions,order);
+ std::string sql = sqlBuf;
+   return  dbHelper->sqlExcute(sql,"ExamSystem");
+}

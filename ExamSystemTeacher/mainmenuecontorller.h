@@ -15,6 +15,14 @@ public :
     std::vector<std::vector<std::string>> showTeacherAcountInfo(QString acount);
     void changeGender(bool isMan,QString pAcount);
     void changeHeadPicture(QString LocalFilePath,QString acount);
+    bool initSingleChoiceTable();//初始化单选表
+    bool initMultiChoiceTable();//初始化多选表
+    bool initJudgeTable(); //初始化判断表
+    bool initShortAnswerTable(); //初始化简答题表
+    bool initTestPaperTable();
+    bool addSignalChoiceInfo(QString grade,QString question,QString sessionA,
+                             QString sessionB,QString sessionC,QString sessionD,
+                             QString correctOptions,int order);
 private:
     CMainMenueModel* m_mainMenueModel = nullptr;
 };

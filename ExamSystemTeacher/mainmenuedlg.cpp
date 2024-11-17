@@ -9,6 +9,10 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
     this->setWindowTitle("在线考试系统-教师端");
     this->setWindowIcon(QIcon(":/icons/winIcon.png"));
 
+    this->signalCount = 0;
+    this->multiCount = 0;
+    this->judgeCount = 0;
+    this->shortAnswerCount = 0;
     //生成控制层
     this->m_mainMenueContorller = new CMainMenueContorller();
     //设置标题栏头像为圆形
@@ -94,8 +98,78 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
     this->ui->treeWidget->addTopLevelItem(this->m_multiOerator);
     this->ui->treeWidget->addTopLevelItem(this->m_judge);
     this->ui->treeWidget->addTopLevelItem(this->m_ShortAnswer);
-    QTreeWidgetItem* test = new QTreeWidgetItem(QStringList()<<"测试");
-    this->m_signalOperator->addChild(test);
+
+    QObject::connect(this->ui->radioButton,&QRadioButton::toggled,[=](bool checked){
+        if(checked)
+        {
+            this->m_signalCorrectOptions = this->ui->radioButton->text().trimmed();
+        }else
+        {
+            this->m_signalCorrectOptions = "";
+        }
+    });
+
+    QObject::connect(this->ui->radioButton_2,&QRadioButton::toggled,[=](bool checked){
+        if(checked)
+        {
+            this->m_signalCorrectOptions = this->ui->radioButton_2->text().trimmed();
+        }else
+        {
+            this->m_signalCorrectOptions = "";
+        }
+    });
+
+    QObject::connect(this->ui->radioButton_3,&QRadioButton::toggled,[=](bool checked){
+        if(checked)
+        {
+            this->m_signalCorrectOptions = this->ui->radioButton_3->text().trimmed();
+        }else
+        {
+            this->m_signalCorrectOptions = "";
+        }
+    });
+
+    QObject::connect(this->ui->radioButton_4,&QRadioButton::toggled,[=](bool checked){
+        if(checked)
+        {
+            this->m_signalCorrectOptions = this->ui->radioButton_4->text().trimmed();
+        }else
+        {
+            this->m_signalCorrectOptions = "";
+        }
+    });
+
+
+    QObject::connect(this->ui->pushButton_14,&QPushButton::clicked,this,&CMainMenueDlg::clearSignalOption);
+
+
+    QObject::connect(this->ui->pushButton_13,&QPushButton::clicked,[=](){
+        QString str = "(";
+        QString num = QString::number(++this->signalCount);
+        str += num;
+        str +=")";
+        QTreeWidgetItem* signalItem = new QTreeWidgetItem(QStringList()<<str);
+        this->m_signalOperator->addChild(signalItem);
+        this->m_signalOperatorLst.push_back(signalItem);
+        this->m_signalMap.insert(str,this->signalCount);
+        qDebug()<<"正确选项: "<<this->m_signalCorrectOptions;
+        QMap<QString,int>::iterator pos = this->m_signalMap.find(str);
+        if(pos == this->m_signalMap.end())
+        {
+            return;
+        }
+        int order = pos.value();
+        //将数据存储到数据库中
+         this->addSignalChoiceInfo(this->ui->lineEdit->text().trimmed(),
+                                   this->ui->textEdit->toPlainText().trimmed(),
+                                   this->ui->textEdit_2->toPlainText().trimmed(),
+                                   this->ui->textEdit_3->toPlainText().trimmed(),
+                                   this->ui->textEdit_4->toPlainText().trimmed(),
+                                   this->ui->textEdit_5->toPlainText().trimmed(),
+                                   this->m_signalCorrectOptions.trimmed(),order);
+        //将UI的题进行清空
+        emit this->ui->pushButton_14->clicked();
+    });
 
     QObject::connect(this->ui->pushButton_8,&QPushButton::clicked,[=](){
         this->ui->stackedWidget_2->setCurrentIndex(0);
@@ -104,6 +178,23 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
         this->ui->pushButton_9->setStyleSheet("QPushButton{border:none;border:1px solid #faa046;color:#faa046;border-radius:20;}QPushButton:hover{border:1px solid #50b8f7;color:#50b8f7;}");
         this->ui->pushButton_10->setStyleSheet("QPushButton{border:none;border:1px solid #faa046;color:#faa046;border-radius:20;}QPushButton:hover{border:1px solid #50b8f7;color:#50b8f7;}");
         this->ui->pushButton_11->setStyleSheet("QPushButton{border:none;border:1px solid #faa046;color:#faa046;border-radius:20;}QPushButton:hover{border:1px solid #50b8f7;color:#50b8f7;}");
+    });
+
+
+
+    QObject::connect(this->ui->pushButton_15,&QPushButton::clicked,[=](){
+        QString str = "(";
+        QString num = QString::number(++this->multiCount);
+        str += num;
+        str +=")";
+        QTreeWidgetItem* multiItem = new QTreeWidgetItem(QStringList()<<str);
+        this->m_multiOerator->addChild(multiItem);
+        this->m_multiOeratorLst.push_back(multiItem);
+        this->m_multiMap.insert(str,this->multiCount);
+
+        //将数据存储到数据库中
+
+        //将UI的题进行清空
     });
 
     QObject::connect(this->ui->pushButton_9,&QPushButton::clicked,[=](){
@@ -115,13 +206,43 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
         this->ui->pushButton_11->setStyleSheet("QPushButton{border:none;border:1px solid #faa046;color:#faa046;border-radius:20;}QPushButton:hover{border:1px solid #50b8f7;color:#50b8f7;}");
     });
 
-    QObject::connect(this->ui->pushButton_10,&QPushButton::clicked,[=](){
+    QObject::connect(this->ui->pushButton_17,&QPushButton::clicked,[=](){
+        QString str = "(";
+        QString num = QString::number(++this->judgeCount);
+        str += num;
+        str +=")";
+        QTreeWidgetItem* judgeItem = new QTreeWidgetItem(QStringList()<<str);
+        this->m_judge->addChild(judgeItem);
+        this->m_judgeLst.push_back(judgeItem);
+        this->m_judgeMap.insert(str,this->judgeCount);
+
+        //将数据存储到数据库中
+
+        //将UI的题进行清空
+    });
+
+    QObject::connect(this->ui->pushButton_10,&QPushButton::clicked,[=](){       
         this->ui->stackedWidget_2->setCurrentIndex(2);
         this->ui->pushButton_10->setStyleSheet("QPushButton{border:1px solid #50b8f7;background-color:#50b8f7;color:#ffffff;border-radius:20;}");
         //其他的都要设置为原样
         this->ui->pushButton_8->setStyleSheet("QPushButton{border:none;border:1px solid #faa046;color:#faa046;border-radius:20;}QPushButton:hover{border:1px solid #50b8f7;color:#50b8f7;}");
         this->ui->pushButton_9->setStyleSheet("QPushButton{border:none;border:1px solid #faa046;color:#faa046;border-radius:20;}QPushButton:hover{border:1px solid #50b8f7;color:#50b8f7;}");
         this->ui->pushButton_11->setStyleSheet("QPushButton{border:none;border:1px solid #faa046;color:#faa046;border-radius:20;}QPushButton:hover{border:1px solid #50b8f7;color:#50b8f7;}");
+    });
+
+    QObject::connect(this->ui->pushButton_19,&QPushButton::clicked,[=](){
+        QString str = "(";
+        QString num = QString::number(++this->shortAnswerCount);
+        str += num;
+        str +=")";
+        QTreeWidgetItem* shortAnswerItem = new QTreeWidgetItem(QStringList()<<str);
+        this->m_ShortAnswer->addChild(shortAnswerItem);
+        this->m_ShortAnswerLst.push_back(shortAnswerItem);
+        this->m_shortAnswerMap.insert(str,this->shortAnswerCount);
+
+        //将数据存储到数据库中
+
+        //将UI的题进行清空
     });
 
     QObject::connect(this->ui->pushButton_11,&QPushButton::clicked,[=](){
@@ -179,6 +300,109 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
     //如果选的不是男就设置为女
     QObject::connect(this->ui->radioButton_7,&QRadioButton::toggled,this,&CMainMenueDlg::changeGender);
     QObject::connect(this->ui->pushButton_2,&QPushButton::clicked,this,&CMainMenueDlg::headPictureChange);
+
+    QObject::connect(this,&CMainMenueDlg::startInitTestPaperTable,this,&CMainMenueDlg::initTestPaperTable);
+    QObject::connect(this,&CMainMenueDlg::startInitSingleChoiceTable,this,&CMainMenueDlg::initSingleChoiceTable);
+    QObject::connect(this,&CMainMenueDlg::startInitMultiChoiceTable,this,&CMainMenueDlg::initMultiChoiceTable);
+    QObject::connect(this,&CMainMenueDlg::startInitJudgeTable,this,&CMainMenueDlg::initJudgeTable);
+    QObject::connect(this,&CMainMenueDlg::startInitShortAnswerTable,this,&CMainMenueDlg::initShortAnswerTable);
+    emit this->startInitTestPaperTable();
+    emit this->startInitSingleChoiceTable();
+    emit this->startInitMultiChoiceTable();
+    emit this->startInitJudgeTable();
+    emit this->startInitShortAnswerTable();
+}
+
+void CMainMenueDlg::clearSignalOption()
+{
+    this->ui->lineEdit->clear();
+    this->ui->textEdit->clear();
+    this->ui->textEdit_2->clear();
+    this->ui->textEdit_3->clear();
+    this->ui->textEdit_4->clear();
+    this->ui->textEdit_5->clear();
+    //设置所有的radiobutton都为未点击
+    this->ui->radioButton->setAutoExclusive(false);
+    this->ui->radioButton->setChecked(false);
+    this->ui->radioButton->setAutoExclusive(true);
+
+    this->ui->radioButton_2->setAutoExclusive(false);
+    this->ui->radioButton_2->setChecked(false);
+    this->ui->radioButton_2->setAutoExclusive(true);
+
+    this->ui->radioButton_3->setAutoExclusive(false);
+    this->ui->radioButton_3->setChecked(false);
+    this->ui->radioButton_3->setAutoExclusive(true);
+
+    this->ui->radioButton_4->setAutoExclusive(false);
+    this->ui->radioButton_4->setChecked(false);
+    this->ui->radioButton_4->setAutoExclusive(true);
+}
+
+void CMainMenueDlg::addSignalChoiceInfo(QString grade,QString question,QString sessionA,QString sessionB,QString sessionC,QString sessionD,QString correctOptions,int order)
+{
+   this->m_mainMenueContorller->addSignalChoiceInfo(grade,question,sessionA,sessionB,sessionC,sessionD,correctOptions,order);
+}
+
+void CMainMenueDlg::deleteTreeItemRecursively(QTreeWidgetItem* item) {
+    if (!item) return; // 若传入的item为空，则直接返回
+
+    // 获取并删除item的所有子项
+    int childCount = item->childCount();
+    for (int i = 0; i < childCount; ++i) {
+        deleteTreeItemRecursively(item->takeChild(0)); // 递归删除子项，
+       /*  注意：takeChild(0)会移除并返回第一个子项，
+         因此每次循环都会处理下一个子项（因为列表已经更新）。
+         如果您不希望修改原始子项列表（即不移除它们），
+         则应使用child(i)来获取子项，并手动管理索引。
+         但在此递归删除场景中，使用takeChild()是更合适的选择，
+         因为它允许我们在遍历过程中直接修改列表。*/
+    }
+    // 删除当前item（现在已无子项）
+    delete item;
+}
+
+void CMainMenueDlg::deleteAllTreeItems(QTreeWidget* treeWidget) {
+    if (!treeWidget) return; // 若传入的treeWidget为空，则直接返回
+
+    // 获取treeWidget的顶层项数量
+    int topLevelItemCount = treeWidget->topLevelItemCount();
+    for (int i = 0; i < topLevelItemCount; ++i) {
+        // 获取并删除每一个顶层项及其所有子项
+        deleteTreeItemRecursively(treeWidget->topLevelItem(i));
+    }
+     /*注意：此处我们并未清空treeWidget本身，只是删除了所有项。
+     若您希望清空treeWidget（即移除所有项的指针，但不删除它们），
+     则应在此处调用treeWidget->clear()，但请注意，这样做不会释放内存，
+     因为clear()只会移除指针，不会delete指向的对象。
+     由于我们已经递归删除了所有项，因此在此处调用clear()是多余的，
+     除非您需要在之后重新向treeWidget添加项，并希望从UI中移除所有现有项。*/
+}
+
+
+void CMainMenueDlg::initTestPaperTable()
+{
+     this->m_mainMenueContorller->initTestPaperTable();
+}
+
+void CMainMenueDlg::initSingleChoiceTable()
+{
+    this->m_mainMenueContorller->initSingleChoiceTable();
+}
+
+void CMainMenueDlg::initMultiChoiceTable()
+{
+    this->m_mainMenueContorller->initMultiChoiceTable();
+}
+
+void CMainMenueDlg::initJudgeTable()
+{
+    this->m_mainMenueContorller->initJudgeTable();
+}
+
+void CMainMenueDlg::initShortAnswerTable()
+{
+    this->m_mainMenueContorller->initShortAnswerTable();
 }
 
 void CMainMenueDlg::headPictureChange()
@@ -249,7 +473,7 @@ void  CMainMenueDlg::showTeacherInfo(QString acount)
    {
        //进行回显头像
        this->m_headPath = ret.at(0).at(1);
-       _beginthreadex(nullptr,0,&CMainMenueDlg::threadShowHeadEntry,this,0,nullptr);
+       this->m_recvHeadThead = (HANDLE)_beginthreadex(nullptr,0,&CMainMenueDlg::threadShowHeadEntry,this,0,nullptr);
    }
 }
 
@@ -370,5 +594,9 @@ CMainMenueDlg::~CMainMenueDlg()
         delete this->m_mainMenueContorller;
         this->m_mainMenueContorller = nullptr;
     }
+    //如果关闭界面，接收头像信息的线程还在执行的话就等待接收后结束线程
+    WaitForSingleObject(this->m_recvHeadThead,INFINITE); //找到退出崩溃的原因，因为关闭界面的时候，接收头像线程还在执行，但是UI已经释放导致异常
+    //释放容器中的QTreeItem
+    this->deleteAllTreeItems(this->ui->treeWidget);
     delete ui;
 }

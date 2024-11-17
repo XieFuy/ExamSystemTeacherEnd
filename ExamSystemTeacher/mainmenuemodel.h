@@ -17,6 +17,14 @@ public:
     std::vector<std::vector<std::string>> showTeacherAcountInfo(char* pAcount);
     void changeGender(bool isMan,char* pAcount);
     void changeHeadPicture(char* localFilePath,char* fileName,char* acount);
+    bool initSingleChoiceTable();
+    bool initMultiChoiceTable();
+    bool initJudgeTable();
+    bool initShortAnswerTable();
+    bool initTestPaperTable();
+    bool addSignalChoiceInfo(double grade,const char* question,const char* sessionA,
+                             const char* sessionB,const char* sessionC,const char* sessionD,
+                             const char* correctOptions,int order);
 };
 
 #endif // CMAINMENUEMODEL_H
