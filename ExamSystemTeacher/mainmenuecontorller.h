@@ -23,6 +23,12 @@ public :
     bool addSignalChoiceInfo(QString grade,QString question,QString sessionA,
                              QString sessionB,QString sessionC,QString sessionD,
                              QString correctOptions,int order);
+    bool addMultiChoiceInfo(QString grade,QString question,QString sessionA,
+                            QString sessionB,QString sessionC,QString sessionD,
+                            QString sessionE,QString sessionF,QString correctOpetions,int order);
+    bool addJudgeInfo(QString grade,QString question,QString sessionTrue,QString sessionFalse,
+                      QString correctAnswer,int order);
+    bool addShortAnswerInfo(QString grade,QString question,QString referenceAnswer,int order);
 private:
     CMainMenueModel* m_mainMenueModel = nullptr;
 };

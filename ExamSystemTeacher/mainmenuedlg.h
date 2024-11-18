@@ -65,6 +65,8 @@ private:
     CPhoneNumberChangeDlg* m_phoneNumChangeDlg = nullptr;//修改电话对话框
     HANDLE m_recvHeadThead; //接收头像信息的线程
     QString m_signalCorrectOptions;
+    QString m_multiCorrectOptions;
+    QString m_judgeAnswer;
 private:
     void initSingleChoiceTable();//初始化单选表
     void initMultiChoiceTable();//初始化多选表
@@ -83,6 +85,12 @@ private:
     void deleteTreeItemRecursively(QTreeWidgetItem* item);
     void addSignalChoiceInfo(QString grade,QString question,QString sessionA,QString sessionB,QString sessionC,QString sessionD,QString correctOptions,int order);//添加单选题信息
     void clearSignalOption();//清空单选区域
+    void clearMultiOption();//清空多选区域
+    void addMultiChoiceInfo(QString grade,QString question,QString sessionA,QString sessionB,QString sessionC,QString sessionD,QString sessionE,QString sessionF,QString correctOpetions,int order);
+    void addJudgeInfo(QString grade,QString question,QString sessionTrue,QString sessionFalse,QString correctAnswer,int order); //添加判断题
+    void clearJudge(); //判断题清空
+    void addShortAnswerInfo(QString grade,QString question,QString referenceAnswer,int order);
+    void clearShortAnswer();//清空简答题
 private:
     Ui::CMainMenueDlg *ui;
 };

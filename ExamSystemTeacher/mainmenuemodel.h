@@ -25,6 +25,14 @@ public:
     bool addSignalChoiceInfo(double grade,const char* question,const char* sessionA,
                              const char* sessionB,const char* sessionC,const char* sessionD,
                              const char* correctOptions,int order);
+    bool addMultiChoiceInfo(double grade,const char* question,const char* sessionA,
+                            const char* sessionB,const char* sessionC,const char* sessionD,
+                            const char* sessionE,const char* sessionF,const char* correctOpetions,
+                            int order);
+    bool addJudgeInfo(double grade,const char* question,const char* sessionTrue,
+                      const char* sessionFalse,
+                      const char* correctAnswer,int order);
+    bool addShortAnswerInfo(double grade,const char* question,const char* referenceAnswer,int order);
 };
 
 #endif // CMAINMENUEMODEL_H

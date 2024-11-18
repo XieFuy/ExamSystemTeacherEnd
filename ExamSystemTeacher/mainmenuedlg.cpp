@@ -13,6 +13,8 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
     this->multiCount = 0;
     this->judgeCount = 0;
     this->shortAnswerCount = 0;
+    this->m_multiCorrectOptions = "";
+    this->m_judgeAnswer = "";
     //生成控制层
     this->m_mainMenueContorller = new CMainMenueContorller();
     //设置标题栏头像为圆形
@@ -180,7 +182,7 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
         this->ui->pushButton_11->setStyleSheet("QPushButton{border:none;border:1px solid #faa046;color:#faa046;border-radius:20;}QPushButton:hover{border:1px solid #50b8f7;color:#50b8f7;}");
     });
 
-
+    QObject::connect(this->ui->pushButton_16,&QPushButton::clicked,this,&CMainMenueDlg::clearMultiOption);
 
     QObject::connect(this->ui->pushButton_15,&QPushButton::clicked,[=](){
         QString str = "(";
@@ -192,9 +194,54 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
         this->m_multiOeratorLst.push_back(multiItem);
         this->m_multiMap.insert(str,this->multiCount);
 
-        //将数据存储到数据库中
+        this->m_multiCorrectOptions = "";
+        //拿到被选项
+        if(this->ui->checkBox->isChecked() == true)
+        {
+            this->m_multiCorrectOptions +=  this->ui->checkBox->text().trimmed();
+            this->m_multiCorrectOptions += ',';
+        }
+        if(this->ui->checkBox_2->isChecked() == true)
+        {
+            this->m_multiCorrectOptions +=  this->ui->checkBox_2->text().trimmed();
+            this->m_multiCorrectOptions += ',';
+        }
+        if(this->ui->checkBox_3->isChecked() == true)
+        {
+            this->m_multiCorrectOptions +=  this->ui->checkBox_3->text().trimmed();
+            this->m_multiCorrectOptions += ',';
+        }
+        if(this->ui->checkBox_4->isChecked() == true)
+        {
+            this->m_multiCorrectOptions +=  this->ui->checkBox_4->text().trimmed();
+            this->m_multiCorrectOptions += ',';
+        }
+        if(this->ui->checkBox_5->isChecked() == true)
+        {
+            this->m_multiCorrectOptions +=  this->ui->checkBox_5->text().trimmed();
+            this->m_multiCorrectOptions += ',';
+        }
+        if(this->ui->checkBox_6->isChecked() == true)
+        {
+            this->m_multiCorrectOptions +=  this->ui->checkBox_6->text().trimmed();
+            this->m_multiCorrectOptions += ',';
+        }
+        qDebug()<<"多选选中的选项："<<this->m_multiCorrectOptions;
 
+         QMap<QString,int>::iterator ret = this->m_multiMap.find(str);
+         int order = ret.value();
+        //将数据存储到数据库中
+        this->addMultiChoiceInfo(this->ui->lineEdit_2->text().trimmed(),
+                                 this->ui->textEdit_6->toPlainText().trimmed(),
+                                 this->ui->textEdit_12->toPlainText().trimmed(),
+                                 this->ui->textEdit_7->toPlainText().trimmed(),
+                                 this->ui->textEdit_8->toPlainText().trimmed(),
+                                 this->ui->textEdit_9->toPlainText().trimmed(),
+                                 this->ui->textEdit_10->toPlainText().trimmed(),
+                                 this->ui->textEdit_11->toPlainText().trimmed(),
+                                 this->m_multiCorrectOptions,order);
         //将UI的题进行清空
+         emit this->ui->pushButton_16->clicked();
     });
 
     QObject::connect(this->ui->pushButton_9,&QPushButton::clicked,[=](){
@@ -206,6 +253,28 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
         this->ui->pushButton_11->setStyleSheet("QPushButton{border:none;border:1px solid #faa046;color:#faa046;border-radius:20;}QPushButton:hover{border:1px solid #50b8f7;color:#50b8f7;}");
     });
 
+    QObject::connect(this->ui->radioButton_5,&QRadioButton::toggled,[=](bool isChecked){
+        if(isChecked)
+        {
+            this->m_judgeAnswer = "1";
+        }else
+        {
+            this->m_judgeAnswer = "0";
+        }
+    });
+
+    QObject::connect(this->ui->radioButton_6,&QRadioButton::toggled,[=](bool isChecked){
+        if(isChecked)
+        {
+            this->m_judgeAnswer = "0";
+        }else
+        {
+            this->m_judgeAnswer = "1";
+        }
+    });
+
+    QObject::connect(this->ui->pushButton_18,&QPushButton::clicked,this,&CMainMenueDlg::clearJudge);
+
     QObject::connect(this->ui->pushButton_17,&QPushButton::clicked,[=](){
         QString str = "(";
         QString num = QString::number(++this->judgeCount);
@@ -216,9 +285,18 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
         this->m_judgeLst.push_back(judgeItem);
         this->m_judgeMap.insert(str,this->judgeCount);
 
-        //将数据存储到数据库中
+        QMap<QString,int>::iterator ret = this->m_judgeMap.find(str);
+        int order = ret.value();
 
+        qDebug()<<"正确："<<this->m_judgeAnswer;
+        //将数据存储到数据库中,判断题
+        this->addJudgeInfo(this->ui->lineEdit_3->text().trimmed(),
+                           this->ui->textEdit_13->toPlainText().trimmed(),
+                           this->ui->textEdit_14->toPlainText().trimmed(),
+                           this->ui->textEdit_15->toPlainText().trimmed(),
+                           this->m_judgeAnswer,order);
         //将UI的题进行清空
+       emit this->ui->pushButton_18->clicked();
     });
 
     QObject::connect(this->ui->pushButton_10,&QPushButton::clicked,[=](){       
@@ -230,6 +308,8 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
         this->ui->pushButton_11->setStyleSheet("QPushButton{border:none;border:1px solid #faa046;color:#faa046;border-radius:20;}QPushButton:hover{border:1px solid #50b8f7;color:#50b8f7;}");
     });
 
+    QObject::connect(this->ui->pushButton_20,&QPushButton::clicked,this,&CMainMenueDlg::clearShortAnswer);
+
     QObject::connect(this->ui->pushButton_19,&QPushButton::clicked,[=](){
         QString str = "(";
         QString num = QString::number(++this->shortAnswerCount);
@@ -240,9 +320,15 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
         this->m_ShortAnswerLst.push_back(shortAnswerItem);
         this->m_shortAnswerMap.insert(str,this->shortAnswerCount);
 
+        QMap<QString,int>::iterator ret = this->m_shortAnswerMap.find(str);
+        int order = ret.value();
         //将数据存储到数据库中
-
+        this->addShortAnswerInfo(this->ui->lineEdit_4->text().trimmed(),
+                                 this->ui->textEdit_16->toPlainText().trimmed(),
+                                 this->ui->textEdit_17->toPlainText().trimmed(),
+                                 order);
         //将UI的题进行清空
+        emit this->ui->pushButton_20->clicked();
     });
 
     QObject::connect(this->ui->pushButton_11,&QPushButton::clicked,[=](){
@@ -311,6 +397,70 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
     emit this->startInitMultiChoiceTable();
     emit this->startInitJudgeTable();
     emit this->startInitShortAnswerTable();
+}
+
+ void CMainMenueDlg::clearShortAnswer()
+ {
+     this->ui->lineEdit_4->clear();
+     this->ui->textEdit_16->clear();
+     this->ui->textEdit_17->clear();
+ }
+
+void CMainMenueDlg::addShortAnswerInfo(QString grade,QString question,QString referenceAnswer,int order)
+{
+    this->m_mainMenueContorller->addShortAnswerInfo(grade,question,referenceAnswer,order);
+}
+
+void CMainMenueDlg::clearJudge()
+{
+    this->ui->lineEdit_3->clear();
+    this->ui->textEdit_13->clear();
+    this->ui->textEdit_14->clear();
+    this->ui->textEdit_15->clear();
+
+    this->ui->radioButton_5->setAutoExclusive(false);
+    this->ui->radioButton_5->setChecked(false);
+    this->ui->radioButton_5->setAutoExclusive(true);
+
+    this->ui->radioButton_6->setAutoExclusive(false);
+    this->ui->radioButton_6->setChecked(false);
+    this->ui->radioButton_6->setAutoExclusive(true);
+}
+
+void CMainMenueDlg::addJudgeInfo(QString grade,QString question,QString sessionTrue,QString sessionFalse,QString correctAnswer,int order)
+{
+   this->m_mainMenueContorller->addJudgeInfo(grade,question,sessionTrue,sessionFalse,correctAnswer,order);
+}
+
+void CMainMenueDlg::clearMultiOption()
+{
+    this->ui->lineEdit_2->clear();
+    this->ui->textEdit_6->clear();
+    this->ui->textEdit_12->clear();
+    this->ui->textEdit_7->clear();
+    this->ui->textEdit_8->clear();
+    this->ui->textEdit_9->clear();
+    this->ui->textEdit_10->clear();
+    this->ui->textEdit_11->clear();
+
+    //清除多选框的选中
+    this->ui->checkBox->setChecked(false);
+    this->ui->checkBox_2->setChecked(false);
+    this->ui->checkBox_3->setChecked(false);
+    this->ui->checkBox_4->setChecked(false);
+    this->ui->checkBox_5->setChecked(false);
+    this->ui->checkBox_6->setChecked(false);
+}
+
+void CMainMenueDlg::addMultiChoiceInfo(QString grade,QString question,QString sessionA,
+                                       QString sessionB,QString sessionC,QString sessionD,
+                                       QString sessionE,QString sessionF,
+                                       QString correctOpetions,int order)
+{
+
+    this->m_mainMenueContorller->addMultiChoiceInfo(grade,question,sessionA,sessionB,sessionC,
+                                                    sessionD,sessionE,sessionF,
+                                                    correctOpetions,order);
 }
 
 void CMainMenueDlg::clearSignalOption()

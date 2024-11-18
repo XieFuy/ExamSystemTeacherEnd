@@ -113,3 +113,54 @@ void CMainMenueContorller::changeGender(bool isMan,QString pAcount)
     const char* acount = acountArr.data();
     this->m_mainMenueModel->changeGender(isMan,const_cast<char*>(acount));
 }
+
+bool CMainMenueContorller::addMultiChoiceInfo(QString grade,QString question,QString sessionA,
+                        QString sessionB,QString sessionC,QString sessionD,
+                        QString sessionE,QString sessionF,QString correctOpetions,int order)
+{
+    double dGrade = grade.toDouble();
+    QByteArray questionArr = question.toLocal8Bit();
+    QByteArray sessionAArr = sessionA.toLocal8Bit();
+    QByteArray sessionBArr = sessionB.toLocal8Bit();
+    QByteArray sessionCArr = sessionC.toLocal8Bit();
+    QByteArray sessionDArr = sessionD.toLocal8Bit();
+    QByteArray sessionEArr = sessionE.toLocal8Bit();
+    QByteArray sessionFArr = sessionF.toLocal8Bit();
+    QByteArray correctOpetionsArr = correctOpetions.toUtf8();
+
+    const char* pQuestion = questionArr.data();
+    const char* pSessionA = sessionAArr.data();
+    const char* pSessionB = sessionBArr.data();
+    const char* pSessionC = sessionCArr.data();
+    const char* pSessionD = sessionDArr.data();
+    const char* pSessionE = sessionEArr.data();
+    const char* pSessionF = sessionFArr.data();
+    const char* pCorrectOpetions = correctOpetionsArr.data();
+    return  this->m_mainMenueModel->addMultiChoiceInfo(dGrade,pQuestion,pSessionA,pSessionB,pSessionC,pSessionD,pSessionE,pSessionF,pCorrectOpetions,order);
+}
+
+bool CMainMenueContorller::addJudgeInfo(QString grade,QString question,QString sessionTrue,QString sessionFalse,
+                  QString correctAnswer,int order)
+{
+   double dGrade = grade.toDouble();
+   QByteArray questionArr = question.toLocal8Bit();
+   QByteArray sessionTrueArr = sessionTrue.toLocal8Bit();
+   QByteArray sessionFalseArr = sessionFalse.toLocal8Bit();
+   QByteArray correctAnswerArr = correctAnswer.toLocal8Bit();
+
+   const char* pQuestion = questionArr.data();
+   const char* pSessionTrue = sessionTrueArr.data();
+   const char* pSessionFalse = sessionFalseArr.data();
+   const char* pcorrectAnswer = correctAnswerArr.data();
+   return this->m_mainMenueModel->addJudgeInfo(dGrade,pQuestion,pSessionTrue,pSessionFalse,pcorrectAnswer,order);
+}
+
+bool CMainMenueContorller::addShortAnswerInfo(QString grade,QString question,QString referenceAnswer,int order)
+{
+    double dGrade = grade.toDouble();
+    QByteArray questionArr = question.toLocal8Bit();
+    QByteArray referenceAnswerArr = referenceAnswer.toLocal8Bit();
+    const char* pQuestion = questionArr.data();
+    const char* pReferenceAnswer = referenceAnswerArr.data();
+    return this->m_mainMenueModel->addShortAnswerInfo(dGrade,pQuestion,pReferenceAnswer,order);
+}
