@@ -28,6 +28,8 @@ CNameChangeDlg::CNameChangeDlg(QWidget *parent) :
     });
 }
 
+
+
 CNameChangeDlg::~CNameChangeDlg()
 {
     delete ui;

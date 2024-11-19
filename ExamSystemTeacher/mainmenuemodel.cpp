@@ -287,6 +287,9 @@ bool CMainMenueModel::initTestPaperTable()
     dbHelper->sqlExcute(sql);
     sql= "create table if not exists `testPaperInfo`(\
 `testPaperId` integer primary key auto_increment,\
+`testPaperName` varchar(100) not null ,\
+`saveTime` datetime not null,\
+`publishStatus` varchar(2) not null default '0',\
 `teacherId` varchar(20)  not null,\
 foreign key(`teacherId`) references `Teacher`(`teacherId`)\
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;";

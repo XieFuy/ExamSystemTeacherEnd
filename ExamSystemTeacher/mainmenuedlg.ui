@@ -726,7 +726,7 @@ color:#50b8f7;
 }</string>
         </property>
         <property name="text">
-         <string>新建试卷</string>
+         <string>保存试卷</string>
         </property>
        </widget>
       </widget>

@@ -397,6 +397,80 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
     emit this->startInitMultiChoiceTable();
     emit this->startInitJudgeTable();
     emit this->startInitShortAnswerTable();
+
+    QObject::connect(this->ui->pushButton_12,&QPushButton::clicked,[=](){
+        if(this->m_testPaperSaveDlg == nullptr)
+        {
+            this->m_testPaperSaveDlg = new CTestPaperSaveDlg();
+            //给对话框的属性进行赋值
+            this->m_testPaperSaveDlg->m_acount = this->m_acount;
+            this->m_testPaperSaveDlg->move((this->width() - this->m_testPaperSaveDlg->width()) / 2,
+                                           (this->height() - this->m_testPaperSaveDlg->height()) / 2);
+            this->m_testPaperSaveDlg->show();
+            //监听返回信号
+            QObject::connect(this->m_testPaperSaveDlg,&CTestPaperSaveDlg::rejected,[=](){
+                if(this->m_testPaperSaveDlg != nullptr)
+                {
+                    delete this->m_testPaperSaveDlg;
+                    this->m_testPaperSaveDlg = nullptr;
+                }
+                //清除所有的项
+                this->clearTreeItemSignal();
+                this->clearTreeItemMulti();
+                this->clearTreeItemJudge();
+                this->clearTreeItemShortAnswer();
+            });
+        }
+    });
+
+}
+
+void CMainMenueDlg::clearTreeItemSignal()
+{
+    for(int i = 0 ; i < this->m_signalOperatorLst.size();i++)
+    {
+        QTreeWidgetItem* item = this->m_signalOperatorLst.at(i);
+        delete item;
+    }
+    this->m_signalOperatorLst.clear();
+    this->m_signalMap.clear();
+    this->signalCount = 0;
+}
+
+void CMainMenueDlg::clearTreeItemMulti()
+{
+    for(int i = 0 ; i < this->m_multiOeratorLst.size();i++)
+    {
+        QTreeWidgetItem* item = this->m_multiOeratorLst.at(i);
+        delete item;
+    }
+    this->m_multiOeratorLst.clear();
+    this->m_multiMap.clear();
+    this->multiCount = 0;
+}
+
+void CMainMenueDlg::clearTreeItemJudge()
+{
+    for(int i = 0 ; i < this->m_judgeLst.size();i++)
+    {
+        QTreeWidgetItem* item = this->m_judgeLst.at(i);
+        delete item;
+    }
+    this->m_judgeLst.clear();
+    this->m_judgeMap.clear();
+    this->judgeCount = 0;
+}
+
+void CMainMenueDlg::clearTreeItemShortAnswer()
+{
+    for(int i = 0 ; i < this->m_ShortAnswerLst.size();i++)
+    {
+        QTreeWidgetItem* item = this->m_ShortAnswerLst.at(i);
+        delete item;
+    }
+    this->m_ShortAnswerLst.clear();
+    this->m_shortAnswerMap.clear();
+    this->shortAnswerCount = 0;
 }
 
  void CMainMenueDlg::clearShortAnswer()

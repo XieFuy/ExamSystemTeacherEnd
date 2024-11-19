@@ -23,6 +23,7 @@ SOURCES += \
     registercontorller.cpp \
     registerdlg.cpp \
     registermodel.cpp \
+    testpapersavedlg.cpp \
     widget.cpp
 
 HEADERS += \
@@ -39,6 +40,7 @@ HEADERS += \
     registercontorller.h \
     registerdlg.h \
     registermodel.h \
+    testpapersavedlg.h \
     widget.h
 
 FORMS += \
@@ -47,6 +49,7 @@ FORMS += \
     namechangedlg.ui \
     phonenumberchangedlg.ui \
     registerdlg.ui \
+    testpapersavedlg.ui \
     widget.ui
 
 # Default rules for deployment.

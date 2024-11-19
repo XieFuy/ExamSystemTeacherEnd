@@ -15,6 +15,7 @@
 #include "namechangedlg.h"
 #include "phonenumberchangedlg.h"
 #include <QFileDialog>
+#include "testpapersavedlg.h"
 
 namespace Ui {
 class CMainMenueDlg;  //主菜单管理页面
@@ -67,7 +68,12 @@ private:
     QString m_signalCorrectOptions;
     QString m_multiCorrectOptions;
     QString m_judgeAnswer;
+    CTestPaperSaveDlg* m_testPaperSaveDlg = nullptr;
 private:
+    void clearTreeItemSignal();
+    void clearTreeItemMulti();
+    void clearTreeItemJudge();
+    void clearTreeItemShortAnswer();
     void initSingleChoiceTable();//初始化单选表
     void initMultiChoiceTable();//初始化多选表
     void initJudgeTable(); //初始化判断表
