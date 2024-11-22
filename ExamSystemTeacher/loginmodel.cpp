@@ -45,7 +45,7 @@ bool CLoginModel::login(char* acount,char* password,int acountSize,int passwordS
     delete recvBuffer;
     return result;
 */
-    CDBHelper* dbHelper = CDBHelper::getInstance();
+    CDBHelper* dbHelper = new CDBHelper();
     std::string sql = "use `ExamSystem`;";
     dbHelper->sqlExcute(sql);
     char buffer[1024];
@@ -61,19 +61,23 @@ bool CLoginModel::login(char* acount,char* password,int acountSize,int passwordS
     {
         result = false;
     }
+    delete dbHelper;
     return result;
 }
 
 void CLoginModel::initTeacherDatabase()
 {
-    CDBHelper* dbHelper = CDBHelper::getInstance();
+//    CDBHelper* dbHelper = CDBHelper::getInstance();
+    CDBHelper* dbHelper = new CDBHelper();
     std::string sql =  "create database if not exists `ExamSystem`;";
     dbHelper->sqlExcute(sql);
+    delete dbHelper;
 }
 
 void CLoginModel::initTeacherTable()
 {
-    CDBHelper* dbHelper = CDBHelper::getInstance();
+//    CDBHelper* dbHelper = CDBHelper::getInstance();
+    CDBHelper* dbHelper = new CDBHelper();
     std::string sql = "use `ExamSystem`;";
     bool ret =  dbHelper->sqlExcute(sql);
     sql = "create table if not exists `Teacher`(\
@@ -82,4 +86,5 @@ void CLoginModel::initTeacherTable()
 `role` varchar(10) not null default 'teacher')\
 ENGINE=InnoDB DEFAULT CHARSET=utf8;";
    ret = dbHelper->sqlExcute(sql,"ExamSystem");
+   delete dbHelper;
 }

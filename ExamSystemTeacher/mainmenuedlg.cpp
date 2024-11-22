@@ -9,12 +9,20 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
     this->setWindowTitle("在线考试系统-教师端");
     this->setWindowIcon(QIcon(":/icons/winIcon.png"));
 
+    this->sortNUmber = 0;
     this->signalCount = 0;
     this->multiCount = 0;
     this->judgeCount = 0;
     this->shortAnswerCount = 0;
     this->m_multiCorrectOptions = "";
+
     this->m_judgeAnswer = "";
+    this->ui->comboBox->addItem("全部",0);
+    this->ui->comboBox->addItem("已发布",1);
+    this->ui->comboBox->addItem("未发布",2);
+    this->m_pageCount = "";
+    this->curPageIndex = 1;
+    this->initTableWidgetHeader();
     //生成控制层
     this->m_mainMenueContorller = new CMainMenueContorller();
     //设置标题栏头像为圆形
@@ -54,6 +62,8 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
 
     QObject::connect(this->ui->pushButton_4,&QPushButton::clicked,[=](){
         this->ui->stackedWidget->setCurrentIndex(1);
+        this->getTablePageCount();
+        this->getCurPageIndexTableData();
         this->ui->pushButton_4->setStyleSheet("QPushButton{border:1px solid #50b8f7;background-color:#50b8f7;color:#ffffff;border-radius:20;}");
         //其他的都要设置为原样
         this->ui->pushButton_3->setStyleSheet("QPushButton{border:none;border:1px solid #faa046;color:#faa046;border-radius:20;}QPushButton:hover{border:1px solid #50b8f7;color:#50b8f7;}");
@@ -423,6 +433,247 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
         }
     });
 
+    QObject::connect(this,&CMainMenueDlg::startInitTestPaperTableContorl,this,&CMainMenueDlg::initTestPaperTableContorl);
+    emit this->startInitTestPaperTableContorl();
+
+    QObject::connect(this,&CMainMenueDlg::startShowPageIndex,this,&CMainMenueDlg::showPageIndex);
+
+    QObject::connect(this,&CMainMenueDlg::startShowCurPageIndexTable,this,&CMainMenueDlg::showCurPageIndexTable);
+}
+
+void CMainMenueDlg::initTestPaperTableContorl()
+{
+    //初始化序号
+    for(int i = 0 ; i < 8 ; i++)
+    {
+        QWidget* widget = new QWidget();
+        QHBoxLayout* layout = new QHBoxLayout();
+        widget->setLayout(layout);
+        QCheckBox* checkBox = new QCheckBox();
+        checkBox->setText(QString::number(++this->sortNUmber));
+        checkBox->setFont(QFont("黑体"));
+        checkBox->setStyleSheet("QCheckBox{margin-left:45px;}");
+        checkBox->setVisible(false);
+        layout->addWidget(checkBox);
+        checkBox->setParent(widget);
+        this->ui->tableWidget->setCellWidget(i,0,widget);
+        this->m_checkVec.push_back(widget);
+    }
+
+    //初始化试卷名称
+    for(int i = 0 ; i < 8 ; i++)
+    {
+        QLabel* testName = new QLabel();
+        testName->setText("");
+        testName->setFont(QFont("黑体",12));
+        this->ui->tableWidget->setCellWidget(i,1,testName);
+        testName->setAlignment(Qt::AlignCenter);
+        this->m_testPaperName.push_back(testName);
+    }
+
+    //初始化题量
+    for(int i = 0 ; i < 8 ; i++)
+    {
+        QLabel* testName = new QLabel();
+        testName->setText("");
+        testName->setFont(QFont("黑体",12));
+        this->ui->tableWidget->setCellWidget(i,2,testName);
+        testName->setAlignment(Qt::AlignCenter);
+        this->m_testPaperCount.push_back(testName);
+    }
+
+    //初始化创建时间
+    for(int i = 0 ; i < 8;i++)
+    {
+        QLabel* testName = new QLabel();
+        testName->setText("");
+        testName->setFont(QFont("黑体",9));
+        this->ui->tableWidget->setCellWidget(i,3,testName);
+        testName->setAlignment(Qt::AlignCenter);
+        this->m_createTime.push_back(testName);
+    }
+
+    //初始化出卷人
+    for(int i = 0 ; i < 8 ;i++)
+    {
+        QLabel* testName = new QLabel();
+        testName->setText("");
+        testName->setFont(QFont("黑体",12));
+        this->ui->tableWidget->setCellWidget(i,4,testName);
+        testName->setAlignment(Qt::AlignCenter);
+        this->m_creater.push_back(testName);
+    }
+
+    //初始化发布状态
+    for(int i = 0 ; i < 8 ;i++)
+    {
+        QLabel* testName = new QLabel();
+        testName->setText("");
+        testName->setFont(QFont("黑体",12));
+        this->ui->tableWidget->setCellWidget(i,5,testName);
+        testName->setAlignment(Qt::AlignCenter);
+        this->m_status.push_back(testName);
+    }
+
+    //初始化操作
+    for(int i = 0 ; i < 8 ; i++)
+    {
+        QWidget* widget = new QWidget();
+        QHBoxLayout* layout = new QHBoxLayout();
+        widget->setLayout(layout);
+        QPushButton* deleteBtn = new QPushButton("删除");
+        deleteBtn->setStyleSheet("QPushButton{border:none; border:1px solid #faa046; color:#faa046;border-radius:5;}QPushButton:hover{border:1px solid #50b8f7;color:#50b8f7;}");
+        deleteBtn->setParent(widget);
+        QPushButton* release = new QPushButton("发布");
+        release->setStyleSheet("QPushButton{border:none; border:1px solid #faa046; color:#faa046;border-radius:5;}QPushButton:hover{border:1px solid #50b8f7;color:#50b8f7;}");
+        release->setParent(widget);
+        layout->addWidget(deleteBtn);
+        layout->addWidget(release);
+        deleteBtn->setVisible(false);
+        release->setVisible(false);
+        this->ui->tableWidget->setCellWidget(i,6,widget);
+        this->m_operators.push_back(widget);
+    }
+
+}
+
+unsigned WINAPI CMainMenueDlg::threadGetCurPageIndexTableData(LPVOID arg)
+{
+    CMainMenueDlg* thiz = (CMainMenueDlg*)arg;
+    std::vector<std::vector<std::string>> ret = thiz->m_mainMenueContorller->showCurPageIndexTable(thiz->curPageIndex,thiz->m_acount);
+    //转换成Qt的元对象后进行信号传递
+    QVector<QVector<QString>>* result = new QVector<QVector<QString>>();
+    for(int i = 0 ; i < ret.size();i++)
+    {
+        QVector<QString> temp;
+        for(int j = 0 ; j < ret.at(i).size();j++)
+        {
+            QString str = QString::fromLocal8Bit(ret.at(i).at(j).c_str());
+            temp.push_back(str);
+        }
+        result->push_back(temp);
+    }
+    emit thiz->startShowCurPageIndexTable(result);
+    _endthreadex(0);
+    return 0;
+}
+
+void CMainMenueDlg::getCurPageIndexTableData()
+{
+    _beginthreadex(nullptr,0,&CMainMenueDlg::threadGetCurPageIndexTableData,this,0,nullptr);
+}
+
+void CMainMenueDlg::showCurPageIndexTable(QVector<QVector<QString>>* ret)
+{
+   //将数据进行插入到表格中
+   for(int i = 0 ; i < ret->size()-1 ; i++)
+   {
+       //显示序号
+       QList<QCheckBox*> buttons = this->m_checkVec.at(i)->findChildren<QCheckBox*>();
+       for (QCheckBox *button : buttons) {
+           button->setVisible(true);
+       }
+
+       //显示试卷名
+       QString str = ret->at(i+1).at(0);
+       this->m_testPaperName.at(i)->setText(str);
+
+       //显示题量
+       str = ret->at(i+1).at(1);
+       this->m_testPaperCount.at(i)->setText(str);
+
+       //显示创建时间
+       str = ret->at(i+1).at(2);
+       this->m_createTime.at(i)->setText(str);
+       //创建人
+       str = ret->at(i+1).at(3);
+       this->m_creater.at(i)->setText(str);
+
+       //发布状态
+       str = ret->at(i+1).at(4);
+       this->m_status.at(i)->setText(str);
+
+       //显示操作按钮
+       QList<QPushButton*> optButton = this->m_operators.at(i)->findChildren<QPushButton*>();
+       for (QPushButton *button : optButton) {
+           button->setVisible(true);
+       }
+   }
+   qDebug()<<"试卷表格UI显示完成!";
+}
+
+void CMainMenueDlg::showPageIndex()
+{
+    QString first = QString::number(this->curPageIndex);
+    first += "/";
+    first += this->m_pageCount;
+    this->ui->label_43->setText(first);
+}
+
+void CMainMenueDlg::initTableWidgetHeader()
+{
+
+    this->ui->tableWidget->setRowCount(8);
+    this->ui->tableWidget->setColumnCount(7);
+    this->ui->tableWidget->horizontalHeader()->hide();
+    this->ui->tableWidget->verticalHeader()->hide();
+
+    //设置列宽
+    int width = this->ui->tableWidget->width();
+    int heigth = this->ui->tableWidget->height();
+    this->ui->tableWidget->setColumnWidth(0,135);
+    this->ui->tableWidget->setColumnWidth(1,205);
+    this->ui->tableWidget->setColumnWidth(2,135);
+    this->ui->tableWidget->setColumnWidth(3,153);
+    this->ui->tableWidget->setColumnWidth(4,135);
+    this->ui->tableWidget->setColumnWidth(5,175);
+    this->ui->tableWidget->setColumnWidth(6,445);
+
+    this->ui->tableWidget->setRowHeight(0,heigth/ 8);
+    this->ui->tableWidget->setRowHeight(1,heigth/ 8);
+    this->ui->tableWidget->setRowHeight(2,heigth/ 8);
+    this->ui->tableWidget->setRowHeight(3,heigth/ 8);
+    this->ui->tableWidget->setRowHeight(4,heigth/ 8);
+    this->ui->tableWidget->setRowHeight(5,heigth/ 8);
+    this->ui->tableWidget->setRowHeight(6,heigth/ 8);
+    this->ui->tableWidget->setRowHeight(7,heigth/ 8);
+    this->ui->tableWidget->setRowHeight(8,heigth/ 8);
+    this->ui->tableWidget->setRowHeight(9,heigth/ 8);
+
+    // 动态设置每行的背景色
+       for (int row = 0; row < this->ui->tableWidget->rowCount(); ++row) {
+           QColor bgColor;
+           if (row % 2 == 0) {
+               bgColor = QColor(200, 255, 200); // 偶数行背景色
+           } else {
+               bgColor = QColor(255, 200, 200); // 奇数行背景色
+           }
+//           QBrush brush(bgColor);
+           for (int col = 0; col <this->ui->tableWidget->columnCount(); ++col) {
+//              this->ui->tableWidget->item(row, col)->setBackground(brush); //item拿到的是每一个单元格
+               QTableWidgetItem* item = this->ui->tableWidget->item(row,col);
+               if(item != nullptr)
+               {
+                   item->setBackgroundColor(bgColor);
+               }
+
+           }
+       }
+}
+
+unsigned WINAPI CMainMenueDlg::threadGetTablePageCountEntry(LPVOID arg)
+{
+    CMainMenueDlg* thiz = (CMainMenueDlg*)arg;
+    thiz->m_pageCount = thiz->m_mainMenueContorller->getTablePageCount(thiz->m_acount);
+    emit thiz->startShowPageIndex();
+    _endthreadex(0);
+    return 0;
+}
+
+void CMainMenueDlg::getTablePageCount()
+{
+   //this->m_pageCount = this->m_mainMenueContorller->getTablePageCount(this->m_acount);
+   _beginthreadex(nullptr,0,&CMainMenueDlg::threadGetTablePageCountEntry,this,0,nullptr);
 }
 
 void CMainMenueDlg::clearTreeItemSignal()
@@ -503,7 +754,8 @@ void CMainMenueDlg::clearJudge()
 
 void CMainMenueDlg::addJudgeInfo(QString grade,QString question,QString sessionTrue,QString sessionFalse,QString correctAnswer,int order)
 {
-   this->m_mainMenueContorller->addJudgeInfo(grade,question,sessionTrue,sessionFalse,correctAnswer,order);
+
+    this->m_mainMenueContorller->addJudgeInfo(grade,question,sessionTrue,sessionFalse,correctAnswer,order);
 }
 
 void CMainMenueDlg::clearMultiOption()
@@ -532,9 +784,10 @@ void CMainMenueDlg::addMultiChoiceInfo(QString grade,QString question,QString se
                                        QString correctOpetions,int order)
 {
 
+
     this->m_mainMenueContorller->addMultiChoiceInfo(grade,question,sessionA,sessionB,sessionC,
-                                                    sessionD,sessionE,sessionF,
-                                                    correctOpetions,order);
+                                                        sessionD,sessionE,sessionF,
+                                                        correctOpetions,order);
 }
 
 void CMainMenueDlg::clearSignalOption()
@@ -565,7 +818,8 @@ void CMainMenueDlg::clearSignalOption()
 
 void CMainMenueDlg::addSignalChoiceInfo(QString grade,QString question,QString sessionA,QString sessionB,QString sessionC,QString sessionD,QString correctOptions,int order)
 {
-   this->m_mainMenueContorller->addSignalChoiceInfo(grade,question,sessionA,sessionB,sessionC,sessionD,correctOptions,order);
+
+    this->m_mainMenueContorller->addSignalChoiceInfo(grade,question,sessionA,sessionB,sessionC,sessionD,correctOptions,order);
 }
 
 void CMainMenueDlg::deleteTreeItemRecursively(QTreeWidgetItem* item) {
@@ -604,29 +858,69 @@ void CMainMenueDlg::deleteAllTreeItems(QTreeWidget* treeWidget) {
 }
 
 
+unsigned WINAPI CMainMenueDlg::threadInitTestPaperTableEntry(LPVOID arg)
+{
+    CMainMenueDlg* thiz = (CMainMenueDlg*)arg;
+    thiz->m_mainMenueContorller->initTestPaperTable();
+    _endthreadex(0);
+    return 0;
+}
+
 void CMainMenueDlg::initTestPaperTable()
 {
-     this->m_mainMenueContorller->initTestPaperTable();
+    _beginthreadex(nullptr,0,&CMainMenueDlg::threadInitTestPaperTableEntry,this,0,nullptr);
+}
+
+unsigned WINAPI CMainMenueDlg::threadInitSingleChoiceTableEntry(LPVOID arg)
+{
+    CMainMenueDlg* thiz = (CMainMenueDlg*)arg;
+    thiz->m_mainMenueContorller->initSingleChoiceTable();
+    _endthreadex(0);
+    return 0;
 }
 
 void CMainMenueDlg::initSingleChoiceTable()
 {
-    this->m_mainMenueContorller->initSingleChoiceTable();
+    _beginthreadex(nullptr,0,&CMainMenueDlg::threadInitSingleChoiceTableEntry,this,0,nullptr);
+}
+
+unsigned WINAPI CMainMenueDlg::threadInitMultiChoiceTableEntry(LPVOID arg)
+{
+    CMainMenueDlg* thiz = (CMainMenueDlg*)arg;
+    thiz->m_mainMenueContorller->initMultiChoiceTable();
+    _endthreadex(0);
+    return 0;
 }
 
 void CMainMenueDlg::initMultiChoiceTable()
 {
-    this->m_mainMenueContorller->initMultiChoiceTable();
+    _beginthreadex(nullptr,0,&CMainMenueDlg::threadInitMultiChoiceTableEntry,this,0,nullptr);
+}
+
+unsigned WINAPI CMainMenueDlg::threadInitJudgeTableEntry(LPVOID arg)
+{
+    CMainMenueDlg* thiz = (CMainMenueDlg*)arg;
+    thiz->m_mainMenueContorller->initJudgeTable();
+    _endthreadex(0);
+    return 0;
 }
 
 void CMainMenueDlg::initJudgeTable()
 {
-    this->m_mainMenueContorller->initJudgeTable();
+    _beginthreadex(nullptr,0,&CMainMenueDlg::threadInitJudgeTableEntry,this,0,nullptr);
+}
+
+unsigned WINAPI CMainMenueDlg::threadInitShortAnswerTableEntry(LPVOID arg)
+{
+    CMainMenueDlg* thiz = (CMainMenueDlg*)arg;
+    thiz->m_mainMenueContorller->initShortAnswerTable();
+    _endthreadex(0);
+    return 0;
 }
 
 void CMainMenueDlg::initShortAnswerTable()
 {
-    this->m_mainMenueContorller->initShortAnswerTable();
+    _beginthreadex(nullptr,0,&CMainMenueDlg::threadInitShortAnswerTableEntry,this,0,nullptr);
 }
 
 void CMainMenueDlg::headPictureChange()
@@ -763,9 +1057,17 @@ unsigned WINAPI CMainMenueDlg::threadShowHeadEntry(LPVOID arg)
     return 0;
 }
 
+unsigned WINAPI CMainMenueDlg::threadInitTeacherInfoTableEntry(LPVOID arg)
+{
+    CMainMenueDlg* thiz = (CMainMenueDlg*)arg;
+    thiz->m_mainMenueContorller->initTeacherInfoTable();
+    _endthreadex(0);
+    return 0;
+}
+
 void CMainMenueDlg::initTeacherInfoTable()
 {
-  this->m_mainMenueContorller->initTeacherInfoTable();
+   _beginthreadex(nullptr,0,&CMainMenueDlg::threadInitTeacherInfoTableEntry,this,0,nullptr);
 }
 
 bool CMainMenueDlg::eventFilter (QObject* obj, QEvent* e) //原理底层跟一个定时器一样一直触发执行的函数
@@ -818,6 +1120,69 @@ CMainMenueDlg::~CMainMenueDlg()
         delete this->m_mainMenueContorller;
         this->m_mainMenueContorller = nullptr;
     }
+
+    for(QVector<QWidget*>::iterator pos = this->m_checkVec.begin(); pos != this->m_checkVec.end();pos++)
+    {
+        if(*pos != nullptr)
+        {
+           delete  *pos;
+        }
+    }
+    this->m_checkVec.clear();
+
+    for(QVector<QLabel*>::iterator pos = this->m_testPaperName.begin(); pos != this->m_testPaperName.end();pos++)
+    {
+        if(*pos != nullptr)
+        {
+           delete  *pos;
+        }
+    }
+    this->m_testPaperName.clear();
+
+    for(QVector<QLabel*>::iterator pos = this->m_testPaperCount.begin(); pos != this->m_testPaperCount.end();pos++)
+    {
+        if(*pos != nullptr)
+        {
+           delete  *pos;
+        }
+    }
+    this->m_testPaperCount.clear();
+
+    for(QVector<QLabel*>::iterator pos = this->m_createTime.begin(); pos != this->m_createTime.end();pos++)
+    {
+        if(*pos != nullptr)
+        {
+           delete  *pos;
+        }
+    }
+    this->m_createTime.clear();
+
+    for(QVector<QLabel*>::iterator pos = this->m_creater.begin(); pos != this->m_creater.end();pos++)
+    {
+        if(*pos != nullptr)
+        {
+           delete  *pos;
+        }
+    }
+    this->m_creater.clear();
+
+    for(QVector<QLabel*>::iterator pos = this->m_status.begin(); pos != this->m_status.end();pos++)
+    {
+        if(*pos != nullptr)
+        {
+           delete  *pos;
+        }
+    }
+    this->m_status.clear();
+
+    for(QVector<QWidget*>::iterator pos = this->m_operators.begin(); pos != this->m_operators.end();pos++)
+    {
+        if(*pos != nullptr)
+        {
+           delete  *pos;
+        }
+    }
+    this->m_operators.clear();
     //如果关闭界面，接收头像信息的线程还在执行的话就等待接收后结束线程
     WaitForSingleObject(this->m_recvHeadThead,INFINITE); //找到退出崩溃的原因，因为关闭界面的时候，接收头像线程还在执行，但是UI已经释放导致异常
     //释放容器中的QTreeItem

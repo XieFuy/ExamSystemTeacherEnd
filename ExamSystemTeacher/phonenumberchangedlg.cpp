@@ -21,8 +21,10 @@ CPhoneNumberChangeDlg::CPhoneNumberChangeDlg(QWidget *parent) :
             const char* pAcount = acountArr.data();
             sprintf(sqlBuf,"update  `TeacherInfo` set `phoneNumber` = '%s' where `teacherId` = '%s'; ",pPhoneNumber,pAcount);
             std::string sql = sqlBuf;
-            CDBHelper* dbHelper = CDBHelper::getInstance();
+//            CDBHelper* dbHelper = CDBHelper::getInstance();
+            CDBHelper* dbHelper = new CDBHelper();
             dbHelper->sqlExcute(sql,"ExamSystem");
+            delete dbHelper;
         }
         emit this->rejected();
     });

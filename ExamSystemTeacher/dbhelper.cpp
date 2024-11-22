@@ -1,26 +1,26 @@
 #include "dbhelper.h"
 
-CDBHelper* CDBHelper::m_instance = nullptr;
-CDBHelper::CHelper CDBHelper::m_helper;
+//CDBHelper* CDBHelper::m_instance = nullptr;
+//CDBHelper::CHelper CDBHelper::m_helper;
 
-CDBHelper* CDBHelper::getInstance()
-{
-    if (CDBHelper::m_instance == nullptr)
-    {
-        CDBHelper::m_instance = new CDBHelper();
-        return CDBHelper::m_instance;
-    }
-    return CDBHelper::m_instance;
-}
+//CDBHelper* CDBHelper::getInstance()
+//{
+//    if (CDBHelper::m_instance == nullptr)
+//    {
+//        CDBHelper::m_instance = new CDBHelper();
+//        return CDBHelper::m_instance;
+//    }
+//    return CDBHelper::m_instance;
+//}
 
-void CDBHelper::releaseInstance()
-{
-    if (CDBHelper::m_instance != nullptr)
-    {
-        delete CDBHelper::m_instance;
-        CDBHelper::m_instance = nullptr;
-    }
-}
+//void CDBHelper::releaseInstance()
+//{
+//    if (CDBHelper::m_instance != nullptr)
+//    {
+//        delete CDBHelper::m_instance;
+//        CDBHelper::m_instance = nullptr;
+//    }
+//}
 
 CDBHelper::CDBHelper()
 {
@@ -34,7 +34,7 @@ CDBHelper::~CDBHelper()
 
 CDBHelper::CDBHelper(CDBHelper& dbHelper){}
 
-void CDBHelper::operator=(CDBHelper& dbHelper){}
+//void CDBHelper::operator=(CDBHelper& dbHelper){}
 
 void CDBHelper::initMysql()
 {

@@ -11,7 +11,8 @@ int CRegisterModel::registerTeacherInfo(char* pAcount,char* pPassword)
     {
         return -1;
     }
-    CDBHelper* dbHelper = CDBHelper::getInstance();
+//    CDBHelper* dbHelper = CDBHelper::getInstance();
+    CDBHelper* dbHelper = new CDBHelper();
     std::string sql;
     char buf[1024];
     memset(buf,'\0',sizeof(char) * 1024);
@@ -33,6 +34,7 @@ int CRegisterModel::registerTeacherInfo(char* pAcount,char* pPassword)
     sprintf(buf,"insert into `TeacherInfo` (`teacherId`) values('%s');",pAcount);
     sql = buf;
     ret = dbHelper->sqlExcute(sql,"ExamSystem");
+    delete dbHelper;
     return 0;
 }
 

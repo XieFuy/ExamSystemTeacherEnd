@@ -16,6 +16,10 @@
 #include "phonenumberchangedlg.h"
 #include <QFileDialog>
 #include "testpapersavedlg.h"
+#include <QCheckBox>
+#include <QLabel>
+#include <QHBoxLayout>
+#include "threadpool.h"
 
 namespace Ui {
 class CMainMenueDlg;  //主菜单管理页面
@@ -41,6 +45,9 @@ signals:
     void startInitJudgeTable();
     void startInitShortAnswerTable();
     void startInitTestPaperTable();
+    void startInitTestPaperTableContorl();
+    void startShowPageIndex();
+    void startShowCurPageIndexTable(QVector<QVector<QString>>* ret);
 private:
     CExitLoginDlg* m_exitLoginDlg = nullptr;
     QTreeWidgetItem* m_signalOperator = nullptr; //单选题父项
@@ -69,18 +76,44 @@ private:
     QString m_multiCorrectOptions;
     QString m_judgeAnswer;
     CTestPaperSaveDlg* m_testPaperSaveDlg = nullptr;
+    QString m_pageCount; //表示查询结果的页数
+    int curPageIndex; //表示当前页
+    int sortNUmber;//试卷表的序号
+    QVector<QWidget*> m_checkVec;//表示一整个列的复选框
+    QVector<QLabel*> m_testPaperName;//表示试卷名称
+    QVector<QLabel*> m_testPaperCount;//题量
+    QVector<QLabel*> m_createTime;//创建时间
+    QVector<QLabel*> m_creater;//出卷人
+    QVector<QLabel*> m_status;//发布状态
+    QVector<QWidget*> m_operators; //操作
 private:
+    void showPageIndex();//显示分页查询的下标页
+    void initTableWidgetHeader(); //初始化表头
     void clearTreeItemSignal();
     void clearTreeItemMulti();
     void clearTreeItemJudge();
     void clearTreeItemShortAnswer();
+
     void initSingleChoiceTable();//初始化单选表
+    static unsigned WINAPI threadInitSingleChoiceTableEntry(LPVOID arg);
+
     void initMultiChoiceTable();//初始化多选表
+    static unsigned WINAPI threadInitMultiChoiceTableEntry(LPVOID arg);
+
     void initJudgeTable(); //初始化判断表
+    static unsigned WINAPI threadInitJudgeTableEntry(LPVOID arg);
+
     void initShortAnswerTable(); //初始化简答题表
+    static unsigned WINAPI threadInitShortAnswerTableEntry(LPVOID arg);
+
     void initTestPaperTable();//初始化试卷表
+    static unsigned WINAPI threadInitTestPaperTableEntry(LPVOID arg);
+
     void initTeacherInfoTable(); //初始化教职工信息数据库表
+    static unsigned WINAPI threadInitTeacherInfoTableEntry(LPVOID arg);
+
     void  showTeacherInfo(QString acount); //显示主页的职工个人姓名和头像
+    void initTestPaperTableContorl();//初始化试卷表格控件
     static unsigned WINAPI threadShowHeadEntry(LPVOID arg); //进行与服务器进行网络通信获取头像数据的线程函数
     void threadShowHead(); //执行向服务器的网络请求头像数据线程函数
     void showHeadImageUI(QImage image); //从服务器中请求到数据后进行UI更新
@@ -97,6 +130,14 @@ private:
     void clearJudge(); //判断题清空
     void addShortAnswerInfo(QString grade,QString question,QString referenceAnswer,int order);
     void clearShortAnswer();//清空简答题
+
+    void getTablePageCount(); //获取数据库中试卷表中的总的页数
+    static unsigned WINAPI threadGetTablePageCountEntry(LPVOID arg);
+
+    void getCurPageIndexTableData();
+    static unsigned WINAPI threadGetCurPageIndexTableData(LPVOID arg);
+
+    void showCurPageIndexTable(QVector<QVector<QString>>* ret);//显示处于当前页表的查询记录,用于更新UI
 private:
     Ui::CMainMenueDlg *ui;
 };

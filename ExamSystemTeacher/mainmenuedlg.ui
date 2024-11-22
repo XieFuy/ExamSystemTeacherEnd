@@ -2238,6 +2238,41 @@ color:#646465;
         <height>41</height>
        </rect>
       </property>
+      <property name="font">
+       <font>
+        <family>黑体</family>
+        <pointsize>14</pointsize>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QComboBox{
+  color:#666666;
+  padding: 1px 15px 1px 3px;
+  border: 1px solid #50b8fd;
+}
+
+QComboBox::drop-down
+{
+border-image:url(:/icons/comboxDowm.png);
+min-width:30px;
+min-heigth:30px;
+}
+
+QComboBox#comboBox::drop-down:checked
+{
+border-image:url(:/icons/comboxUp.png);
+}
+
+QComboBox QAbstractItemView{
+	background:rgba(255,255,255,1);
+    border:1px solid rgba(228,228,228,1);
+    border-radius:0px 0px 5px 5px;
+	font-size:14px;
+    outline: 0px;  
+ }
+
+</string>
+      </property>
      </widget>
      <widget class="QLabel" name="label_42">
       <property name="geometry">
@@ -2247,6 +2282,18 @@ color:#646465;
         <width>101</width>
         <height>41</height>
        </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>黑体</family>
+        <pointsize>12</pointsize>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">#label_42
+{
+color:#646465;
+}</string>
       </property>
       <property name="text">
        <string>发布状态：</string>
@@ -2261,6 +2308,18 @@ color:#646465;
         <height>41</height>
        </rect>
       </property>
+      <property name="font">
+       <font>
+        <family>黑体</family>
+        <pointsize>12</pointsize>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">#lineEdit_5
+{
+border:1px solid #646465;
+}</string>
+      </property>
       <property name="placeholderText">
        <string>输入试卷名称查找</string>
       </property>
@@ -2268,11 +2327,32 @@ color:#646465;
      <widget class="QPushButton" name="pushButton_23">
       <property name="geometry">
        <rect>
-        <x>1010</x>
+        <x>1000</x>
         <y>100</y>
-        <width>131</width>
+        <width>81</width>
         <height>41</height>
        </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>黑体</family>
+        <pointsize>12</pointsize>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">#pushButton_23
+{
+border:1px solid #50b8fd;
+background-color:#FFFFFF;
+color:#50b8fd;
+border-radius:10;
+}
+
+#pushButton_23:hover
+{
+background-color: #50b8fd;
+color:#ffffff;
+}</string>
       </property>
       <property name="text">
        <string>查询</string>
@@ -2282,9 +2362,9 @@ color:#646465;
       <property name="geometry">
        <rect>
         <x>20</x>
-        <y>170</y>
+        <y>260</y>
         <width>1391</width>
-        <height>581</height>
+        <height>481</height>
        </rect>
       </property>
      </widget>
@@ -2292,10 +2372,16 @@ color:#646465;
       <property name="geometry">
        <rect>
         <x>20</x>
-        <y>770</y>
+        <y>767</y>
         <width>61</width>
         <height>19</height>
        </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">#checkBox_7
+{
+color:#646465;
+}</string>
       </property>
       <property name="text">
        <string>全选</string>
@@ -2310,6 +2396,13 @@ color:#646465;
         <height>31</height>
        </rect>
       </property>
+      <property name="styleSheet">
+       <string notr="true">#pushButton_25
+{
+border:none;
+color:#50b8fd;
+}</string>
+      </property>
       <property name="text">
        <string>批量删除</string>
       </property>
@@ -2323,6 +2416,13 @@ color:#646465;
         <height>31</height>
        </rect>
       </property>
+      <property name="styleSheet">
+       <string notr="true">#pushButton_26
+{
+border:none;
+color:#50b8fd;
+}</string>
+      </property>
       <property name="text">
        <string>批量发布</string>
       </property>
@@ -2330,9 +2430,9 @@ color:#646465;
      <widget class="QLabel" name="label_43">
       <property name="geometry">
        <rect>
-        <x>680</x>
+        <x>650</x>
         <y>830</y>
-        <width>81</width>
+        <width>151</width>
         <height>31</height>
        </rect>
       </property>
@@ -2355,37 +2455,27 @@ color:#646465;
        <set>Qt::AlignCenter</set>
       </property>
      </widget>
-     <widget class="QLabel" name="label_44">
-      <property name="geometry">
-       <rect>
-        <x>430</x>
-        <y>820</y>
-        <width>72</width>
-        <height>41</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>每页显示</string>
-      </property>
-     </widget>
-     <widget class="QComboBox" name="comboBox_2">
-      <property name="geometry">
-       <rect>
-        <x>510</x>
-        <y>820</y>
-        <width>61</width>
-        <height>41</height>
-       </rect>
-      </property>
-     </widget>
      <widget class="QPushButton" name="pushButton_27">
       <property name="geometry">
        <rect>
-        <x>580</x>
+        <x>550</x>
         <y>830</y>
         <width>93</width>
         <height>28</height>
        </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">#pushButton_27
+{
+border:1px solid #646465;
+color:#646465;
+}
+
+#pushButton_27:hover
+{
+background-color: #646465;
+color:#ffffff;
+}</string>
       </property>
       <property name="text">
        <string>上一页</string>
@@ -2394,15 +2484,198 @@ color:#646465;
      <widget class="QPushButton" name="pushButton_28">
       <property name="geometry">
        <rect>
-        <x>780</x>
+        <x>810</x>
         <y>830</y>
         <width>93</width>
         <height>28</height>
        </rect>
       </property>
+      <property name="styleSheet">
+       <string notr="true">#pushButton_28
+{
+border:1px solid #646465;
+color:#646465;
+}
+
+#pushButton_28:hover
+{
+background-color: #646465;
+color:#ffffff;
+}</string>
+      </property>
       <property name="text">
        <string>下一页</string>
       </property>
+     </widget>
+     <widget class="QWidget" name="widget_15" native="true">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>180</y>
+        <width>1391</width>
+        <height>80</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">#widget_15
+{
+background-color: #F8FAF7;
+}</string>
+      </property>
+      <widget class="QLabel" name="label_44">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>0</y>
+         <width>91</width>
+         <height>80</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>黑体</family>
+         <pointsize>14</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>序号</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_45">
+       <property name="geometry">
+        <rect>
+         <x>110</x>
+         <y>0</y>
+         <width>241</width>
+         <height>80</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>黑体</family>
+         <pointsize>14</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>试卷名称</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_46">
+       <property name="geometry">
+        <rect>
+         <x>340</x>
+         <y>0</y>
+         <width>111</width>
+         <height>80</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>黑体</family>
+         <pointsize>14</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>题量</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_47">
+       <property name="geometry">
+        <rect>
+         <x>460</x>
+         <y>10</y>
+         <width>141</width>
+         <height>61</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>黑体</family>
+         <pointsize>14</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>创建时间</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_48">
+       <property name="geometry">
+        <rect>
+         <x>610</x>
+         <y>10</y>
+         <width>151</width>
+         <height>61</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>黑体</family>
+         <pointsize>14</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>出卷人</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_49">
+       <property name="geometry">
+        <rect>
+         <x>760</x>
+         <y>0</y>
+         <width>151</width>
+         <height>80</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>黑体</family>
+         <pointsize>14</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>发布状态</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_50">
+       <property name="geometry">
+        <rect>
+         <x>940</x>
+         <y>0</y>
+         <width>441</width>
+         <height>80</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>黑体</family>
+         <pointsize>14</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>操作</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
      </widget>
     </widget>
    </widget>

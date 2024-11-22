@@ -13,7 +13,8 @@ CTestPaperSaveDlg::CTestPaperSaveDlg(QWidget *parent) :
         if(this->ui->lineEdit->text().size() > 0)
         {
             //直接进行sql数据库的操作，这里不再设置控制层和模型层
-            CDBHelper* dbHelper = CDBHelper::getInstance();
+//            CDBHelper* dbHelper = CDBHelper::getInstance();
+            CDBHelper* dbHelper = new CDBHelper();
             char sqlBuf[1024];
             memset(sqlBuf,'\0',sizeof(char) * 1024);
             std::string sql;
@@ -57,6 +58,7 @@ CTestPaperSaveDlg::CTestPaperSaveDlg(QWidget *parent) :
  where  `testPaperId` = 0;",result.at(0).at(0).c_str());
             sql = sqlBuf;
             dbHelper->sqlExcute(sql,"ExamSystem");
+            delete dbHelper;
         }
         emit this->rejected();
     });

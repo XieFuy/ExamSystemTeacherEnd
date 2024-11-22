@@ -14,6 +14,13 @@ CMainMenueContorller::~CMainMenueContorller()
  }
 }
 
+QString CMainMenueContorller::getTablePageCount(QString acount)
+{
+    QByteArray acountArr = acount.toUtf8();
+    const char* pAcount = acountArr.data();
+    return this->m_mainMenueModel->getTablePageCount(const_cast<char*>(pAcount));
+}
+
 void CMainMenueContorller::changeHeadPicture(QString LocalFilePath,QString acount)
 {
     QString tempFileName;
@@ -164,3 +171,10 @@ bool CMainMenueContorller::addShortAnswerInfo(QString grade,QString question,QSt
     const char* pReferenceAnswer = referenceAnswerArr.data();
     return this->m_mainMenueModel->addShortAnswerInfo(dGrade,pQuestion,pReferenceAnswer,order);
 }
+
+ std::vector<std::vector<std::string>> CMainMenueContorller::showCurPageIndexTable(int curPageIndex,QString acount)
+ {
+      QByteArray acountArr = acount.toUtf8();
+      const char* pAcount = acountArr.data();
+      return this->m_mainMenueModel->showCurPageIndexTable(curPageIndex,const_cast<char*>(pAcount));
+ }

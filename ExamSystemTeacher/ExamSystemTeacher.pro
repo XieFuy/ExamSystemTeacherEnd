@@ -24,6 +24,7 @@ SOURCES += \
     registerdlg.cpp \
     registermodel.cpp \
     testpapersavedlg.cpp \
+    threadpool.cpp \
     widget.cpp
 
 HEADERS += \
@@ -41,6 +42,7 @@ HEADERS += \
     registerdlg.h \
     registermodel.h \
     testpapersavedlg.h \
+    threadpool.h \
     widget.h
 
 FORMS += \

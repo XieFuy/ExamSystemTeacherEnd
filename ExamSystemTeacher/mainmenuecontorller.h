@@ -29,6 +29,8 @@ public :
     bool addJudgeInfo(QString grade,QString question,QString sessionTrue,QString sessionFalse,
                       QString correctAnswer,int order);
     bool addShortAnswerInfo(QString grade,QString question,QString referenceAnswer,int order);
+    QString getTablePageCount(QString acount);
+    std::vector<std::vector<std::string>> showCurPageIndexTable(int curPageIndex,QString acount);
 private:
     CMainMenueModel* m_mainMenueModel = nullptr;
 };
