@@ -48,6 +48,7 @@ signals:
     void startInitTestPaperTableContorl();
     void startShowPageIndex();
     void startShowCurPageIndexTable(QVector<QVector<QString>>* ret);
+    void startShowTeacherAcountInfo(std::vector<std::vector<std::string>>* ret);
 private:
     CExitLoginDlg* m_exitLoginDlg = nullptr;
     QTreeWidgetItem* m_signalOperator = nullptr; //单选题父项
@@ -117,18 +118,36 @@ private:
     static unsigned WINAPI threadShowHeadEntry(LPVOID arg); //进行与服务器进行网络通信获取头像数据的线程函数
     void threadShowHead(); //执行向服务器的网络请求头像数据线程函数
     void showHeadImageUI(QImage image); //从服务器中请求到数据后进行UI更新
-    void showTeacherAcountInfo();//显示职工账号管理信息
+
+    void showTeacherAcountInfo(std::vector<std::vector<std::string>>* ret);//显示职工账号管理信息
+    void getTeacherAcountInfoData();//获取职工账号信息数据
+    static unsigned WINAPI threadGetTeacherAcountInfoDataEntry(LPVOID arg);
+
     void changeGender(bool isChecked); //进行更改性别
+    static unsigned WINAPI threadChangeGenderEntry(LPVOID arg);
+
     void headPictureChange();//进行头像更换
     void deleteAllTreeItems(QTreeWidget* treeWidget);
     void deleteTreeItemRecursively(QTreeWidgetItem* item);
+
     void addSignalChoiceInfo(QString grade,QString question,QString sessionA,QString sessionB,QString sessionC,QString sessionD,QString correctOptions,int order);//添加单选题信息
+    static unsigned WINAPI threadAddSignalChoiceInfoEntry(LPVOID arg);
+
+
     void clearSignalOption();//清空单选区域
     void clearMultiOption();//清空多选区域
+
     void addMultiChoiceInfo(QString grade,QString question,QString sessionA,QString sessionB,QString sessionC,QString sessionD,QString sessionE,QString sessionF,QString correctOpetions,int order);
+    static unsigned WINAPI threadAddMultiChoiceInfoEntry(LPVOID arg);
+
     void addJudgeInfo(QString grade,QString question,QString sessionTrue,QString sessionFalse,QString correctAnswer,int order); //添加判断题
+    static unsigned WINAPI threadAddJudgeInfoEntry(LPVOID arg);
+
     void clearJudge(); //判断题清空
+
     void addShortAnswerInfo(QString grade,QString question,QString referenceAnswer,int order);
+    static unsigned WINAPI threadAddShortAnswerInfoEntry(LPVOID arg);
+
     void clearShortAnswer();//清空简答题
 
     void getTablePageCount(); //获取数据库中试卷表中的总的页数

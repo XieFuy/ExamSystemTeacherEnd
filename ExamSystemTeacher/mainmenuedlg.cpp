@@ -355,7 +355,9 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
     //监听头像UI更新信号
     QObject::connect(this,&CMainMenueDlg::startShowHeadImage,this,&CMainMenueDlg::showHeadImageUI);
     //显示职工账号管理信息
-    QObject::connect(this->ui->pushButton,&QPushButton::clicked,this,&CMainMenueDlg::showTeacherAcountInfo);
+    //QObject::connect(this->ui->pushButton,&QPushButton::clicked,this,&CMainMenueDlg::showTeacherAcountInfo);
+    QObject::connect(this->ui->pushButton,&QPushButton::clicked,this,&CMainMenueDlg::getTeacherAcountInfoData);
+
     QObject::connect(this->ui->pushButton_22,&QPushButton::clicked,[=](){
         if(this->m_nameChangeDlg == nullptr)
         {
@@ -439,6 +441,7 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
     QObject::connect(this,&CMainMenueDlg::startShowPageIndex,this,&CMainMenueDlg::showPageIndex);
 
     QObject::connect(this,&CMainMenueDlg::startShowCurPageIndexTable,this,&CMainMenueDlg::showCurPageIndexTable);
+    QObject::connect(this,&CMainMenueDlg::startShowTeacherAcountInfo,this,&CMainMenueDlg::showTeacherAcountInfo);
 }
 
 void CMainMenueDlg::initTestPaperTableContorl()
@@ -731,9 +734,34 @@ void CMainMenueDlg::clearTreeItemShortAnswer()
      this->ui->textEdit_17->clear();
  }
 
+ typedef struct shortAnswerInfoArg
+ {
+     QString grade;
+     QString question;
+     QString referenceAnswer;
+     int order;
+     CMainMenueDlg* thiz;
+ }ShortAnswerInfoArg;
+
 void CMainMenueDlg::addShortAnswerInfo(QString grade,QString question,QString referenceAnswer,int order)
 {
-    this->m_mainMenueContorller->addShortAnswerInfo(grade,question,referenceAnswer,order);
+    ShortAnswerInfoArg* arg = new ShortAnswerInfoArg();
+    arg->thiz = this;
+    arg->grade = grade;
+    arg->question = question;
+    arg->referenceAnswer = referenceAnswer;
+    arg->order = order;
+    _beginthreadex(nullptr,0,&CMainMenueDlg::threadAddShortAnswerInfoEntry,arg,0,nullptr);
+}
+
+unsigned WINAPI CMainMenueDlg::threadAddShortAnswerInfoEntry(LPVOID arg)
+{
+    ShortAnswerInfoArg* pram = (ShortAnswerInfoArg*)arg;
+    pram->thiz->m_mainMenueContorller->addShortAnswerInfo(pram->grade,pram->question,pram->referenceAnswer,
+                                                       pram->order);
+    delete pram;
+    _endthreadex(0);
+    return 0;
 }
 
 void CMainMenueDlg::clearJudge()
@@ -752,10 +780,38 @@ void CMainMenueDlg::clearJudge()
     this->ui->radioButton_6->setAutoExclusive(true);
 }
 
+typedef struct addJudgeInfoArg
+{
+    QString grade;
+    QString question;
+    QString sessionTrue;
+    QString sessionFalse;
+    QString correctAnswer;
+    int order;
+    CMainMenueDlg* thiz;
+}AddJudgeInfoArg;
+
 void CMainMenueDlg::addJudgeInfo(QString grade,QString question,QString sessionTrue,QString sessionFalse,QString correctAnswer,int order)
 {
+    AddJudgeInfoArg* arg = new AddJudgeInfoArg();
+    arg->grade = grade;
+    arg->question = question;
+    arg->sessionTrue = sessionTrue;
+    arg->sessionFalse = sessionFalse;
+    arg->correctAnswer = correctAnswer;
+    arg->order = order;
+    arg->thiz = this;
+    _beginthreadex(nullptr,0,&CMainMenueDlg::threadAddJudgeInfoEntry,arg,0,nullptr);
+}
 
-    this->m_mainMenueContorller->addJudgeInfo(grade,question,sessionTrue,sessionFalse,correctAnswer,order);
+unsigned WINAPI CMainMenueDlg::threadAddJudgeInfoEntry(LPVOID arg)
+{
+    AddJudgeInfoArg* aInfo = (AddJudgeInfoArg*)arg;
+    aInfo->thiz->m_mainMenueContorller->addJudgeInfo(aInfo->grade,aInfo->question,aInfo->sessionTrue,
+                                                     aInfo->sessionFalse,aInfo->correctAnswer,aInfo->order);
+    delete aInfo;
+    _endthreadex(0);
+    return 0;
 }
 
 void CMainMenueDlg::clearMultiOption()
@@ -778,16 +834,53 @@ void CMainMenueDlg::clearMultiOption()
     this->ui->checkBox_6->setChecked(false);
 }
 
+typedef struct addMultiChoiceInfoArg
+{
+    QString grade;
+    QString question;
+    QString sessionA;
+    QString sessionB;
+    QString sessionC;
+    QString sessionD;
+    QString sessionE;
+    QString sessionF;
+    QString correctOpetions;
+    int order ;
+    CMainMenueDlg* thiz;
+}AddMultiChoiceInfoArg;
+
 void CMainMenueDlg::addMultiChoiceInfo(QString grade,QString question,QString sessionA,
                                        QString sessionB,QString sessionC,QString sessionD,
                                        QString sessionE,QString sessionF,
                                        QString correctOpetions,int order)
 {
 
+   AddMultiChoiceInfoArg* arg = new  AddMultiChoiceInfoArg();
+   arg->grade = grade;
+   arg->question = question;
+   arg->sessionA = sessionA;
+   arg->sessionB = sessionB;
+   arg->sessionC = sessionC;
+   arg->sessionD = sessionD;
+   arg->sessionE = sessionE;
+   arg->sessionF = sessionF;
+   arg->correctOpetions = correctOpetions;
+   arg->order = order;
+   arg->thiz = this;
+   _beginthreadex(nullptr,0,&CMainMenueDlg::threadAddMultiChoiceInfoEntry,arg,0,nullptr);
 
-    this->m_mainMenueContorller->addMultiChoiceInfo(grade,question,sessionA,sessionB,sessionC,
-                                                        sessionD,sessionE,sessionF,
-                                                        correctOpetions,order);
+}
+
+unsigned WINAPI CMainMenueDlg::threadAddMultiChoiceInfoEntry(LPVOID arg)
+{
+    AddMultiChoiceInfoArg* aInfo = (AddMultiChoiceInfoArg*)arg;
+    aInfo->thiz->m_mainMenueContorller->addMultiChoiceInfo(aInfo->grade,aInfo->question,aInfo->sessionA,
+                                                           aInfo->sessionB,aInfo->sessionC,
+                                                        aInfo->sessionD,aInfo->sessionE,aInfo->sessionF,
+                                                        aInfo->correctOpetions,aInfo->order);
+    delete aInfo;
+    _endthreadex(0);
+    return 0;
 }
 
 void CMainMenueDlg::clearSignalOption()
@@ -816,10 +909,44 @@ void CMainMenueDlg::clearSignalOption()
     this->ui->radioButton_4->setAutoExclusive(true);
 }
 
+typedef struct addSignalChoiceInfoArg
+{
+   QString grade;
+   QString question;
+   QString sessionA;
+   QString sessionB;
+   QString sessionC;
+   QString sessionD;
+   QString correctOptions;
+   int order;
+   CMainMenueDlg* thiz;
+}AddSignalChoiceInfoArg;
+
 void CMainMenueDlg::addSignalChoiceInfo(QString grade,QString question,QString sessionA,QString sessionB,QString sessionC,QString sessionD,QString correctOptions,int order)
 {
+    AddSignalChoiceInfoArg* arg = new AddSignalChoiceInfoArg();
+    arg->correctOptions = correctOptions;
+    arg->grade = grade;
+    arg->order = order;
+    arg->question = question;
+    arg->sessionA = sessionA;
+    arg->sessionB = sessionB;
+    arg->sessionC = sessionC;
+    arg->sessionD = sessionD;
+    arg->thiz = this;
+    _beginthreadex(nullptr,0,&CMainMenueDlg::threadAddSignalChoiceInfoEntry,arg,0,nullptr);
+}
 
-    this->m_mainMenueContorller->addSignalChoiceInfo(grade,question,sessionA,sessionB,sessionC,sessionD,correctOptions,order);
+unsigned WINAPI CMainMenueDlg::threadAddSignalChoiceInfoEntry(LPVOID arg)
+{
+    AddSignalChoiceInfoArg* aInfo = (AddSignalChoiceInfoArg*)arg;
+    aInfo->thiz->m_mainMenueContorller->addSignalChoiceInfo(aInfo->grade,aInfo->question,aInfo->sessionA
+                                                            ,aInfo->sessionB,
+                                                            aInfo->sessionC,aInfo->sessionD,
+                                                            aInfo->correctOptions,aInfo->order);
+    delete aInfo;
+    _endthreadex(0);
+    return 0;
 }
 
 void CMainMenueDlg::deleteTreeItemRecursively(QTreeWidgetItem* item) {
@@ -940,18 +1067,59 @@ void CMainMenueDlg::headPictureChange()
      }
 }
 
+typedef struct changeGenderArg
+{
+   bool isChecked;
+   CMainMenueDlg* thiz;
+}ChangeGenderArg;
+
 void CMainMenueDlg::changeGender(bool isChecked)
 {
-    this->m_mainMenueContorller->changeGender(isChecked,this->m_acount);
+   ChangeGenderArg* arg = new ChangeGenderArg();
+   arg->thiz = this;
+   arg->isChecked = isChecked;
+   _beginthreadex(nullptr,0,&CMainMenueDlg::threadChangeGenderEntry,arg,0,nullptr);
 }
 
-void CMainMenueDlg::showTeacherAcountInfo()
+unsigned WINAPI CMainMenueDlg::threadChangeGenderEntry(LPVOID arg)
 {
-    std::vector<std::vector<std::string>> ret =  this->m_mainMenueContorller->showTeacherAcountInfo(this->m_acount);
-    QString name = QString::fromLocal8Bit(ret.at(0).at(0).c_str());
-    QString teacherId = QString::fromLocal8Bit(ret.at(0).at(1).c_str());
-    QString gender = QString::fromLocal8Bit(ret.at(0).at(2).c_str());
-    QString phoneNumber = QString::fromLocal8Bit(ret.at(0).at(3).c_str());
+    ChangeGenderArg* cInfo =  (ChangeGenderArg*)arg;
+    cInfo->thiz->m_mainMenueContorller->changeGender(cInfo->isChecked,cInfo->thiz->m_acount);
+    delete cInfo;
+    _endthreadex(0);
+    return 0;
+}
+
+typedef struct teacherAcountInfoArg
+{
+    QString acount;
+    CMainMenueDlg* thiz;
+}TeacherAcountInfoArg;
+
+void CMainMenueDlg::getTeacherAcountInfoData()
+{
+    TeacherAcountInfoArg* arg = new TeacherAcountInfoArg();
+    arg->thiz = this;
+    arg->acount = this->m_acount;
+    _beginthreadex(nullptr,0,&CMainMenueDlg::threadGetTeacherAcountInfoDataEntry,arg,0,nullptr);
+}
+
+unsigned WINAPI CMainMenueDlg::threadGetTeacherAcountInfoDataEntry(LPVOID arg)
+{
+    TeacherAcountInfoArg* tInfo = (TeacherAcountInfoArg*)arg;
+    std::vector<std::vector<std::string>> ret =  tInfo->thiz->m_mainMenueContorller->showTeacherAcountInfo(tInfo->acount); //view层调用conntorller层的接口全部写到子线程中
+    emit tInfo->thiz->startShowTeacherAcountInfo(&ret);
+    delete tInfo;
+    _endthreadex(0);
+    return 0;
+}
+
+void CMainMenueDlg::showTeacherAcountInfo(std::vector<std::vector<std::string>>* ret)
+{
+    QString name = QString::fromLocal8Bit(ret->at(0).at(0).c_str());
+    QString teacherId = QString::fromLocal8Bit(ret->at(0).at(1).c_str());
+    QString gender = QString::fromLocal8Bit(ret->at(0).at(2).c_str());
+    QString phoneNumber = QString::fromLocal8Bit(ret->at(0).at(3).c_str());
 
     this->ui->label_39->setText(name);
     this->ui->label_40->setText(teacherId);

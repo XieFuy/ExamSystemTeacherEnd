@@ -10,6 +10,7 @@ CMainMenueModel::~CMainMenueModel()
 
 }
 
+//极大提升了查询单表的速度，优化方案就是减少对数据库的多次访问，尽量一个sql解决
 std::vector<std::vector<std::string>> CMainMenueModel::showCurPageIndexTable(int curPageIndex,char* acount)
 {
     if(curPageIndex == 0 || acount == nullptr)
@@ -18,7 +19,7 @@ std::vector<std::vector<std::string>> CMainMenueModel::showCurPageIndexTable(int
     }
     // 返回的数据集是一个表
 //    CDBHelper* dbHelper = CDBHelper::getInstance();
-    CDBHelper* dbHelper = new CDBHelper();
+    /*CDBHelper* dbHelper = new CDBHelper();
     char sqlBuf[1024];
     memset(sqlBuf,'\0',sizeof(char) * 1024);
     std::string sql;
@@ -113,7 +114,7 @@ std::vector<std::vector<std::string>> CMainMenueModel::showCurPageIndexTable(int
               temp.push_back(tempArr.data());
           }
           result.push_back(std::move(temp));
-    }
+    }*/
     /*测试打印结果的值*/
    /* qDebug()<<"测试循环进入";
     for(int i = 1 ; i < result.size();i++)
@@ -125,8 +126,49 @@ std::vector<std::vector<std::string>> CMainMenueModel::showCurPageIndexTable(int
         std::cout<<std::endl;
     }*/
     //拿到的存储结果不访问第一行，第一行是测试行
+    CDBHelper* dbHelper = new CDBHelper();
+    char sqlBuf[1024];
+    memset(sqlBuf,'\0',sizeof(char) * 1024);
+    std::string sql;
+        //拿到试卷表的全部 试卷名称，创建时间，发布状态
+    sprintf(sqlBuf,"SELECT tp.testPaperName,(\n\
+COALESCE((SELECT COUNT(*) FROM singleChoice sc WHERE sc.testPaperId = tp.testPaperId), 0) +\n\
+COALESCE((SELECT COUNT(*) FROM multiChoice mc WHERE mc.testPaperId = tp.testPaperId), 0) +\n\
+COALESCE((SELECT COUNT(*) FROM judge j WHERE j.testPaperId = tp.testPaperId), 0) +\n\
+COALESCE((SELECT COUNT(*) FROM shortAnswer sa WHERE sa.testPaperId = tp.testPaperId), 0)\n\
+) AS totalQuestionCount,\n\
+tp.saveTime,\n\
+t.name AS teacherName,\n\
+tp.publishStatus\n\
+FROM \n\
+testPaperInfo tp\n\
+JOIN \n\
+TeacherInfo t ON tp.teacherId = t.teacherId\n\
+WHERE \n\
+tp.teacherId = '%s'\n\
+ORDER BY \n\
+tp.testPaperId\n\
+LIMIT 8 OFFSET %d;",acount,((curPageIndex -1) * 8));
+    sql = sqlBuf;
+    std::vector<std::vector<std::string>> ret = dbHelper->sqlQuery(sql,"ExamSystem");
+    qDebug()<<sql.c_str();
+    //对容器中的最后一列进行处理(发布状态)
+    for(int i = 0 ; i < ret.size();i++)
+    {
+        if(ret.at(i).at(4) == "0")
+        {
+            QString strTemp = "未发布";
+            QByteArray tempArr = strTemp.toLocal8Bit();
+            ret.at(i).at(4) = tempArr.data();
+        }else if(ret.at(i).at(4) == "1")
+        {
+            QString strTemp = "以发布";
+            QByteArray tempArr = strTemp.toLocal8Bit();
+            ret.at(i).at(4) = tempArr.data();
+        }
+    }
     delete dbHelper;
-    return result;
+    return ret;
 }
 
 QString CMainMenueModel::getTablePageCount(char* acount)
