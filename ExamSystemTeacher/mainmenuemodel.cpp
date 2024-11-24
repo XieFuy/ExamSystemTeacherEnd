@@ -127,8 +127,8 @@ std::vector<std::vector<std::string>> CMainMenueModel::showCurPageIndexTable(int
     }*/
     //拿到的存储结果不访问第一行，第一行是测试行
     CDBHelper* dbHelper = new CDBHelper();
-    char sqlBuf[1024];
-    memset(sqlBuf,'\0',sizeof(char) * 1024);
+    char* sqlBuf = new char[1024000];
+    memset(sqlBuf,'\0',sizeof(char) * 1024000);
     std::string sql;
         //拿到试卷表的全部 试卷名称，创建时间，发布状态
     sprintf(sqlBuf,"SELECT tp.testPaperName,(\n\
@@ -148,9 +148,10 @@ WHERE \n\
 tp.teacherId = '%s'\n\
 ORDER BY \n\
 tp.testPaperId\n\
-LIMIT 8 OFFSET %d;",acount,((curPageIndex -1) * 8));
+LIMIT 9 OFFSET %d;",acount,((curPageIndex -1) * 8)); //这里limite 9 的原因是因为第一行数据不是我们需要显示的
     sql = sqlBuf;
     std::vector<std::vector<std::string>> ret = dbHelper->sqlQuery(sql,"ExamSystem");
+    delete[] sqlBuf;
     qDebug()<<sql.c_str();
     //对容器中的最后一列进行处理(发布状态)
     for(int i = 0 ; i < ret.size();i++)
@@ -179,12 +180,14 @@ QString CMainMenueModel::getTablePageCount(char* acount)
     }
 //    CDBHelper* dbHelper = CDBHelper::getInstance();
     CDBHelper* dbHelper = new CDBHelper();
-    char sqlBuf[1024];
-    memset(sqlBuf,'\0',sizeof(char) * 1024);
+    char* sqlBuf = new char[1024000];
+    memset(sqlBuf,'\0',sizeof(char) * 1024000);
     std::string sql;
     sprintf(sqlBuf,"select count(*) from `testPaperInfo` where `teacherId` = '%s';",acount);
     sql = sqlBuf;
     int tableCount =  dbHelper->sqlQueryCount(sql,"ExamSystem"); //获取的是表的记录条数
+    tableCount -= 1; //减去最上面的一条记录
+    delete[] sqlBuf;
     int result = (tableCount / 8) ;
     if(result <= 0) //表示总的记录条数小于8
     {
@@ -195,7 +198,7 @@ QString CMainMenueModel::getTablePageCount(char* acount)
         if(yuShu > 0)
         {
             result += 1;
-        }
+        }    
     }
     delete dbHelper;
     return QString::number(result);
@@ -210,11 +213,12 @@ bool CMainMenueModel::addShortAnswerInfo(double grade,const char* question,
     }
 //    CDBHelper* dbHelper = CDBHelper::getInstance();
     CDBHelper* dbHelper = new CDBHelper();
-    char sqlBuf[1024];
-    memset(sqlBuf,'\0',sizeof(char) * 1024);
+    char* sqlBuf = new char[1024000];
+    memset(sqlBuf,'\0',sizeof(char) * 1024000);
     sprintf(sqlBuf,"insert into  `shortAnswer` (`grade`,`question`,`referenceAnswer`,`order`)\
  values(%lf,'%s','%s',%d);",grade,question,referenceAnswer,order);
  std::string sql = sqlBuf;
+   delete[] sqlBuf;
    bool ret =   dbHelper->sqlExcute(sql,"ExamSystem");
    delete dbHelper;
    return ret;
@@ -231,11 +235,12 @@ bool CMainMenueModel::addJudgeInfo(double grade,const char* question,const char*
     }
 //    CDBHelper* dbHelper = CDBHelper::getInstance();
     CDBHelper* dbHelper = new CDBHelper();
-    char sqlBuf[1024];
-    memset(sqlBuf,'\0',sizeof(char) * 1024);
+    char* sqlBuf = new char[1024000];
+    memset(sqlBuf,'\0',sizeof(char) * 1024000);
     sprintf(sqlBuf,"insert into  `judge` (`grade`,`question`,`sessionTrue`,`sessionFalse`,`order`,`correctAnswer`)\
 values(%lf,'%s','%s','%s',%d,'%s');",grade,question,sessionTrue,sessionFalse,order,correctAnswer);
  std::string sql = sqlBuf;
+    delete[] sqlBuf;
     bool ret =   dbHelper->sqlExcute(sql,"ExamSystem");
     delete dbHelper;
     return ret;
@@ -255,14 +260,15 @@ bool CMainMenueModel::addMultiChoiceInfo(double grade,const char* question,const
     }
 //    CDBHelper* dbHelper = CDBHelper::getInstance();
     CDBHelper* dbHelper = new CDBHelper();
-    char sqlBuf[1024];
-    memset(sqlBuf,'\0',sizeof(char) * 1024);
+    char* sqlBuf = new char[1024000];
+    memset(sqlBuf,'\0',sizeof(char) * 1024000);
     sprintf(sqlBuf,"insert into  `multiChoice` (`grade`,`question`,`sessionA`,`sessionB`,\
 `sessionC`,`sessionD`,`sessionE`,`sessionF`,`correctOptions`,`order`)\
  values(%lf,'%s','%s','%s','%s','%s','%s','%s','%s',%d);",grade,question,sessionA,sessionB,
     sessionC,sessionD,
     sessionE,sessionF,correctOpetions,order);
  std::string sql = sqlBuf;
+ delete[] sqlBuf;
  bool ret =   dbHelper->sqlExcute(sql,"ExamSystem");
  delete dbHelper;
  return ret;
@@ -335,10 +341,11 @@ void CMainMenueModel::changeGender(bool isMan,char* pAcount)
     }
 //    CDBHelper* dbHelper = CDBHelper::getInstance();
     CDBHelper* dbHelper = new CDBHelper();
-    char sqlBuf[1024];
-    memset(sqlBuf,'\0',sizeof(char) * 1024);
+    char* sqlBuf = new char[1024000];
+    memset(sqlBuf,'\0',sizeof(char) * 1024000);
     sprintf(sqlBuf,"update  `TeacherInfo` set `gender` = '%s' where `teacherId` = '%s'; ",gender.c_str(),pAcount);
     std::string sql  = sqlBuf;
+    delete[] sqlBuf;
     bool ret =   dbHelper->sqlExcute(sql,"ExamSystem");
     delete dbHelper;
     return;
@@ -353,10 +360,11 @@ std::vector<std::vector<std::string>> CMainMenueModel::showTeacherAcountInfo(cha
 //    CDBHelper* dbHelper = CDBHelper::getInstance();
     CDBHelper* dbHelper = new CDBHelper();
     std::string sql;
-    char sqlBuf[1024];
-    memset(sqlBuf,'\0',sizeof(char) * 1024);
+    char* sqlBuf = new char[1024000];
+    memset(sqlBuf,'\0',sizeof(char) * 1024000);
     sprintf(sqlBuf,"select `name`,`teacherId`,`gender`,`phoneNumber` from `TeacherInfo` where `teacherId` = '%s';",pAcount);
     sql = sqlBuf;
+    delete[] sqlBuf;
     std::vector<std::vector<std::string>> ret =  dbHelper->sqlQuery(sql,"ExamSystem");
     delete dbHelper;
     return ret;
@@ -546,13 +554,14 @@ bool CMainMenueModel::addSignalChoiceInfo(double grade,const char* question,cons
     }
 //    CDBHelper* dbHelper = CDBHelper::getInstance();
     CDBHelper* dbHelper = new CDBHelper();
-    char sqlBuf[1024];
-    memset(sqlBuf,'\0',sizeof(char) * 1024);
+    char* sqlBuf = new char[1024000];
+    memset(sqlBuf,'\0',sizeof(char) * 1024000);
     sprintf(sqlBuf,"insert into  `singleChoice` \
 (`grade`,`question`,`sessionA`,`sessionB`,`sessionC`,`sessionD`,`correctOptions`,`order`)\
  values('%lf','%s','%s','%s','%s','%s','%s','%d');",grade,question,sessionA,
             sessionB,sessionC,sessionD,correctOptions,order);
  std::string sql = sqlBuf;
+ delete[] sqlBuf;
  bool ret =   dbHelper->sqlExcute(sql,"ExamSystem");
  delete dbHelper;
  return ret;

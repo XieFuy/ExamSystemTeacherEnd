@@ -114,6 +114,7 @@ private:
     static unsigned WINAPI threadInitTeacherInfoTableEntry(LPVOID arg);
 
     void  showTeacherInfo(QString acount); //显示主页的职工个人姓名和头像
+    void clearTestPaperTableContorl(); //清除表格内容
     void initTestPaperTableContorl();//初始化试卷表格控件
     static unsigned WINAPI threadShowHeadEntry(LPVOID arg); //进行与服务器进行网络通信获取头像数据的线程函数
     void threadShowHead(); //执行向服务器的网络请求头像数据线程函数
@@ -157,6 +158,17 @@ private:
     static unsigned WINAPI threadGetCurPageIndexTableData(LPVOID arg);
 
     void showCurPageIndexTable(QVector<QVector<QString>>* ret);//显示处于当前页表的查询记录,用于更新UI
+
+    void showNextPageIndexTable(); //显示下一页的页表查询记录，更新UI
+
+    void showLastPageIndexTable();//显示上一页的页表查询记录，更新UI
+
+    void getCurPageIndexTableDataPubulished(); //获取状态为已发布的试卷的记录
+    static unsigned WINAPI threadGetCurPageIndexTableDataPubulishedEntry(LPVOID arg);
+
+    void getCurPageIndexTableDataNotPubulished();//获取状态为未发布的试卷的记录
+    static unsigned WINAPI threadGetCurPageIndexTableDataNotPubulishedEntry(LPVOID arg);
+
 private:
     Ui::CMainMenueDlg *ui;
 };

@@ -442,7 +442,112 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
 
     QObject::connect(this,&CMainMenueDlg::startShowCurPageIndexTable,this,&CMainMenueDlg::showCurPageIndexTable);
     QObject::connect(this,&CMainMenueDlg::startShowTeacherAcountInfo,this,&CMainMenueDlg::showTeacherAcountInfo);
+    QObject::connect(this->ui->pushButton_28,&QPushButton::clicked,this,&CMainMenueDlg::showNextPageIndexTable);
+    QObject::connect(this->ui->pushButton_27,&QPushButton::clicked,this,&CMainMenueDlg::showLastPageIndexTable);
 }
+
+void CMainMenueDlg:: showLastPageIndexTable()
+{
+    //防止恶意刷新
+    if(this->curPageIndex <= 1)
+    {
+        return ;
+    }
+    //清除当前表中的记录
+    this->clearTestPaperTableContorl();
+    //给当前页递减，并且不能低于1
+    if(this->curPageIndex > 1)
+    {
+        this->curPageIndex -= 1;
+    }
+     //进行重新调用控制层获取数据
+    this->getCurPageIndexTableData();
+    //重新显示总量
+    this->getTablePageCount();
+}
+
+void CMainMenueDlg::showNextPageIndexTable()
+{
+    if(QString::number(this->curPageIndex) == this->m_pageCount)
+    {
+        return;
+    }
+    //清除当前表中的记录
+    this->clearTestPaperTableContorl();
+
+    //给当前页自增，并且不能超过总页
+    if(QString::number(this->curPageIndex) != this->m_pageCount)
+    {
+        this->curPageIndex += 1;
+    }
+    //进行重新调用控制层获取数据
+    this->getCurPageIndexTableData();
+
+    //重新显示总量
+    this->getTablePageCount();
+}
+
+void CMainMenueDlg::clearTestPaperTableContorl()
+{
+    //隐藏序号
+    for(int i = 0 ; i < 8 ; i++)
+    {
+        QList<QCheckBox*> buttons = this->m_checkVec.at(i)->findChildren<QCheckBox*>();
+        for (QCheckBox *button : buttons) {
+            button->setVisible(false);
+        }
+    }
+
+    //清除试卷名称
+    for(int i = 0 ; i < 8 ; i++)
+    {
+        for (QLabel *button : this->m_testPaperName) {
+            button->setText("");
+        }
+    }
+
+    //清除题量
+    for(int i = 0 ; i < 8 ; i++)
+    {
+        for (QLabel *button : this->m_testPaperCount) {
+            button->setText("");
+        }
+    }
+
+    //清除创建时间
+    for(int i = 0 ; i < 8;i++)
+    {
+        for (QLabel *button : this->m_createTime) {
+            button->setText("");
+        }
+    }
+
+    //清除出卷人
+    for(int i = 0 ; i < 8 ;i++)
+    {
+        for (QLabel *button : this->m_creater) {
+            button->setText("");
+        }
+    }
+
+    //清除化发布状态
+    for(int i = 0 ; i < 8 ;i++)
+    {
+        for (QLabel *button : this->m_status) {
+            button->setText("");
+        }
+    }
+
+    //清除化操作
+    for(int i = 0 ; i < 8 ; i++)
+    {
+        QList<QPushButton*> optButton = this->m_operators.at(i)->findChildren<QPushButton*>();
+        for (QPushButton *button : optButton) {
+            button->setVisible(false);
+        }
+    }
+}
+
 
 void CMainMenueDlg::initTestPaperTableContorl()
 {
@@ -559,6 +664,26 @@ unsigned WINAPI CMainMenueDlg::threadGetCurPageIndexTableData(LPVOID arg)
     emit thiz->startShowCurPageIndexTable(result);
     _endthreadex(0);
     return 0;
+}
+
+void CMainMenueDlg::getCurPageIndexTableDataPubulished()
+{
+
+}
+
+unsigned WINAPI CMainMenueDlg::threadGetCurPageIndexTableDataPubulishedEntry(LPVOID arg)
+{
+
+}
+
+void CMainMenueDlg::getCurPageIndexTableDataNotPubulished()
+{
+
+}
+
+unsigned WINAPI CMainMenueDlg::threadGetCurPageIndexTableDataNotPubulishedEntry(LPVOID arg)
+{
+
 }
 
 void CMainMenueDlg::getCurPageIndexTableData()
