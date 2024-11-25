@@ -154,6 +154,9 @@ private:
     void getTablePageCount(); //获取数据库中试卷表中的总的页数
     static unsigned WINAPI threadGetTablePageCountEntry(LPVOID arg);
 
+    void getTablePageCountPublished();//获取查询结果为已发布的总数
+    static unsigned WINAPI threadGetTablePageCountPublishedEntry(LPVOID arg);
+
     void getCurPageIndexTableData();
     static unsigned WINAPI threadGetCurPageIndexTableData(LPVOID arg);
 

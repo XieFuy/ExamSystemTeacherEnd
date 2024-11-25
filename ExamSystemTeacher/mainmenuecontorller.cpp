@@ -48,6 +48,27 @@ void CMainMenueContorller::changeHeadPicture(QString LocalFilePath,QString acoun
     return  this->m_mainMenueModel->changeHeadPicture(const_cast<char*>(pLocalFilePath),const_cast<char*>( pFileName),const_cast<char*>(pAcount));
 }
 
+int CMainMenueContorller::getTablePageCountPublished(QString acount,
+                                                                                       QString status)
+{
+   QByteArray acountArr = acount.toUtf8();
+   QByteArray statusArr = status.toUtf8();
+   const char* pAcount = acountArr.data();
+   const char* pStatus = statusArr.data();
+   return this->m_mainMenueModel->getTablePageCountPublished(pAcount,pStatus);
+}
+
+std::vector<std::vector<std::string>> CMainMenueContorller::getCurPageIndexTableDataPubulished(
+        int curPageIndex,QString acount,QString status)
+{
+    QByteArray acountArr = acount.toUtf8();
+    QByteArray statusArr = status.toUtf8();
+    const char* pAcount = acountArr.data();
+    const char* pStatus = statusArr.data();
+    return this->m_mainMenueModel->getCurPageIndexTableDataPubulished(curPageIndex,pAcount,pStatus);
+}
+
+
 bool CMainMenueContorller::addSignalChoiceInfo(QString grade,QString question,QString sessionA,
                          QString sessionB,QString sessionC,QString sessionD,
                          QString correctOptions,int order)

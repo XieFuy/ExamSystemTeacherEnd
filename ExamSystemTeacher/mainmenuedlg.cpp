@@ -444,6 +444,48 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
     QObject::connect(this,&CMainMenueDlg::startShowTeacherAcountInfo,this,&CMainMenueDlg::showTeacherAcountInfo);
     QObject::connect(this->ui->pushButton_28,&QPushButton::clicked,this,&CMainMenueDlg::showNextPageIndexTable);
     QObject::connect(this->ui->pushButton_27,&QPushButton::clicked,this,&CMainMenueDlg::showLastPageIndexTable);
+
+    QObject::connect(this->ui->comboBox,static_cast<void(QComboBox::*)(int)>(&QComboBox::activated),[=](int index){
+        int value = this->ui->comboBox->itemData(index).toInt();
+        if(value == 0) // 查询全部
+        {
+           this->getCurPageIndexTableData();
+        }else if(value == 1) //查询已发布
+        {
+           this->getCurPageIndexTableDataPubulished();
+               //重新显示符合条件的总页数
+           this->getTablePageCountPublished();
+        }else if(value == 2) //查询未发布
+        {
+           this->getCurPageIndexTableDataNotPubulished();
+        }
+    });
+}
+
+typedef struct getTablePageCountPublished{
+    QString acount;
+    QString status;
+    CMainMenueDlg* thiz;
+}GetTablePageCountPublished;
+
+void CMainMenueDlg::getTablePageCountPublished()
+{
+    GetTablePageCountPublished* arg = new GetTablePageCountPublished();
+    arg->thiz = this;
+    arg->acount = this->m_acount;
+    arg->status = "1";
+    _beginthreadex(nullptr,0,&CMainMenueDlg::threadGetTablePageCountPublishedEntry,arg,0,nullptr);
+}
+
+unsigned WINAPI CMainMenueDlg::threadGetTablePageCountPublishedEntry(LPVOID arg)
+{
+    GetTablePageCountPublished* gInfo = (GetTablePageCountPublished*)arg;
+    int ret = gInfo->thiz->m_mainMenueContorller->getTablePageCountPublished(gInfo->acount,gInfo->status);
+    gInfo->thiz->m_pageCount =QString::number(ret);
+    emit gInfo->thiz->startShowPageIndex();
+    delete gInfo;
+    _endthreadex(0);
+    return 0;
 }
 
 void CMainMenueDlg:: showLastPageIndexTable()
@@ -666,14 +708,44 @@ unsigned WINAPI CMainMenueDlg::threadGetCurPageIndexTableData(LPVOID arg)
     return 0;
 }
 
+typedef struct getCurPageIndexTableDataPubulishedArg
+{
+    int curPageIndex;
+    QString acount;
+    QString status;
+    CMainMenueDlg* thiz;
+}GetCurPageIndexTableDataPubulishedArg;
+
 void CMainMenueDlg::getCurPageIndexTableDataPubulished()
 {
-
+    GetCurPageIndexTableDataPubulishedArg* arg = new GetCurPageIndexTableDataPubulishedArg();
+    arg->thiz = this;
+    this->curPageIndex = 1;
+    arg->curPageIndex = this->curPageIndex;
+    arg->acount = this->m_acount;
+    arg->status = "1";
+    _beginthreadex(nullptr,0,&CMainMenueDlg::threadGetCurPageIndexTableDataPubulishedEntry,arg,0,nullptr);
 }
 
 unsigned WINAPI CMainMenueDlg::threadGetCurPageIndexTableDataPubulishedEntry(LPVOID arg)
 {
-
+   GetCurPageIndexTableDataPubulishedArg* gInfo = (GetCurPageIndexTableDataPubulishedArg*)arg;
+   std::vector<std::vector<std::string>>  ret =  gInfo->thiz->m_mainMenueContorller->getCurPageIndexTableDataPubulished(gInfo->curPageIndex,gInfo->acount,gInfo->status);
+   QVector<QVector<QString>>* result = new QVector<QVector<QString>>();
+   for(int i = 0 ; i < ret.size();i++)
+   {
+       QVector<QString> temp;
+       for(int j = 0 ; j < ret.at(i).size();j++)
+       {
+           QString str = QString::fromLocal8Bit(ret.at(i).at(j).c_str());
+           temp.push_back(str);
+       }
+       result->push_back(temp);
+   }
+   emit gInfo->thiz->startShowCurPageIndexTable(result);
+   delete gInfo;
+   _endthreadex(0);
+   return 0;
 }
 
 void CMainMenueDlg::getCurPageIndexTableDataNotPubulished()
@@ -693,6 +765,7 @@ void CMainMenueDlg::getCurPageIndexTableData()
 
 void CMainMenueDlg::showCurPageIndexTable(QVector<QVector<QString>>* ret)
 {
+    this->clearTestPaperTableContorl();
    //将数据进行插入到表格中
    for(int i = 0 ; i < ret->size()-1 ; i++)
    {
@@ -726,6 +799,10 @@ void CMainMenueDlg::showCurPageIndexTable(QVector<QVector<QString>>* ret)
        for (QPushButton *button : optButton) {
            button->setVisible(true);
        }
+   }
+   if(ret != nullptr)
+   {
+       delete ret;
    }
    qDebug()<<"试卷表格UI显示完成!";
 }

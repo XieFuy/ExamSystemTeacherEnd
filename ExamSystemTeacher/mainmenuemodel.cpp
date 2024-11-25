@@ -10,6 +10,69 @@ CMainMenueModel::~CMainMenueModel()
 
 }
 
+int CMainMenueModel::getTablePageCountPublished(
+        const char* acount,
+        const char* status)
+{
+    if(acount == nullptr || status == nullptr)
+    {
+        return -1;
+    }
+    CDBHelper* dbHelper = new CDBHelper();
+    char* sqlBuf = new char[1024000];
+    memset(sqlBuf,'\0',sizeof(char) * 1024000);
+    std::string sql;
+    sprintf(sqlBuf,"select count(*) from `testPaperInfo` \
+where  `teacherId` = '%s' and `publishStatus` = '%s';",acount,status);
+    sql = sqlBuf;
+    int ret =  dbHelper->sqlQueryCount(sql,"ExamSystem");
+    delete[] sqlBuf;
+    delete dbHelper;
+    return ret;
+}
+
+
+std::vector<std::vector<std::string>> CMainMenueModel::getCurPageIndexTableDataPubulished(int curPageIndex,
+                                                                         const char* acount,
+                                                                         const char* status)
+{
+    if(acount == nullptr || status == nullptr)
+    {
+        return std::vector<std::vector<std::string>>();
+    }
+    CDBHelper* dbHelper = new CDBHelper();
+    char* sqlBuf = new char[1024000];
+    memset(sqlBuf,'\0',sizeof(char) * 1024000);
+    std::string sql;
+    sprintf(sqlBuf,"SELECT \n\
+tp.testPaperName,\n\
+(\n\
+COALESCE((SELECT COUNT(*) FROM singleChoice sc WHERE sc.testPaperId = tp.testPaperId), 0) +\n\
+COALESCE((SELECT COUNT(*) FROM multiChoice mc WHERE mc.testPaperId = tp.testPaperId), 0) +\n\
+COALESCE((SELECT COUNT(*) FROM judge j WHERE j.testPaperId = tp.testPaperId), 0) +\n\
+COALESCE((SELECT COUNT(*) FROM shortAnswer sa WHERE sa.testPaperId = tp.testPaperId), 0)\n\
+) AS totalQuestionCount,\n\
+tp.saveTime,\n\
+t.name AS teacherName,\n\
+tp.publishStatus\n\
+FROM \n\
+testPaperInfo tp\n\
+JOIN \n\
+TeacherInfo t ON tp.teacherId = t.teacherId\n\
+WHERE \n\
+tp.teacherId = '%s'\n\
+AND \n\
+tp.publishStatus = '%s' \n\
+ORDER BY \n\
+tp.testPaperId\n\
+LIMIT 9 OFFSET %d;",acount,status,(curPageIndex - 1)* 8);
+    sql = sqlBuf;
+    std::vector<std::vector<std::string>> ret =  dbHelper->sqlQuery(sql,"ExamSystem");
+    delete[] sqlBuf;
+    delete dbHelper;
+    return ret;
+}
+
 //极大提升了查询单表的速度，优化方案就是减少对数据库的多次访问，尽量一个sql解决
 std::vector<std::vector<std::string>> CMainMenueModel::showCurPageIndexTable(int curPageIndex,char* acount)
 {

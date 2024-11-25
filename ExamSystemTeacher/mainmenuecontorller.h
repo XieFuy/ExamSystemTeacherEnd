@@ -32,6 +32,7 @@ public :
     QString getTablePageCount(QString acount);
     std::vector<std::vector<std::string>> showCurPageIndexTable(int curPageIndex,QString acount);
     std::vector<std::vector<std::string>> getCurPageIndexTableDataPubulished(int curPageIndex,QString acount,QString status);
+    int getTablePageCountPublished(QString acount,QString status);
  private:
     CMainMenueModel* m_mainMenueModel = nullptr;
 };

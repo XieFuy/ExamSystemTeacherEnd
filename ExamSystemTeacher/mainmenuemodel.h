@@ -36,6 +36,8 @@ public:
     bool addShortAnswerInfo(double grade,const char* question,const char* referenceAnswer,int order);
     QString getTablePageCount(char* acount);
     std::vector<std::vector<std::string>> showCurPageIndexTable(int curPageIndex,char* acount);
+    std::vector<std::vector<std::string>> getCurPageIndexTableDataPubulished(int curPageIndex,const char* acount,const char* status);
+    int getTablePageCountPublished(const char* acount,const char* status);
 private:
       HANDLE m_mutex; //因为所有操作都是使用的一个CDBHelper对象，所以要给每一个执行sql的步骤进行上锁
 };
