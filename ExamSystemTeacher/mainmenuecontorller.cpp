@@ -5,6 +5,28 @@ CMainMenueContorller::CMainMenueContorller()
  this->m_mainMenueModel = new CMainMenueModel();
 }
 
+
+int CMainMenueContorller::getTablePageCountNotPublished(QString acount,QString status)
+{
+    QByteArray acountArr = acount.toUtf8();
+    QByteArray statusArr = status.toUtf8();
+    const char* pAcount = acountArr.data();
+    const char* pStatus = statusArr.data();
+    return this->m_mainMenueModel->getTablePageCountNotPublished(pAcount,pStatus);
+}
+
+std::vector<std::vector<std::string>> CMainMenueContorller:: getCurPageIndexTableDataNotPubulished(
+                                                                            int curPageIndex,
+                                                                            QString acount,
+                                                                            QString status)
+{
+   QByteArray acountArr = acount.toUtf8();
+   QByteArray statusArr = status.toUtf8();
+   const char* pAcount = acountArr.data();
+   const char* pStatus = statusArr.data();
+   return this->m_mainMenueModel->getCurPageIndexTableDataNotPubulished(curPageIndex,pAcount,pStatus);
+}
+
 CMainMenueContorller::~CMainMenueContorller()
 {
  if(this->m_mainMenueModel != nullptr)
@@ -49,7 +71,7 @@ void CMainMenueContorller::changeHeadPicture(QString LocalFilePath,QString acoun
 }
 
 int CMainMenueContorller::getTablePageCountPublished(QString acount,
-                                                                                       QString status)
+                                                     QString status)
 {
    QByteArray acountArr = acount.toUtf8();
    QByteArray statusArr = status.toUtf8();

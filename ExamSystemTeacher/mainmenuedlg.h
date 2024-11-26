@@ -87,6 +87,7 @@ private:
     QVector<QLabel*> m_creater;//出卷人
     QVector<QLabel*> m_status;//发布状态
     QVector<QWidget*> m_operators; //操作
+    int m_testPaperStatusChoise;//表示试卷管理状态选择的类型
 private:
     void showPageIndex();//显示分页查询的下标页
     void initTableWidgetHeader(); //初始化表头
@@ -156,6 +157,9 @@ private:
 
     void getTablePageCountPublished();//获取查询结果为已发布的总数
     static unsigned WINAPI threadGetTablePageCountPublishedEntry(LPVOID arg);
+
+    void getTablePageCountNotPublished();//获取查询结果为未发布的总数
+    static unsigned WINAPI threadGetTablePageCountNotPublishedEntry(LPVOID arg);
 
     void getCurPageIndexTableData();
     static unsigned WINAPI threadGetCurPageIndexTableData(LPVOID arg);

@@ -31,8 +31,14 @@ public :
     bool addShortAnswerInfo(QString grade,QString question,QString referenceAnswer,int order);
     QString getTablePageCount(QString acount);
     std::vector<std::vector<std::string>> showCurPageIndexTable(int curPageIndex,QString acount);
-    std::vector<std::vector<std::string>> getCurPageIndexTableDataPubulished(int curPageIndex,QString acount,QString status);
+    std::vector<std::vector<std::string>> getCurPageIndexTableDataPubulished(int curPageIndex,
+                                                                             QString acount,
+                                                                             QString status);
     int getTablePageCountPublished(QString acount,QString status);
+    std::vector<std::vector<std::string>> getCurPageIndexTableDataNotPubulished(int curPageIndex,
+                                                                                QString acount,
+                                                                                QString status);
+    int getTablePageCountNotPublished(QString acount,QString status);
  private:
     CMainMenueModel* m_mainMenueModel = nullptr;
 };

@@ -15,6 +15,7 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
     this->judgeCount = 0;
     this->shortAnswerCount = 0;
     this->m_multiCorrectOptions = "";
+    this->m_testPaperStatusChoise = 0;
 
     this->m_judgeAnswer = "";
     this->ui->comboBox->addItem("全部",0);
@@ -447,9 +448,13 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
 
     QObject::connect(this->ui->comboBox,static_cast<void(QComboBox::*)(int)>(&QComboBox::activated),[=](int index){
         int value = this->ui->comboBox->itemData(index).toInt();
+        this->curPageIndex = 1;
+        this->m_testPaperStatusChoise = value;
         if(value == 0) // 查询全部
         {
            this->getCurPageIndexTableData();
+             //重新显示符合条件的总页数
+            this->getTablePageCount();
         }else if(value == 1) //查询已发布
         {
            this->getCurPageIndexTableDataPubulished();
@@ -458,8 +463,35 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
         }else if(value == 2) //查询未发布
         {
            this->getCurPageIndexTableDataNotPubulished();
+           this->getTablePageCountNotPublished();
         }
     });
+}
+
+typedef struct getTablePageCountNotPublishedArg{
+    QString acount;
+    QString status;
+    CMainMenueDlg* thiz;
+}GetTablePageCountNotPublishedArg;
+
+void CMainMenueDlg::getTablePageCountNotPublished()
+{
+    GetTablePageCountNotPublishedArg* arg = new GetTablePageCountNotPublishedArg();
+    arg->thiz = this;
+    arg->acount = this->m_acount;
+    arg->status = "0";
+    _beginthreadex(nullptr,0,&CMainMenueDlg::threadGetTablePageCountNotPublishedEntry,arg,0,nullptr);
+}
+
+unsigned WINAPI CMainMenueDlg::threadGetTablePageCountNotPublishedEntry(LPVOID arg)
+{
+    GetTablePageCountNotPublishedArg* gInfo = (GetTablePageCountNotPublishedArg*)arg;
+    int ret = gInfo->thiz->m_mainMenueContorller->getTablePageCountNotPublished(gInfo->acount,gInfo->status);
+    gInfo->thiz->m_pageCount =QString::number(ret);
+    emit gInfo->thiz->startShowPageIndex();
+    delete gInfo;
+    _endthreadex(0);
+    return 0;
 }
 
 typedef struct getTablePageCountPublished{
@@ -490,6 +522,10 @@ unsigned WINAPI CMainMenueDlg::threadGetTablePageCountPublishedEntry(LPVOID arg)
 
 void CMainMenueDlg:: showLastPageIndexTable()
 {
+    if(this->m_pageCount == "0")
+    {
+        return;
+    }
     //防止恶意刷新
     if(this->curPageIndex <= 1)
     {
@@ -502,14 +538,30 @@ void CMainMenueDlg:: showLastPageIndexTable()
     {
         this->curPageIndex -= 1;
     }
-     //进行重新调用控制层获取数据
-    this->getCurPageIndexTableData();
-    //重新显示总量
-    this->getTablePageCount();
+    if(this->m_testPaperStatusChoise == 0) //选择状态为全部执行逻辑
+    {
+        //进行重新调用控制层获取数据
+        this->getCurPageIndexTableData();
+        //重新显示总量
+        this->getTablePageCount();
+    }else if(this->m_testPaperStatusChoise == 1)//选择状态为 已发布 执行逻辑
+    {
+        this->getCurPageIndexTableDataPubulished();
+        this->getTablePageCountPublished();
+    }else if(this->m_testPaperStatusChoise == 2)//选择状态为 未发布 执行逻辑
+    {
+        this->getCurPageIndexTableDataNotPubulished();
+        this->getTablePageCountNotPublished();
+    }
 }
 
 void CMainMenueDlg::showNextPageIndexTable()
 {
+    if(this->m_pageCount == "0") //如果查询的结果集为空则不进行操作
+    {
+        return;
+    }
+
     if(QString::number(this->curPageIndex) == this->m_pageCount)
     {
         return;
@@ -522,11 +574,22 @@ void CMainMenueDlg::showNextPageIndexTable()
     {
         this->curPageIndex += 1;
     }
-    //进行重新调用控制层获取数据
-    this->getCurPageIndexTableData();
 
-    //重新显示总量
-    this->getTablePageCount();
+    if(this->m_testPaperStatusChoise == 0) //选择状态为全部执行逻辑
+    {
+        //进行重新调用控制层获取数据
+        this->getCurPageIndexTableData();
+        //重新显示总量
+        this->getTablePageCount();
+    }else if(this->m_testPaperStatusChoise == 1)//选择状态为 已发布 执行逻辑
+    {
+        this->getCurPageIndexTableDataPubulished();
+        this->getTablePageCountPublished();
+    }else if(this->m_testPaperStatusChoise == 2)//选择状态为 未发布 执行逻辑
+    {
+        this->getCurPageIndexTableDataNotPubulished();
+        this->getTablePageCountNotPublished();
+    }
 }
 
 void CMainMenueDlg::clearTestPaperTableContorl()
@@ -720,7 +783,6 @@ void CMainMenueDlg::getCurPageIndexTableDataPubulished()
 {
     GetCurPageIndexTableDataPubulishedArg* arg = new GetCurPageIndexTableDataPubulishedArg();
     arg->thiz = this;
-    this->curPageIndex = 1;
     arg->curPageIndex = this->curPageIndex;
     arg->acount = this->m_acount;
     arg->status = "1";
@@ -748,14 +810,45 @@ unsigned WINAPI CMainMenueDlg::threadGetCurPageIndexTableDataPubulishedEntry(LPV
    return 0;
 }
 
+typedef struct getCurPageIndexTableDataNotPubulishedArg
+{
+    int curPageIndex;
+    QString acount;
+    QString status;
+    CMainMenueDlg* thiz;
+}GetCurPageIndexTableDataNotPubulishedArg;
+
 void CMainMenueDlg::getCurPageIndexTableDataNotPubulished()
 {
-
+   GetCurPageIndexTableDataNotPubulishedArg* arg = new GetCurPageIndexTableDataNotPubulishedArg();
+   arg->thiz = this;
+   arg->curPageIndex = this->curPageIndex;
+   arg->acount = this->m_acount;
+   arg->status = "0";
+   _beginthreadex(nullptr,0,&CMainMenueDlg::threadGetCurPageIndexTableDataNotPubulishedEntry,arg,0,nullptr);
 }
 
 unsigned WINAPI CMainMenueDlg::threadGetCurPageIndexTableDataNotPubulishedEntry(LPVOID arg)
 {
-
+   GetCurPageIndexTableDataNotPubulishedArg* gInfo = (GetCurPageIndexTableDataNotPubulishedArg*)arg;
+   std::vector<std::vector<std::string>> ret = gInfo->thiz->m_mainMenueContorller->getCurPageIndexTableDataNotPubulished(gInfo->curPageIndex,
+                                                                             gInfo->acount,
+                                                                             gInfo->status);
+   QVector<QVector<QString>>* result = new QVector<QVector<QString>>();
+   for(int i = 0 ; i < ret.size();i++)
+   {
+       QVector<QString> temp;
+       for(int j = 0 ; j < ret.at(i).size();j++)
+       {
+           QString str = QString::fromLocal8Bit(ret.at(i).at(j).c_str());
+           temp.push_back(str);
+       }
+       result->push_back(temp);
+   }
+   emit gInfo->thiz->startShowCurPageIndexTable(result);
+   delete gInfo;
+   _endthreadex(0);
+   return 0;
 }
 
 void CMainMenueDlg::getCurPageIndexTableData()
@@ -767,7 +860,7 @@ void CMainMenueDlg::showCurPageIndexTable(QVector<QVector<QString>>* ret)
 {
     this->clearTestPaperTableContorl();
    //将数据进行插入到表格中
-   for(int i = 0 ; i < ret->size()-1 ; i++)
+   for(int i = 0 ; i < ret->size(); i++)
    {
        //显示序号
        QList<QCheckBox*> buttons = this->m_checkVec.at(i)->findChildren<QCheckBox*>();
@@ -776,22 +869,22 @@ void CMainMenueDlg::showCurPageIndexTable(QVector<QVector<QString>>* ret)
        }
 
        //显示试卷名
-       QString str = ret->at(i+1).at(0);
+       QString str = ret->at(i).at(0);
        this->m_testPaperName.at(i)->setText(str);
 
        //显示题量
-       str = ret->at(i+1).at(1);
+       str = ret->at(i).at(1);
        this->m_testPaperCount.at(i)->setText(str);
 
        //显示创建时间
-       str = ret->at(i+1).at(2);
+       str = ret->at(i).at(2);
        this->m_createTime.at(i)->setText(str);
        //创建人
-       str = ret->at(i+1).at(3);
+       str = ret->at(i).at(3);
        this->m_creater.at(i)->setText(str);
 
        //发布状态
-       str = ret->at(i+1).at(4);
+       str = ret->at(i).at(4);
        this->m_status.at(i)->setText(str);
 
        //显示操作按钮
