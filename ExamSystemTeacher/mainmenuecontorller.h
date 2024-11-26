@@ -39,6 +39,11 @@ public :
                                                                                 QString acount,
                                                                                 QString status);
     int getTablePageCountNotPublished(QString acount,QString status);
+    std::vector<std::vector<std::string>> getTableDataByFindTestName(int curPageIndex,
+                                                                     QString acount,
+                                                                     QString testPaperName);
+
+    int getTableDataByFindTestNameCount(QString acount,QString testPaperName);
  private:
     CMainMenueModel* m_mainMenueModel = nullptr;
 };

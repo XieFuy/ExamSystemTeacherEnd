@@ -161,6 +161,9 @@ private:
     void getTablePageCountNotPublished();//获取查询结果为未发布的总数
     static unsigned WINAPI threadGetTablePageCountNotPublishedEntry(LPVOID arg);
 
+    void getTableDataByFindTestNameCount(); //获取模糊查询的结果的条数
+    static unsigned WINAPI threadGetTableDataByFindTestNameCountEntry(LPVOID arg);
+
     void getCurPageIndexTableData();
     static unsigned WINAPI threadGetCurPageIndexTableData(LPVOID arg);
 
@@ -175,6 +178,10 @@ private:
 
     void getCurPageIndexTableDataNotPubulished();//获取状态为未发布的试卷的记录
     static unsigned WINAPI threadGetCurPageIndexTableDataNotPubulishedEntry(LPVOID arg);
+
+    void getTableDataByFindTestName();//根据试卷的名称进行模糊查询
+    static unsigned WINAPI threadGetTableDataByFindTestNameEntry(LPVOID arg);
+
 
 private:
     Ui::CMainMenueDlg *ui;

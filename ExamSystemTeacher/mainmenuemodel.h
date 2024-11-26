@@ -44,6 +44,10 @@ public:
                                                                                 ,const char* acount
                                                                                 ,const char* status);
     int getTablePageCountNotPublished(const char* acount,const char* status);
+    std::vector<std::vector<std::string>> getTableDataByFindTestName(int curPageIndex,
+                                                                     const char* acount,
+                                                                     const char* testPaperName);
+    int getTableDataByFindTestNameCount(const char* acount,const char* testPaperName);
 private:
       HANDLE m_mutex; //因为所有操作都是使用的一个CDBHelper对象，所以要给每一个执行sql的步骤进行上锁
 };

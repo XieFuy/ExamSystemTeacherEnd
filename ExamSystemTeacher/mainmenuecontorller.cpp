@@ -6,6 +6,15 @@ CMainMenueContorller::CMainMenueContorller()
 }
 
 
+int CMainMenueContorller::getTableDataByFindTestNameCount(QString acount,QString testPaperName)
+{
+    QByteArray acountArr = acount.toUtf8();
+    QByteArray testPaperNameArr = testPaperName.toLocal8Bit();
+    const char* pAcount = acountArr.data();
+    const char* pTestPaperName = testPaperNameArr.data();
+    return this->m_mainMenueModel->getTableDataByFindTestNameCount(pAcount,pTestPaperName);
+}
+
 int CMainMenueContorller::getTablePageCountNotPublished(QString acount,QString status)
 {
     QByteArray acountArr = acount.toUtf8();
@@ -78,6 +87,17 @@ int CMainMenueContorller::getTablePageCountPublished(QString acount,
    const char* pAcount = acountArr.data();
    const char* pStatus = statusArr.data();
    return this->m_mainMenueModel->getTablePageCountPublished(pAcount,pStatus);
+}
+
+std::vector<std::vector<std::string>> CMainMenueContorller::getTableDataByFindTestName(int curPageIndex,
+                                                                 QString acount,
+                                                                 QString testPaperName)
+{
+    QByteArray acountArr = acount.toUtf8();
+    QByteArray testPaperNameArr = testPaperName.toLocal8Bit();
+    const char* pAcount = acountArr.data();
+    const char* pTestPaperName = testPaperNameArr.data();
+    return this->m_mainMenueModel->getTableDataByFindTestName(curPageIndex,pAcount,pTestPaperName);
 }
 
 std::vector<std::vector<std::string>> CMainMenueContorller::getCurPageIndexTableDataPubulished(

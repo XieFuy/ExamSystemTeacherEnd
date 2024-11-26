@@ -10,6 +10,39 @@ CMainMenueModel::~CMainMenueModel()
 
 }
 
+int CMainMenueModel::getTableDataByFindTestNameCount(const char* acount,const char* testPaperName)
+{
+    if(acount == nullptr || testPaperName == nullptr)
+    {
+        return -1;
+    }
+    CDBHelper* dbHelper = new CDBHelper();
+    char* sqlBuf = new char[1024000];
+    memset(sqlBuf,'\0',sizeof(char) * 1024000);
+    std::string sql;
+    sprintf(sqlBuf,"select count(*) from `testPaperInfo` \
+where  `teacherId` = '%s' and `testPaperName` like '%%%s%%';",acount,testPaperName);
+    sql = sqlBuf;
+    int tableCount =  dbHelper->sqlQueryCount(sql,"ExamSystem"); //获取的是表的记录条数
+    tableCount -= 1; //减去最上面的一条记录
+    int result = (tableCount / 8) ;
+
+    if(result < 0) //表示总的记录条数小于8
+    {
+         result += 1;
+    }else
+    {
+       int yuShu = tableCount - (result * 8);
+        if(yuShu >= 0)
+        {
+            result += 1;
+        }
+    }
+    delete[] sqlBuf;
+    delete dbHelper;
+    return result;
+}
+
 
 std::vector<std::vector<std::string>> CMainMenueModel::getCurPageIndexTableDataNotPubulished(
                                                                              int curPageIndex
@@ -99,6 +132,62 @@ where  `teacherId` = '%s' and `publishStatus` = '%s';",acount,status);
     delete dbHelper;
     return result;
 }
+
+std::vector<std::vector<std::string>> CMainMenueModel::getTableDataByFindTestName(int curPageIndex,
+                                                                 const char* acount,
+                                                                 const char* testPaperName)
+{
+    if(acount == nullptr || testPaperName == nullptr)
+    {
+        return std::vector<std::vector<std::string>>();
+    }
+    CDBHelper* dbHelper = new CDBHelper();
+    char* sqlBuf = new char[1024000];
+    memset(sqlBuf,'\0',sizeof(char) * 1024000);
+    std::string sql;
+    sprintf(sqlBuf,"SELECT \n\
+tp.testPaperName,\n\
+(\n\
+COALESCE((SELECT COUNT(*) FROM singleChoice sc WHERE sc.testPaperId = tp.testPaperId), 0) +\n\
+COALESCE((SELECT COUNT(*) FROM multiChoice mc WHERE mc.testPaperId = tp.testPaperId), 0) +\n\
+COALESCE((SELECT COUNT(*) FROM judge j WHERE j.testPaperId = tp.testPaperId), 0) +\n\
+COALESCE((SELECT COUNT(*) FROM shortAnswer sa WHERE sa.testPaperId = tp.testPaperId), 0)\n\
+) AS totalQuestionCount,\n\
+tp.saveTime,\n\
+t.name AS teacherName,\n\
+tp.publishStatus\n\
+FROM \n\
+testPaperInfo tp\n\
+JOIN \n\
+TeacherInfo t ON tp.teacherId = t.teacherId\n\
+WHERE \n\
+tp.teacherId = '%s'\n\
+AND \n\
+tp.testPaperName like  '%%%s%%'\n\
+ORDER BY \n\
+tp.testPaperId\n\
+LIMIT 8 OFFSET %d;",acount,testPaperName,(curPageIndex -1)*8);
+    sql = sqlBuf;
+    std::vector<std::vector<std::string>> ret =  dbHelper->sqlQuery(sql,"ExamSystem");
+    delete[] sqlBuf;
+    delete dbHelper;
+    for(int i = 0 ; i < ret.size();i++)
+    {
+        if(ret.at(i).at(4) == "0")
+        {
+            QString strTemp = "未发布";
+            QByteArray tempArr = strTemp.toLocal8Bit();
+            ret.at(i).at(4) = tempArr.data();
+        }else if(ret.at(i).at(4) == "1")
+        {
+            QString strTemp = "以发布";
+            QByteArray tempArr = strTemp.toLocal8Bit();
+            ret.at(i).at(4) = tempArr.data();
+        }
+    }
+    return ret;
+}
+
 
 int CMainMenueModel::getTablePageCountPublished(
         const char* acount,
