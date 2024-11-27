@@ -5,6 +5,14 @@ CMainMenueContorller::CMainMenueContorller()
  this->m_mainMenueModel = new CMainMenueModel();
 }
 
+bool CMainMenueContorller::deleteClickBtn(QString acount,QString createTime)
+{
+    QByteArray acountArr = acount.toUtf8();
+    QByteArray createTimeArr = createTime.toUtf8();
+    const char* pAcount  = acountArr.data();
+    const char* pCreateTime = createTimeArr.data();
+    return this->m_mainMenueModel->deleteClickBtn(pAcount,pCreateTime);
+}
 
 int CMainMenueContorller::getTableDataByFindTestNameCount(QString acount,QString testPaperName)
 {

@@ -44,6 +44,7 @@ public :
                                                                      QString testPaperName);
 
     int getTableDataByFindTestNameCount(QString acount,QString testPaperName);
+    bool deleteClickBtn(QString acount,QString createTime);
  private:
     CMainMenueModel* m_mainMenueModel = nullptr;
 };

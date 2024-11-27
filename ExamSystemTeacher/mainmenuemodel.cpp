@@ -10,6 +10,47 @@ CMainMenueModel::~CMainMenueModel()
 
 }
 
+bool CMainMenueModel::deleteClickBtn(const char* acount,const char* createTime)
+{
+    if(acount == nullptr || createTime == nullptr)
+    {
+        return false;
+    }
+    CDBHelper* dbHelper = new CDBHelper();
+    char* sqlBuf = new char[1024000];
+    memset(sqlBuf,'\0',sizeof(char) * 1024000);
+    std::string sql;
+
+    sprintf(sqlBuf,"delete from `singleChoice`  where  `testPaperId` in (select `testPaperId` from `testPaperInfo` where `saveTime` = '%s' and `teacherId` = '%s');",createTime,acount);
+    sql = sqlBuf;
+    qDebug()<<sql.c_str();
+    bool ret =  dbHelper->sqlExcute(sql,"ExamSystem");
+
+    memset(sqlBuf,'\0',sizeof(char) * 1024000);
+    sprintf(sqlBuf,"delete from `multiChoice`   where `testPaperId` in (select `testPaperId` from `testPaperInfo` where `saveTime` = '%s' and `teacherId` = '%s');",createTime,acount);
+    sql = sqlBuf;
+    ret =  dbHelper->sqlExcute(sql,"ExamSystem");
+
+    memset(sqlBuf,'\0',sizeof(char) * 1024000);
+    sprintf(sqlBuf,"delete from `judge` where `testPaperId` in (select `testPaperId` from `testPaperInfo` where `saveTime` = '%s' and `teacherId` = '%s');",createTime,acount);
+    sql = sqlBuf;
+    ret =  dbHelper->sqlExcute(sql,"ExamSystem");
+
+    memset(sqlBuf,'\0',sizeof(char) * 1024000);
+    sprintf(sqlBuf,"delete from `shortAnswer` where `testPaperId` in (select `testPaperId` from `testPaperInfo` where `saveTime` = '%s' and `teacherId` = '%s');",createTime,acount);
+    sql = sqlBuf;
+    ret =  dbHelper->sqlExcute(sql,"ExamSystem");
+
+    memset(sqlBuf,'\0',sizeof(char) * 1024000);
+    sprintf(sqlBuf," delete from `testPaperInfo` where `saveTime` = '%s' and `teacherId` = '%s';",createTime,acount);
+    sql = sqlBuf;
+    ret =  dbHelper->sqlExcute(sql,"ExamSystem");
+
+    delete[] sqlBuf;
+    delete dbHelper;
+    return ret;
+}
+
 int CMainMenueModel::getTableDataByFindTestNameCount(const char* acount,const char* testPaperName)
 {
     if(acount == nullptr || testPaperName == nullptr)

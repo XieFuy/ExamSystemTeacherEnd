@@ -88,6 +88,8 @@ private:
     QVector<QLabel*> m_status;//发布状态
     QVector<QWidget*> m_operators; //操作
     int m_testPaperStatusChoise;//表示试卷管理状态选择的类型
+    QMap<QPushButton*,int> m_deleteBtnMap;//用于存储删除按钮映射的行
+    QMap<QPushButton*,int> m_updateBtnMap;//用于存储发布按钮映射的行
 private:
     void showPageIndex();//显示分页查询的下标页
     void initTableWidgetHeader(); //初始化表头
@@ -182,6 +184,16 @@ private:
     void getTableDataByFindTestName();//根据试卷的名称进行模糊查询
     static unsigned WINAPI threadGetTableDataByFindTestNameEntry(LPVOID arg);
 
+    //删除点击删除的记录
+    void deleteClickBtn(int row);
+    static unsigned WINAPI threadDeleteClickBtnEntry(LPVOID arg);
+
+    // 更改点击发布的记录
+    void updateStatusClickBtn(int row);
+    static unsigned WINAPI threadUpdateStatusClickBtn(LPVOID arg);
+
+    //给所有的操作按钮进行信号槽的绑定
+    void bindOperatorBtns();
 
 private:
     Ui::CMainMenueDlg *ui;

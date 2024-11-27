@@ -469,6 +469,94 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
     QObject::connect(this->ui->pushButton_23,&QPushButton::clicked,this,&CMainMenueDlg::getTableDataByFindTestName);
 }
 
+void CMainMenueDlg::updateStatusClickBtn(int row)
+{
+
+}
+
+typedef struct deleteClickBtnArg
+{
+    QString acount;
+    QString createTime;
+    CMainMenueDlg* thiz;
+}DeleteClickBtnArg;
+
+void CMainMenueDlg::deleteClickBtn(int row)
+{
+    //获取到同一行的创建时间
+    QString createTime = this->m_createTime.at(row)->text().trimmed();
+    qDebug()<<"createTime: "<<createTime;
+    DeleteClickBtnArg* arg = new DeleteClickBtnArg();
+    arg->thiz = this;
+    arg->acount = this->m_acount;
+    arg->createTime = createTime;
+    _beginthreadex(nullptr,0,&CMainMenueDlg::threadDeleteClickBtnEntry,arg,0,nullptr);
+}
+
+unsigned WINAPI CMainMenueDlg::threadDeleteClickBtnEntry(LPVOID arg)
+{
+   DeleteClickBtnArg* dInfo = (DeleteClickBtnArg*)arg;
+   dInfo->thiz->m_mainMenueContorller->deleteClickBtn(dInfo->acount,dInfo->createTime);
+   //进行删除完成后重新进行查询和显示结果
+   dInfo->thiz->getCurPageIndexTableData();
+   dInfo->thiz->getTablePageCount();
+   delete dInfo;
+   _endthreadex(0);
+   return 0;
+}
+
+void  CMainMenueDlg::bindOperatorBtns()
+{
+    for(QVector<QWidget*>::iterator pos = this->m_operators.begin(); pos != this->m_operators.end();pos++)
+    {
+         QList<QPushButton*> ret = (*pos)->findChildren<QPushButton*>();
+         for(QPushButton* btn : ret)
+         {
+             if(btn->text() == "删除")
+             {
+                 //绑定的删除操作的槽函数
+                 QObject::connect(btn,&QPushButton::clicked,[=](){
+                     //进行遍历是哪一个按钮，并获取对应的行号
+                     int row = 0;
+                     for(int i = 0 ; i < this->m_operators.size();i++)
+                     {
+                         QList<QPushButton*> buttons = this->m_operators.at(i)->findChildren<QPushButton*>();
+                         for(QPushButton* clickedBtn: buttons)
+                         {
+                             if(clickedBtn == btn)
+                             {
+                                 this->deleteClickBtn(row);
+                                 break;
+                             }
+                         }
+                         row++;
+                     }
+                 });
+
+             }else if(btn->text() == "发布")
+             {
+                 //绑定的发布操作的槽函数
+                 QObject::connect(btn,&QPushButton::clicked,[=](){
+                     for(int i = 0 ; i < this->m_operators.size();i++)
+                     {
+                         int row = 0;
+                         QList<QPushButton*> buttons = this->m_operators.at(i)->findChildren<QPushButton*>();
+                         for(QPushButton* clickedBtn: buttons)
+                         {
+                             if(clickedBtn == btn)
+                             {
+                                 this->updateStatusClickBtn(row);
+                                 break;
+                             }
+                         }
+                         row++;
+                     }
+                 });
+             }
+         }
+    }
+}
+
 typedef struct getTableDataByFindTestNameCountArg{
     CMainMenueDlg* thiz;
     QString acount;
@@ -832,6 +920,8 @@ void CMainMenueDlg::initTestPaperTableContorl()
         this->m_operators.push_back(widget);
     }
 
+    //给操作按钮绑定信号槽函数
+    this->bindOperatorBtns();
 }
 
 unsigned WINAPI CMainMenueDlg::threadGetCurPageIndexTableData(LPVOID arg)
