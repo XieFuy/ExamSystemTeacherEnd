@@ -5,6 +5,137 @@ CMainMenueContorller::CMainMenueContorller()
  this->m_mainMenueModel = new CMainMenueModel();
 }
 
+typedef struct deleteFromSignalChoiseArg
+{
+    QString acount;
+    QString createTime;
+    CMainMenueContorller* thiz;
+}DeleteFromSignalChoiseArg;
+
+
+bool CMainMenueContorller::deleteMultiClickBtn(QString acount,QList<QString> createTimeLst)
+{
+    bool ret = false;
+    QByteArray acountArr = acount.toUtf8();
+    const char* pAcount = acountArr.data();
+    //打印一遍时间列表
+    for(int i = 0 ; i < createTimeLst.size();i++)
+    {
+        QByteArray createTimeArr = createTimeLst.at(i).toLocal8Bit();
+        const char* pCreateTime = createTimeArr.data();
+
+        DeleteFromSignalChoiseArg* arg = new DeleteFromSignalChoiseArg();
+        arg->thiz = this;
+        arg->acount = acount;
+        arg->createTime = createTimeLst.at(i);
+        HANDLE thread1 = (HANDLE)_beginthreadex(nullptr,0,&CMainMenueContorller::threadDeleteFromSignalChoise,arg,0,nullptr);
+
+        DeleteFromSignalChoiseArg* arg2 = new DeleteFromSignalChoiseArg();
+        arg2->thiz = this;
+        arg2->acount = acount;
+        arg2->createTime = createTimeLst.at(i);
+        HANDLE thread2 = (HANDLE)_beginthreadex(nullptr,0,&CMainMenueContorller::threadDeleteFromMultiChoise,arg2,0,nullptr);
+
+        DeleteFromSignalChoiseArg* arg3 = new DeleteFromSignalChoiseArg();
+        arg3->thiz = this;
+        arg3->acount = acount;
+        arg3->createTime = createTimeLst.at(i);
+        HANDLE thread3 = (HANDLE)_beginthreadex(nullptr,0,&CMainMenueContorller::threadDeleteFromJudge,arg3,0,nullptr);
+
+        DeleteFromSignalChoiseArg* arg4 = new DeleteFromSignalChoiseArg();
+        arg4->thiz = this;
+        arg4->acount = acount;
+        arg4->createTime = createTimeLst.at(i);
+        HANDLE thread4 = (HANDLE)_beginthreadex(nullptr,0,&CMainMenueContorller::threadDeleteFromShortAnswer,arg4,0,nullptr);
+
+        //先从题库中删除属于该试卷的所有试题
+        //ret = this->m_mainMenueModel->deleteFromSignalChoise(pAcount,pCreateTime);
+//        ret = this->m_mainMenueModel->deleteFromMultiChoise(pAcount,pCreateTime);
+//        ret = this->m_mainMenueModel->deleteFromJudge(pAcount,pCreateTime);
+//        ret = this->m_mainMenueModel->deleteFromShortAnswer(pAcount,pCreateTime);
+        //再进行删除题库中的试卷信息
+        //等待四个线程结束时进行执行
+        WaitForSingleObject(thread1,INFINITE);
+        WaitForSingleObject(thread2,INFINITE);
+        WaitForSingleObject(thread3,INFINITE);
+        WaitForSingleObject(thread4,INFINITE);
+        ret = this->m_mainMenueModel->deleteClickBtn(pAcount,pCreateTime);
+    }
+    return ret;
+}
+
+unsigned WINAPI CMainMenueContorller::threadDeleteFromShortAnswer(LPVOID arg)
+{
+    DeleteFromSignalChoiseArg* dInfo = (DeleteFromSignalChoiseArg*)arg;
+    dInfo->thiz->deleteFromShortAnswer(dInfo->acount,dInfo->createTime);
+    delete dInfo;
+    _endthreadex(0);
+    return 0;
+}
+
+bool CMainMenueContorller::deleteFromShortAnswer(QString acount,QString createTime)
+{
+    QByteArray acountArr = acount.toUtf8();
+    QByteArray createTimeArr = createTime.toLocal8Bit();
+    const char* pAcount = acountArr.data();
+    const char* pCreateTime = createTimeArr.data();
+    return this->m_mainMenueModel->deleteFromShortAnswer(pAcount,pCreateTime);
+}
+
+unsigned WINAPI CMainMenueContorller::threadDeleteFromJudge(LPVOID arg)
+{
+    DeleteFromSignalChoiseArg* dInfo = (DeleteFromSignalChoiseArg*)arg;
+    dInfo->thiz->deleteFromJudge(dInfo->acount,dInfo->createTime);
+    delete dInfo;
+    _endthreadex(0);
+    return 0;
+}
+
+bool CMainMenueContorller::deleteFromJudge(QString acount,QString createTime)
+{
+    QByteArray acountArr = acount.toUtf8();
+    QByteArray createTimeArr = createTime.toLocal8Bit();
+    const char* pAcount = acountArr.data();
+    const char* pCreateTime = createTimeArr.data();
+    return this->m_mainMenueModel->deleteFromJudge(pAcount,pCreateTime);
+}
+
+unsigned WINAPI CMainMenueContorller::threadDeleteFromMultiChoise(LPVOID arg)
+{
+    DeleteFromSignalChoiseArg* dInfo = (DeleteFromSignalChoiseArg*)arg;
+    dInfo->thiz->deleteFromMultiChoise(dInfo->acount,dInfo->createTime);
+    delete dInfo;
+    _endthreadex(0);
+    return 0;
+}
+
+bool CMainMenueContorller::deleteFromMultiChoise(QString acount,QString createTime)
+{
+    QByteArray acountArr = acount.toUtf8();
+    QByteArray createTimeArr = createTime.toLocal8Bit();
+    const char* pAcount = acountArr.data();
+    const char* pCreateTime = createTimeArr.data();
+    return this->m_mainMenueModel->deleteFromMultiChoise(pAcount,pCreateTime);
+}
+
+unsigned WINAPI CMainMenueContorller::threadDeleteFromSignalChoise(LPVOID arg)
+{
+    DeleteFromSignalChoiseArg* dInfo = (DeleteFromSignalChoiseArg*)arg;
+    dInfo->thiz->deleteFromSignalChoise(dInfo->acount,dInfo->createTime);
+    delete dInfo;
+    _endthreadex(0);
+    return 0;
+}
+
+bool CMainMenueContorller::deleteFromSignalChoise(QString acount,QString createTime)
+{
+    QByteArray acountArr = acount.toUtf8();
+    QByteArray createTimeArr = createTime.toLocal8Bit();
+    const char* pAcount = acountArr.data();
+    const char* pCreateTime = createTimeArr.data();
+    return this->m_mainMenueModel->deleteFromSignalChoise(pAcount,pCreateTime);
+}
+
 bool CMainMenueContorller::deleteClickBtn(QString acount,QString createTime)
 {
     QByteArray acountArr = acount.toUtf8();

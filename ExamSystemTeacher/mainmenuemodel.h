@@ -49,6 +49,10 @@ public:
                                                                      const char* testPaperName);
     int getTableDataByFindTestNameCount(const char* acount,const char* testPaperName);
     bool deleteClickBtn(const char* acount,const char* createTime);
+    bool deleteFromSignalChoise(const char* acount,const char* createTime);
+    bool deleteFromMultiChoise(const char* acount,const char* createTime);
+    bool deleteFromJudge(const char* acount,const char* createTime);
+    bool deleteFromShortAnswer(const char* acount,const char* createTime);
 private:
       HANDLE m_mutex; //因为所有操作都是使用的一个CDBHelper对象，所以要给每一个执行sql的步骤进行上锁
 };

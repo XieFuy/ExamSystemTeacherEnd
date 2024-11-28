@@ -10,7 +10,71 @@ CMainMenueModel::~CMainMenueModel()
 
 }
 
-bool CMainMenueModel::deleteClickBtn(const char* acount,const char* createTime)
+bool CMainMenueModel::deleteFromShortAnswer(const char* acount,const char* createTime)
+{
+    if(acount == nullptr || createTime == nullptr)
+    {
+        return false;
+    }
+    CDBHelper* dbHelper = new CDBHelper();
+    char* sqlBuf = new char[1024000];
+    memset(sqlBuf,'\0',sizeof(char) * 1024000);
+    std::string sql;
+
+    memset(sqlBuf,'\0',sizeof(char) * 1024000);
+    sprintf(sqlBuf,"delete from `shortAnswer` where `testPaperId` in (select `testPaperId` from `testPaperInfo` where `saveTime` = '%s' and `teacherId` = '%s');",createTime,acount);
+    sql = sqlBuf;
+    bool ret =  dbHelper->sqlExcute(sql,"ExamSystem");
+
+    delete[] sqlBuf;
+    delete dbHelper;
+    return ret;
+}
+
+
+bool CMainMenueModel::deleteFromJudge(const char* acount,const char* createTime)
+{
+    if(acount == nullptr || createTime == nullptr)
+    {
+        return false;
+    }
+    CDBHelper* dbHelper = new CDBHelper();
+    char* sqlBuf = new char[1024000];
+    memset(sqlBuf,'\0',sizeof(char) * 1024000);
+    std::string sql;
+
+    memset(sqlBuf,'\0',sizeof(char) * 1024000);
+    sprintf(sqlBuf,"delete from `judge` where `testPaperId` in (select `testPaperId` from `testPaperInfo` where `saveTime` = '%s' and `teacherId` = '%s');",createTime,acount);
+    sql = sqlBuf;
+    bool ret =  dbHelper->sqlExcute(sql,"ExamSystem");
+
+    delete[] sqlBuf;
+    delete dbHelper;
+    return ret;
+}
+
+bool CMainMenueModel::deleteFromMultiChoise(const char* acount,const char* createTime)
+{
+    if(acount == nullptr || createTime == nullptr)
+    {
+        return false;
+    }
+    CDBHelper* dbHelper = new CDBHelper();
+    char* sqlBuf = new char[1024000];
+    memset(sqlBuf,'\0',sizeof(char) * 1024000);
+    std::string sql;
+
+    memset(sqlBuf,'\0',sizeof(char) * 1024000);
+    sprintf(sqlBuf,"delete from `multiChoice`   where `testPaperId` in (select `testPaperId` from `testPaperInfo` where `saveTime` = '%s' and `teacherId` = '%s');",createTime,acount);
+    sql = sqlBuf;
+    bool ret =  dbHelper->sqlExcute(sql,"ExamSystem");
+
+    delete[] sqlBuf;
+    delete dbHelper;
+    return ret;
+}
+
+bool CMainMenueModel::deleteFromSignalChoise(const char* acount,const char* createTime)
 {
     if(acount == nullptr || createTime == nullptr)
     {
@@ -26,21 +90,23 @@ bool CMainMenueModel::deleteClickBtn(const char* acount,const char* createTime)
     qDebug()<<sql.c_str();
     bool ret =  dbHelper->sqlExcute(sql,"ExamSystem");
 
-    memset(sqlBuf,'\0',sizeof(char) * 1024000);
-    sprintf(sqlBuf,"delete from `multiChoice`   where `testPaperId` in (select `testPaperId` from `testPaperInfo` where `saveTime` = '%s' and `teacherId` = '%s');",createTime,acount);
-    sql = sqlBuf;
-    ret =  dbHelper->sqlExcute(sql,"ExamSystem");
+    delete[] sqlBuf;
+    delete dbHelper;
+    return ret;
+}
 
+bool CMainMenueModel::deleteClickBtn(const char* acount,const char* createTime)
+{
+    if(acount == nullptr || createTime == nullptr)
+    {
+        return false;
+    }
+    CDBHelper* dbHelper = new CDBHelper();
+    char* sqlBuf = new char[1024000];
     memset(sqlBuf,'\0',sizeof(char) * 1024000);
-    sprintf(sqlBuf,"delete from `judge` where `testPaperId` in (select `testPaperId` from `testPaperInfo` where `saveTime` = '%s' and `teacherId` = '%s');",createTime,acount);
-    sql = sqlBuf;
-    ret =  dbHelper->sqlExcute(sql,"ExamSystem");
+    std::string sql;
 
-    memset(sqlBuf,'\0',sizeof(char) * 1024000);
-    sprintf(sqlBuf,"delete from `shortAnswer` where `testPaperId` in (select `testPaperId` from `testPaperInfo` where `saveTime` = '%s' and `teacherId` = '%s');",createTime,acount);
-    sql = sqlBuf;
-    ret =  dbHelper->sqlExcute(sql,"ExamSystem");
-
+    bool ret = false;
     memset(sqlBuf,'\0',sizeof(char) * 1024000);
     sprintf(sqlBuf," delete from `testPaperInfo` where `saveTime` = '%s' and `teacherId` = '%s';",createTime,acount);
     sql = sqlBuf;

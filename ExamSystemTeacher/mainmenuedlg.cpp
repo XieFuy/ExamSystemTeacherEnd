@@ -467,7 +467,176 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
         }
     });
     QObject::connect(this->ui->pushButton_23,&QPushButton::clicked,this,&CMainMenueDlg::getTableDataByFindTestName);
+    QObject::connect(this->ui->checkBox_7,&QCheckBox::toggled,this,&CMainMenueDlg::changeCurPageCheckBoxStatus);
+    QObject::connect(this->ui->pushButton_25,&QPushButton::clicked,this,&CMainMenueDlg::deleteMultiClickBtn);
 }
+
+typedef struct deleteMultiClickBtnArg
+{
+    QString acount;
+    QList<QString>* createTimeLst;
+    CMainMenueDlg* thiz;
+}DeleteMultiClickBtnArg;
+
+void CMainMenueDlg::deleteMultiClickBtn()
+{
+    DeleteMultiClickBtnArg*  arg = new DeleteMultiClickBtnArg();
+    arg->thiz = this;
+    arg->acount = this->m_acount;
+
+    QList<QString>* createTimeLst = new QList<QString>();
+    for(int i = 0 ; i < this->m_checkVec.size();i++)
+    {
+        QList<QCheckBox*> ret =  m_checkVec.at(i)->findChildren<QCheckBox*>();
+        for(QCheckBox* check :ret)
+        {
+            if(check->isChecked())
+            {
+                QString createTime = this->m_createTime.at(i)->text().trimmed();
+                if(createTime != "")
+                {
+                    createTimeLst->push_back(createTime);
+                }
+            }
+        }
+    }
+    arg->createTimeLst = createTimeLst;
+    _beginthreadex(nullptr,0,&CMainMenueDlg::threadDeleteMultiClickBtnEntry,arg,0,nullptr);
+    //将复选框进行设置为未选中
+    for(int i = 0 ; i < this->m_checkVec.size();i++)
+    {
+        QList<QCheckBox*> ret =  this->m_checkVec.at(i)->findChildren<QCheckBox*>();
+        for(QCheckBox* check : ret)
+        {
+            check->setChecked(false);
+        }
+    }
+}
+
+unsigned WINAPI CMainMenueDlg::threadDeleteMultiClickBtnEntry(LPVOID arg)
+{
+      DeleteMultiClickBtnArg* dInfo = (DeleteMultiClickBtnArg*)arg;
+      dInfo->thiz->m_mainMenueContorller->deleteMultiClickBtn(dInfo->acount,*dInfo->createTimeLst);
+      delete dInfo->createTimeLst;
+      delete dInfo;
+      dInfo->thiz->getCurPageIndexTableData();
+      dInfo->thiz->getTablePageCount();
+      _endthreadex(0);
+      return 0;
+}
+
+typedef struct deleteFromShortAnswerArg
+{
+    QString acount;
+    QString createTime;
+    CMainMenueDlg* thiz;
+}DeleteFromShortAnswerArg;
+
+void CMainMenueDlg::deleteFromShortAnswer(QString createTime)
+{
+    DeleteFromShortAnswerArg* arg = new DeleteFromShortAnswerArg();
+    arg->thiz = this;
+    arg->acount =this->m_acount;
+    arg->createTime = createTime;
+    _beginthreadex(nullptr,0,&CMainMenueDlg::threadDeleteFromShortAnswerEntry,arg,0,nullptr);
+}
+
+unsigned WINAPI CMainMenueDlg::threadDeleteFromShortAnswerEntry(LPVOID arg)
+{
+    DeleteFromShortAnswerArg* dInfo = ( DeleteFromShortAnswerArg*)arg;
+    dInfo->thiz->m_mainMenueContorller->deleteFromShortAnswer(dInfo->acount,dInfo->createTime);
+    delete dInfo;
+    _endthreadex(0);
+    return 0;
+}
+
+typedef struct deleteFromJudgeArg{
+    QString acount;
+    QString createTime;
+    CMainMenueDlg* thiz;
+}DeleteFromJudgeArg;
+
+void CMainMenueDlg::deleteFromJudge(QString createTime)
+{
+    DeleteFromJudgeArg* arg = new DeleteFromJudgeArg();
+    arg->thiz = this;
+    arg->acount =this->m_acount;
+    arg->createTime = createTime;
+    _beginthreadex(nullptr,0,&CMainMenueDlg::threadDeleteFromJudgeEntry,arg,0,nullptr);
+}
+
+unsigned WINAPI CMainMenueDlg::threadDeleteFromJudgeEntry(LPVOID arg)
+{
+    DeleteFromJudgeArg* dInfo = (DeleteFromJudgeArg*)arg;
+    dInfo->thiz->m_mainMenueContorller->deleteFromJudge(dInfo->acount,dInfo->createTime);
+    delete dInfo;
+    _endthreadex(0);
+    return 0;
+}
+
+typedef struct deleteFromMultiChoiseArg
+{
+    QString acount;
+    QString createTime;
+    CMainMenueDlg* thiz;
+}DeleteFromMultiChoiseArg;
+
+void CMainMenueDlg::deleteFromMultiChoise(QString createTime)
+{
+ DeleteFromMultiChoiseArg* arg = new DeleteFromMultiChoiseArg();
+ arg->thiz = this;
+ arg->acount = this->m_acount;
+ arg->createTime =  createTime;
+ _beginthreadex(nullptr,0,&CMainMenueDlg::threadDeleteFromMultiChoiseEntry,arg,0,nullptr);
+}
+
+unsigned WINAPI CMainMenueDlg::threadDeleteFromMultiChoiseEntry(LPVOID arg)
+{
+    DeleteFromMultiChoiseArg* dInfo = (DeleteFromMultiChoiseArg*)arg;
+    dInfo->thiz->m_mainMenueContorller->deleteFromMultiChoise(dInfo->acount,dInfo->createTime);
+    delete dInfo;
+    _endthreadex(0);
+    return 0;
+}
+
+typedef struct deleteFromSignalChoiseArg
+{
+ QString acount;
+ QString createTime;
+ CMainMenueDlg* thiz;
+}DeleteFromSignalChoiseArg;
+
+void CMainMenueDlg::deleteFromSignalChoise(QString createTime)
+{
+    DeleteFromSignalChoiseArg* arg = new DeleteFromSignalChoiseArg();
+    arg->thiz =this;
+    arg->acount = this->m_acount;
+    arg->createTime = createTime;
+    _beginthreadex(nullptr,0,&CMainMenueDlg::threadDeleteFromSignalChoiseEntry,arg,0,nullptr);
+}
+
+unsigned WINAPI CMainMenueDlg::threadDeleteFromSignalChoiseEntry(LPVOID arg)
+{
+    DeleteFromSignalChoiseArg* dInfo = (DeleteFromSignalChoiseArg*)arg;
+    dInfo->thiz->m_mainMenueContorller->deleteFromSignalChoise(dInfo->acount,dInfo->createTime);
+    delete dInfo;
+    _endthreadex(0);
+    return 0;
+}
+
+
+void CMainMenueDlg::changeCurPageCheckBoxStatus(bool status)
+{
+    for(int i = 0 ; i < this->m_checkVec.size();i++)
+    {
+       QList<QCheckBox*> ret =  this->m_checkVec.at(i)->findChildren<QCheckBox*>();
+       for(QCheckBox* check : ret)
+       {
+          check->setChecked(status);
+       }
+    }
+}
+
 
 void CMainMenueDlg::updateStatusClickBtn(int row)
 {
@@ -485,7 +654,13 @@ void CMainMenueDlg::deleteClickBtn(int row)
 {
     //获取到同一行的创建时间
     QString createTime = this->m_createTime.at(row)->text().trimmed();
-    qDebug()<<"createTime: "<<createTime;
+    qDebug()<<"createTime: "<<createTime; 
+
+    this->deleteFromSignalChoise(createTime);
+    this->deleteFromMultiChoise(createTime);
+    this->deleteFromJudge(createTime);
+    this->deleteFromShortAnswer(createTime);
+
     DeleteClickBtnArg* arg = new DeleteClickBtnArg();
     arg->thiz = this;
     arg->acount = this->m_acount;
@@ -537,9 +712,9 @@ void  CMainMenueDlg::bindOperatorBtns()
              {
                  //绑定的发布操作的槽函数
                  QObject::connect(btn,&QPushButton::clicked,[=](){
+                     int row = 0;
                      for(int i = 0 ; i < this->m_operators.size();i++)
-                     {
-                         int row = 0;
+                     {                       
                          QList<QPushButton*> buttons = this->m_operators.at(i)->findChildren<QPushButton*>();
                          for(QPushButton* clickedBtn: buttons)
                          {

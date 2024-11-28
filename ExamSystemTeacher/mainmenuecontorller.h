@@ -43,8 +43,18 @@ public :
                                                                      QString acount,
                                                                      QString testPaperName);
 
-    int getTableDataByFindTestNameCount(QString acount,QString testPaperName);
+    int  getTableDataByFindTestNameCount(QString acount,QString testPaperName);
     bool deleteClickBtn(QString acount,QString createTime);
+
+    bool deleteFromSignalChoise(QString acount,QString createTime);
+    static unsigned WINAPI threadDeleteFromSignalChoise(LPVOID arg);
+    bool deleteFromMultiChoise(QString acount,QString createTime);
+    static unsigned WINAPI threadDeleteFromMultiChoise(LPVOID arg);
+    bool deleteFromJudge(QString acount,QString createTime);
+    static unsigned WINAPI threadDeleteFromJudge(LPVOID arg);
+    bool deleteFromShortAnswer(QString acount,QString createTime);
+    static unsigned WINAPI threadDeleteFromShortAnswer(LPVOID arg);
+    bool deleteMultiClickBtn(QString acount,QList<QString> createTimeLst);
  private:
     CMainMenueModel* m_mainMenueModel = nullptr;
 };

@@ -195,6 +195,27 @@ private:
     //给所有的操作按钮进行信号槽的绑定
     void bindOperatorBtns();
 
+    //将当前页的所有选项进行设置状态
+    void changeCurPageCheckBoxStatus(bool status);
+
+    //下面四个函数通常配合 deleteClickBtn函数 ，删除试卷表记录使用
+    //从单选题库中删除指定的题
+    void deleteFromSignalChoise(QString createTime);
+    static unsigned WINAPI threadDeleteFromSignalChoiseEntry(LPVOID arg);
+    //从多选题库中删除指定的题
+    void deleteFromMultiChoise(QString createTime);
+    static unsigned WINAPI threadDeleteFromMultiChoiseEntry(LPVOID arg);
+    //从判断题库中删除指定的题
+    void deleteFromJudge(QString createTime);
+    static unsigned WINAPI threadDeleteFromJudgeEntry(LPVOID arg);
+    //从简答题库中删除指定的题
+    void deleteFromShortAnswer(QString createTime);
+    static unsigned WINAPI threadDeleteFromShortAnswerEntry(LPVOID arg);
+
+    //批量删除当前页被选中的记录
+    void deleteMultiClickBtn();
+    static unsigned WINAPI threadDeleteMultiClickBtnEntry(LPVOID arg);
+
 private:
     Ui::CMainMenueDlg *ui;
 };
