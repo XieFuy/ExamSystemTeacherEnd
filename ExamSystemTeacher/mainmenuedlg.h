@@ -80,6 +80,7 @@ private:
     QString m_pageCount; //表示查询结果的页数
     int curPageIndex; //表示当前页
     int sortNUmber;//试卷表的序号
+    int sortNumberClass;//课程表的序号
     QVector<QWidget*> m_checkVec;//表示一整个列的复选框
     QVector<QLabel*> m_testPaperName;//表示试卷名称
     QVector<QLabel*> m_testPaperCount;//题量
@@ -90,6 +91,15 @@ private:
     int m_testPaperStatusChoise;//表示试卷管理状态选择的类型
     QMap<QPushButton*,int> m_deleteBtnMap;//用于存储删除按钮映射的行
     QMap<QPushButton*,int> m_updateBtnMap;//用于存储发布按钮映射的行
+
+    //课程表
+    QVector<QWidget*> m_classCheckVec;
+    QVector<QWidget*> m_classIconVec;
+    QVector<QLabel*> m_classNameVec;
+    QVector<QLabel*> m_classCreateTimeVec;
+    QVector<QLabel*> m_classCreatorVec;
+    QVector<QWidget*> m_classOperationsVec;
+
 private:
     void showPageIndex();//显示分页查询的下标页
     void initTableWidgetHeader(); //初始化表头
@@ -215,6 +225,12 @@ private:
     //批量删除当前页被选中的记录
     void deleteMultiClickBtn();
     static unsigned WINAPI threadDeleteMultiClickBtnEntry(LPVOID arg);
+
+    //进行初始化课程表的行高和列宽等
+    void initClassTable();
+
+    //进行初始化课程表的每列的控件
+    void initClassTableControl();
 
 private:
     Ui::CMainMenueDlg *ui;

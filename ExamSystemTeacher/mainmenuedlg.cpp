@@ -9,6 +9,7 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
     this->setWindowTitle("在线考试系统-教师端");
     this->setWindowIcon(QIcon(":/icons/winIcon.png"));
 
+    this->sortNumberClass = 0;
     this->sortNUmber = 0;
     this->signalCount = 0;
     this->multiCount = 0;
@@ -38,6 +39,8 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
 
     this->m_acount = "";
 
+    this->initClassTable();
+    this->initClassTableControl();
     //界面初始化的默认选中项
     this->ui->pushButton_3->setStyleSheet("QPushButton{border:1px solid #50b8f7;background-color:#50b8f7;color:#ffffff;border-radius:20;}");
     this->ui->pushButton_8->setStyleSheet("QPushButton{border:1px solid #50b8f7;background-color:#50b8f7;color:#ffffff;border-radius:20;}");
@@ -469,6 +472,121 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
     QObject::connect(this->ui->pushButton_23,&QPushButton::clicked,this,&CMainMenueDlg::getTableDataByFindTestName);
     QObject::connect(this->ui->checkBox_7,&QCheckBox::toggled,this,&CMainMenueDlg::changeCurPageCheckBoxStatus);
     QObject::connect(this->ui->pushButton_25,&QPushButton::clicked,this,&CMainMenueDlg::deleteMultiClickBtn);
+}
+
+void CMainMenueDlg::initClassTableControl()
+{
+    //初始化序号
+    for(int i = 0 ; i < 8 ; i++)
+    {
+        QWidget* widget = new QWidget();
+        QHBoxLayout* layout = new QHBoxLayout();
+        widget->setLayout(layout);
+        QCheckBox* checkBox = new QCheckBox();
+        checkBox->setText(QString::number(++this->sortNumberClass));
+        checkBox->setFont(QFont("黑体"));
+        checkBox->setStyleSheet("QCheckBox{margin-left:25px;}");
+        checkBox->setVisible(false);
+        layout->addWidget(checkBox);
+        checkBox->setParent(widget);
+        this->ui->tableWidget_2->setCellWidget(i,0,widget);
+        this->m_classCheckVec.push_back(widget);
+    }
+
+    //初始化课程图标
+    for(int i = 0 ; i < 8 ; i++)
+    {
+        QWidget* widget = new QWidget();
+        QLabel* testName = new QLabel(widget);
+        testName->setGeometry(0,0,135,159);
+//        testName->setPixmap(QPixmap(":/icons/acount.png"));
+        testName->setScaledContents(true);
+        this->ui->tableWidget_2->setCellWidget(i,1,widget);
+        this->m_classIconVec.push_back(widget);
+    }
+
+    //初始化课程名称
+    for(int i = 0 ; i < 8 ; i++)
+    {
+        QLabel* testName = new QLabel();
+        testName->setText("");
+        testName->setFont(QFont("黑体",12));
+        this->ui->tableWidget_2->setCellWidget(i,2,testName);
+        testName->setAlignment(Qt::AlignCenter);
+        this->m_classNameVec.push_back(testName);
+    }
+
+    //初始化创建时间
+    for(int i = 0 ; i < 8;i++)
+    {
+        QLabel* testName = new QLabel();
+        testName->setText("");
+        testName->setFont(QFont("黑体",12));
+        this->ui->tableWidget_2->setCellWidget(i,3,testName);
+        testName->setAlignment(Qt::AlignCenter);
+        this->m_classCreateTimeVec.push_back(testName);
+    }
+
+    //初始化创建人
+    for(int i = 0 ; i < 8 ;i++)
+    {
+        QLabel* testName = new QLabel();
+        testName->setText("");
+        testName->setFont(QFont("黑体",12));
+        this->ui->tableWidget_2->setCellWidget(i,4,testName);
+        testName->setAlignment(Qt::AlignCenter);
+        this->m_classCreatorVec.push_back(testName);
+    }
+
+
+    //初始化操作
+    for(int i = 0 ; i < 8 ; i++)
+    {
+        QWidget* widget = new QWidget();
+        QPushButton* deleteBtn = new QPushButton("删除");
+        deleteBtn->setStyleSheet("QPushButton{border:none; border:1px solid #faa046; color:#faa046;border-radius:5;}QPushButton:hover{border:1px solid #50b8f7;color:#50b8f7;}");
+        deleteBtn->setParent(widget);
+        QPushButton* release = new QPushButton("查看详情");
+        release->setStyleSheet("QPushButton{border:none; border:1px solid #faa046; color:#faa046;border-radius:5;}QPushButton:hover{border:1px solid #50b8f7;color:#50b8f7;}");
+        release->setParent(widget);
+        deleteBtn->setGeometry(20,63,150,40);
+        release->setGeometry(deleteBtn->width() + 30,deleteBtn->y(),150,40);
+        deleteBtn->setFont(QFont("黑体",12));
+        release->setFont(QFont("黑体",12));
+        deleteBtn->setVisible(false);
+        release->setVisible(false);
+        this->ui->tableWidget_2->setCellWidget(i,5,widget);
+        this->m_classOperationsVec.push_back(widget);
+    }
+}
+
+void CMainMenueDlg::initClassTable()
+{
+    this->ui->tableWidget_2->setRowCount(8);
+    this->ui->tableWidget_2->setColumnCount(6);
+    this->ui->tableWidget_2->horizontalHeader()->hide();
+    this->ui->tableWidget_2->verticalHeader()->hide();
+
+    //设置列宽
+    int width = this->ui->tableWidget_2->width();
+    int heigth = this->ui->tableWidget_2->height();
+    this->ui->tableWidget_2->setColumnWidth(0,width / 15);
+    this->ui->tableWidget_2->setColumnWidth(1,width / 10);
+    this->ui->tableWidget_2->setColumnWidth(2,width / 5);
+    this->ui->tableWidget_2->setColumnWidth(3,width / 5);
+    this->ui->tableWidget_2->setColumnWidth(4,width / 6);
+    this->ui->tableWidget_2->setColumnWidth(5,width / 4);
+
+    this->ui->tableWidget_2->setRowHeight(0,heigth/ 4);
+    this->ui->tableWidget_2->setRowHeight(1,heigth/ 4);
+    this->ui->tableWidget_2->setRowHeight(2,heigth/ 4);
+    this->ui->tableWidget_2->setRowHeight(3,heigth/ 4);
+    this->ui->tableWidget_2->setRowHeight(4,heigth/ 4);
+    this->ui->tableWidget_2->setRowHeight(5,heigth/ 4);
+    this->ui->tableWidget_2->setRowHeight(6,heigth/ 4);
+    this->ui->tableWidget_2->setRowHeight(7,heigth/ 4);
+    this->ui->tableWidget_2->setRowHeight(8,heigth/ 4);
+    this->ui->tableWidget_2->setRowHeight(9,heigth/ 4);
 }
 
 typedef struct deleteMultiClickBtnArg
@@ -1698,7 +1816,7 @@ void CMainMenueDlg::headPictureChange()
 {
     QString fileName = QFileDialog::getOpenFileName(
          this,
-         tr("请选择PNG图片,并且单张图片不得超过2MB"),
+         tr("请选择PNG图片,并且单张图片不得超过400KB"),
          QDir::homePath(),
          tr("PNG Files (*.png);;All Files (*)")
      );
@@ -1995,6 +2113,60 @@ CMainMenueDlg::~CMainMenueDlg()
         }
     }
     this->m_operators.clear();
+
+    for(QVector<QWidget*>::iterator pos = this->m_classCheckVec.begin(); pos != this->m_classCheckVec.end();pos++)
+    {
+        if(*pos != nullptr)
+        {
+           delete  *pos;
+        }
+    }
+    this->m_classCheckVec.clear();
+
+    for(QVector<QWidget*>::iterator pos = this->m_classIconVec.begin(); pos != this->m_classIconVec.end();pos++)
+    {
+        if(*pos != nullptr)
+        {
+           delete  *pos;
+        }
+    }
+    this->m_classIconVec.clear();
+
+    for(QVector<QLabel*>::iterator pos = this->m_classNameVec.begin(); pos != this->m_classNameVec.end();pos++)
+    {
+        if(*pos != nullptr)
+        {
+           delete  *pos;
+        }
+    }
+    this->m_classNameVec.clear();
+
+    for(QVector<QLabel*>::iterator pos = this->m_classCreateTimeVec.begin(); pos != this->m_classCreateTimeVec.end();pos++)
+    {
+        if(*pos != nullptr)
+        {
+           delete  *pos;
+        }
+    }
+    this->m_classCreateTimeVec.clear();
+
+    for(QVector<QLabel*>::iterator pos =  this->m_classCreatorVec.begin(); pos !=  this->m_classCreatorVec.end();pos++)
+    {
+        if(*pos != nullptr)
+        {
+           delete  *pos;
+        }
+    }
+    this->m_classCreatorVec.clear();
+
+    for(QVector<QWidget*>::iterator pos =  this->m_classOperationsVec.begin(); pos !=  this->m_classOperationsVec.end();pos++)
+    {
+        if(*pos != nullptr)
+        {
+           delete  *pos;
+        }
+    }
+    this->m_classOperationsVec.clear();
     //如果关闭界面，接收头像信息的线程还在执行的话就等待接收后结束线程
     WaitForSingleObject(this->m_recvHeadThead,INFINITE); //找到退出崩溃的原因，因为关闭界面的时候，接收头像线程还在执行，但是UI已经释放导致异常
     //释放容器中的QTreeItem

@@ -6,8 +6,9 @@ CClientSocket::CHelper  CClientSocket::m_helper;
 CClientSocket::CClientSocket()
 {
     this->initSocketVal(); //初始化网络环境
-    this->m_packetSize = 2 + 4 + 2 + (1024*1024*2) + 1;
-    this->m_packet = new char[this->m_packetSize]; //数据部分的大小是2MB的大小
+//    this->m_packetSize = 2 + 4 + 2 + (1024*1024*2) + 1;
+    this->m_packetSize = 2 + 4 + 2 +(1024 * 500) + 1;
+    this->m_packet = new char[this->m_packetSize]; //数据部分的大小是500KB的大小
     memset(this->m_packet,'\0',sizeof(char)*this->m_packetSize);
 }
 
