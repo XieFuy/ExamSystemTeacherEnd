@@ -55,6 +55,7 @@ public :
     bool deleteFromShortAnswer(QString acount,QString createTime);
     static unsigned WINAPI threadDeleteFromShortAnswer(LPVOID arg);
     bool deleteMultiClickBtn(QString acount,QList<QString> createTimeLst);
+    bool initClassTableDatabase();
  private:
     CMainMenueModel* m_mainMenueModel = nullptr;
 };

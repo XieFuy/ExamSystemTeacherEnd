@@ -20,6 +20,7 @@
 #include <QLabel>
 #include <QHBoxLayout>
 #include "threadpool.h"
+#include "classsavedlg.h"
 
 namespace Ui {
 class CMainMenueDlg;  //主菜单管理页面
@@ -49,6 +50,7 @@ signals:
     void startShowPageIndex();
     void startShowCurPageIndexTable(QVector<QVector<QString>>* ret);
     void startShowTeacherAcountInfo(std::vector<std::vector<std::string>>* ret);
+    void startInitClassTable(); //初始化课程表信号
 private:
     CExitLoginDlg* m_exitLoginDlg = nullptr;
     QTreeWidgetItem* m_signalOperator = nullptr; //单选题父项
@@ -99,6 +101,8 @@ private:
     QVector<QLabel*> m_classCreateTimeVec;
     QVector<QLabel*> m_classCreatorVec;
     QVector<QWidget*> m_classOperationsVec;
+
+    CClassSaveDlg* m_classSaveDlg = nullptr;//课程信息输入对话框
 
 private:
     void showPageIndex();//显示分页查询的下标页
@@ -231,6 +235,9 @@ private:
 
     //进行初始化课程表的每列的控件
     void initClassTableControl();
+
+    void initClassTableDatabase();
+    static unsigned WINAPI threadInitClassTableDatabaseEntry(LPVOID arg);
 
 private:
     Ui::CMainMenueDlg *ui;

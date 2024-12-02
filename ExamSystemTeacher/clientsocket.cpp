@@ -160,7 +160,7 @@ long long CClientSocket::getPacketSize()
     return this->m_packetSize;
 }
 
-void CClientSocket::makePacket(char* pData,size_t length,WORD cmd) //注意单个数据包的数据位长度不能超过2MB
+void CClientSocket::makePacket(char* pData,size_t length,WORD cmd) //注意单个数据包的数据位长度不能超过500K
 {
     if(pData == nullptr || length <= 0)
     {

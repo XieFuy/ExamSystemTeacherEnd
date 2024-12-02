@@ -5,6 +5,11 @@ CMainMenueContorller::CMainMenueContorller()
  this->m_mainMenueModel = new CMainMenueModel();
 }
 
+bool CMainMenueContorller::initClassTableDatabase()
+{
+  return this->m_mainMenueModel->initClassTableDatabase();
+}
+
 typedef struct deleteFromSignalChoiseArg
 {
     QString acount;

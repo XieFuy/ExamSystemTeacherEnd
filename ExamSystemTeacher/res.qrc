@@ -12,5 +12,7 @@
         <file>icons/open.png</file>
         <file>icons/comboxDowm.png</file>
         <file>icons/comboxUp.png</file>
+        <file>icons/class.png</file>
+        <file>icons/upLoad.png</file>
     </qresource>
 </RCC>

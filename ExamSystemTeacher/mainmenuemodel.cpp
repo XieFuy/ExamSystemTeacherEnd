@@ -10,6 +10,27 @@ CMainMenueModel::~CMainMenueModel()
 
 }
 
+bool CMainMenueModel::initClassTableDatabase()
+{
+    CDBHelper* dbHelper = new CDBHelper();
+    char* sqlBuf = new char[1024000];
+    memset(sqlBuf,'\0',sizeof(char) * 1024000);
+    std::string sql;
+    sprintf(sqlBuf,"create table if not exists `class`(\n\
+`id` integer  primary key auto_increment,\n\
+`classIconPath` varchar(100) not null,\n\
+`className` varchar(50) not null,\n\
+`createTime` datetime not null,\n\
+`teacherId` varchar(20)  not null,\n\
+foreign key(`teacherId`) references `Teacher`(`teacherId`)\n\
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;");
+    sql = sqlBuf;
+    bool ret =  dbHelper->sqlExcute(sql,"ExamSystem");
+    delete[] sqlBuf;
+    delete dbHelper;
+    return ret;
+}
+
 bool CMainMenueModel::deleteFromShortAnswer(const char* acount,const char* createTime)
 {
     if(acount == nullptr || createTime == nullptr)

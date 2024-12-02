@@ -472,6 +472,40 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
     QObject::connect(this->ui->pushButton_23,&QPushButton::clicked,this,&CMainMenueDlg::getTableDataByFindTestName);
     QObject::connect(this->ui->checkBox_7,&QCheckBox::toggled,this,&CMainMenueDlg::changeCurPageCheckBoxStatus);
     QObject::connect(this->ui->pushButton_25,&QPushButton::clicked,this,&CMainMenueDlg::deleteMultiClickBtn);
+    QObject::connect(this,&CMainMenueDlg::startInitClassTable,this,&CMainMenueDlg::initClassTableDatabase);
+    emit this->startInitClassTable();
+    QObject::connect(this->ui->pushButton_29,&QPushButton::clicked,[=](){
+        if(this->m_classSaveDlg == nullptr)
+        {
+            this->m_classSaveDlg = new CClassSaveDlg();
+            this->m_classSaveDlg->acount = this->m_acount;
+            this->m_classSaveDlg->move((this->width() - this->m_classSaveDlg->width()) / 2,
+                                       (this->height() - this->m_classSaveDlg->height()) / 2);
+            this->m_classSaveDlg->show();
+            this->ui->pushButton_29->setEnabled(false);
+            QObject::connect(this->m_classSaveDlg,&CClassSaveDlg::rejected,[=](){
+                if(this->m_classSaveDlg != nullptr)
+                {
+                    delete this->m_classSaveDlg;
+                    this->m_classSaveDlg = nullptr;
+                }
+                this->ui->pushButton_29->setEnabled(true);
+            });
+        }
+    });
+}
+
+void CMainMenueDlg::initClassTableDatabase()
+{
+    _beginthreadex(nullptr,0,&CMainMenueDlg::threadInitClassTableDatabaseEntry,this,0,nullptr);
+}
+
+unsigned WINAPI CMainMenueDlg::threadInitClassTableDatabaseEntry(LPVOID arg)
+{
+    CMainMenueDlg* thiz = (CMainMenueDlg*)arg;
+    thiz->m_mainMenueContorller->initClassTableDatabase();
+    _endthreadex(0);
+    return 0;
 }
 
 void CMainMenueDlg::initClassTableControl()
