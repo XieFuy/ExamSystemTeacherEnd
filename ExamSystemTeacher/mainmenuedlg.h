@@ -50,7 +50,10 @@ signals:
     void startShowPageIndex();
     void startShowCurPageIndexTable(QVector<QVector<QString>>* ret);
     void startShowTeacherAcountInfo(std::vector<std::vector<std::string>>* ret);
+    void startShowClassTable(QVector<QVector<QString>>* ret);
     void startInitClassTable(); //初始化课程表信号
+    void startShowClassIcon(QImage* image);
+    void startGetClassTableInfo();
 private:
     CExitLoginDlg* m_exitLoginDlg = nullptr;
     QTreeWidgetItem* m_signalOperator = nullptr; //单选题父项
@@ -103,7 +106,13 @@ private:
     QVector<QWidget*> m_classOperationsVec;
 
     CClassSaveDlg* m_classSaveDlg = nullptr;//课程信息输入对话框
+    std::string m_ClassIconPath;
+    int classIconIndex; //用于显示课程图标的下标
+    HANDLE m_Event;
+    HANDLE m_Event_2;
 
+    int m_classCurPageIndex;//课程表 表示当前的页数
+    QString m_classCount;//表示总记录的所有
 private:
     void showPageIndex();//显示分页查询的下标页
     void initTableWidgetHeader(); //初始化表头
@@ -236,8 +245,24 @@ private:
     //进行初始化课程表的每列的控件
     void initClassTableControl();
 
+    //初始化课程数据库表
     void initClassTableDatabase();
     static unsigned WINAPI threadInitClassTableDatabaseEntry(LPVOID arg);
+
+    //获取课程表的数据
+    void getClassTableData();
+    static unsigned WINAPI threadGetClassTableDataEntry(LPVOID arg);
+
+    //UI显示课程表信息(更新UI)
+    void showClassTableInfo(QVector<QVector<QString>>* ret);
+
+    void clearClassTableControl(); //清除课程表UI
+
+    void showClassIconUI(QImage* image);
+
+    static unsigned WINAPI showClassIcon(LPVOID arg);//显示一行的课程图标,这个线程函数进行负责从服务器中进行接收图片数据
+
+    void Dump(const BYTE* Data, size_t nSize);  //打印输出测试设计的包的数据是什么
 
 private:
     Ui::CMainMenueDlg *ui;

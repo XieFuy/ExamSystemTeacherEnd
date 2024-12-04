@@ -9,6 +9,9 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
     this->setWindowTitle("在线考试系统-教师端");
     this->setWindowIcon(QIcon(":/icons/winIcon.png"));
 
+    this->m_classCurPageIndex = 1;
+    this->m_Event = CreateEvent(nullptr,FALSE,FALSE,nullptr);
+    this->m_Event_2 = CreateEvent(nullptr,FALSE,FALSE,nullptr);
     this->sortNumberClass = 0;
     this->sortNUmber = 0;
     this->signalCount = 0;
@@ -88,6 +91,8 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
 
     QObject::connect(this->ui->pushButton_6,&QPushButton::clicked,[=](){
         this->ui->stackedWidget->setCurrentIndex(3);
+        this->m_classCurPageIndex = 1;
+        emit this->getClassTableData();
         this->ui->pushButton_6->setStyleSheet("QPushButton{border:1px solid #50b8f7;background-color:#50b8f7;color:#ffffff;border-radius:20;}");
         //其他的都要设置为原样
         this->ui->pushButton_3->setStyleSheet("QPushButton{border:none;border:1px solid #faa046;color:#faa046;border-radius:20;}QPushButton:hover{border:1px solid #50b8f7;color:#50b8f7;}");
@@ -490,9 +495,256 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
                     this->m_classSaveDlg = nullptr;
                 }
                 this->ui->pushButton_29->setEnabled(true);
+                this->m_classCurPageIndex = 1;
+                emit this->startGetClassTableInfo();
             });
         }
     });
+    QObject::connect(this,&CMainMenueDlg::startGetClassTableInfo,this,&CMainMenueDlg::getClassTableData);
+    QObject::connect(this,&CMainMenueDlg::startShowClassTable,this,&CMainMenueDlg::showClassTableInfo);
+    QObject::connect(this,&CMainMenueDlg::startShowClassIcon,this,&CMainMenueDlg::showClassIconUI);
+}
+
+
+void CMainMenueDlg::showClassIconUI(QImage* image)
+{
+    QList<QLabel*> ret =  this->m_classIconVec.at(this->classIconIndex++)->findChildren<QLabel*>();
+    for(QLabel* lab : ret)
+    {
+        if(image->isNull())
+        {
+            qDebug()<<"图像无效";
+        }
+        lab->setPixmap(QPixmap::fromImage(*image));
+        lab->setScaledContents(true);
+        delete image;
+    }
+}
+
+void CMainMenueDlg::clearClassTableControl()
+{
+    //隐藏序号
+    for(int i = 0 ; i < 8 ; i++)
+    {
+        QList<QCheckBox*> buttons = this->m_classCheckVec.at(i)->findChildren<QCheckBox*>();
+        for (QCheckBox *button : buttons) {
+            button->setVisible(false);
+        }
+    }
+
+    //清除课程图标
+    for(int i = 0 ; i < 8 ; i++)
+    {
+       QList<QLabel*> labels = this->m_classIconVec.at(i)->findChildren<QLabel*>();
+       for(QLabel* lab : labels)
+       {
+           lab->setPixmap(QPixmap());
+       }
+    }
+
+    //清除课程名称
+    for(int i = 0 ; i < 8 ; i++)
+    {
+        for (QLabel *button : this->m_classNameVec) {
+            button->setText("");
+        }
+    }
+
+    //清除创建时间
+    for(int i = 0 ; i < 8;i++)
+    {
+        for (QLabel *button : this->m_classCreateTimeVec) {
+            button->setText("");
+        }
+    }
+
+    //清除创建人
+    for(int i = 0 ; i < 8 ;i++)
+    {
+        for (QLabel *button : this->m_classCreatorVec) {
+            button->setText("");
+        }
+    }
+
+    //清除化操作
+    for(int i = 0 ; i < 8 ; i++)
+    {
+        QList<QPushButton*> optButton = this->m_classOperationsVec.at(i)->findChildren<QPushButton*>();
+        for (QPushButton *button : optButton) {
+            button->setVisible(false);
+        }
+    }
+}
+
+unsigned WINAPI CMainMenueDlg::showClassIcon(LPVOID arg)
+{
+    CMainMenueDlg* thiz = (CMainMenueDlg*)arg;
+    //进行接收图片并且显示到UI上
+//    CClientSocket* clientSocket = CClientSocket::getInstance();
+    CClientSocket* clientSocket = new CClientSocket();
+    clientSocket->initSocket();
+    bool ret2 =  clientSocket->connectToServer();
+    if(!ret2)
+    {
+        return 0;
+    }
+    //进行封包操作
+    char* data = new char[1024];
+    memset(data,'\0',sizeof(char) * 1024);
+    WaitForSingleObject(thiz->m_Event,INFINITE);
+    strcpy(data,thiz->m_ClassIconPath.c_str());
+    ResetEvent(thiz->m_Event);
+    SetEvent(thiz->m_Event_2);
+    ResetEvent(thiz->m_Event_2);
+    clientSocket->makePacket(data,strlen(data),2); //获取课程图标的指令为2
+    delete[] data;
+    //发送数据包
+    char* packet = clientSocket->getPacket();
+    long long packetSize = clientSocket->getPacketSize();
+    int size =  clientSocket->Send(packet);
+    qDebug()<<"send size: "<<size;
+
+    //先获取服务端发送的文件大小 8字节
+    char* fileSize = new char[8];
+    memset(fileSize,'\0',sizeof(char) * 8);
+    size = clientSocket->Recv(fileSize,8);
+    long long fileSizeNum;
+    memmove(&fileSizeNum,fileSize,8);
+    delete[] fileSize;
+    qDebug()<<"fileSize: "<<fileSizeNum;
+
+    char* recvBuffer = new char[fileSizeNum];
+    memset(recvBuffer,'\0',sizeof(char) * fileSizeNum);
+    size = clientSocket->Recv(recvBuffer,fileSizeNum); //直接接收到的就是图片文件数据，没有多余内容
+    qDebug()<<"recv size: "<<size;
+    clientSocket->closeSocket();
+    delete clientSocket;
+
+    QByteArray ba(recvBuffer,fileSizeNum);
+    QImage* image = new QImage();
+    bool ret3 = image->loadFromData(ba,"PNG");
+    if(!ret3)
+    {
+     qDebug()<<"返回false";
+    }
+    if(image->isNull())
+    {
+        qDebug()<<"原先获取的图像无效,";
+    }
+    emit  thiz->startShowClassIcon(image);
+//    delete[] pixmapData;
+    delete[] recvBuffer;
+    _endthreadex(0);
+    return 0;
+}
+
+void CMainMenueDlg::Dump(const BYTE* Data, size_t nSize)
+{
+    std::string strOut;  //用于存储整个包的数据的结果
+    //strOut.resize(nSize);
+    for (size_t i = 0; i < nSize; i++)
+    {
+        char buf[8] = "";
+        if (i > 0 && (i % 16 == 0))
+        {
+            strOut += '\n';
+        }
+        snprintf(buf, sizeof(buf), "%02X", Data[i] & 0xFF);  //%02X的意思是 写入的十六进制占两位，不足位是填充前导零
+        strOut += buf;
+    }
+    strOut += "\n";
+    OutputDebugStringA(strOut.c_str()); //用于输出调试的字符串，类似于QDebug
+}
+
+void CMainMenueDlg::showClassTableInfo(QVector<QVector<QString>>* ret)
+{
+    if(ret == nullptr)
+    {
+        return ;
+    }
+    this->classIconIndex = 0;
+    //进行UI显示
+    this->clearClassTableControl();
+   //将数据进行插入到表格中
+   for(int i = 0 ; i < ret->size(); i++)
+   {
+       //显示序号
+       QList<QCheckBox*> buttons = this->m_classCheckVec.at(i)->findChildren<QCheckBox*>();
+       for (QCheckBox *button : buttons) {
+           button->setVisible(true);
+       }
+
+       //显示试卷图标
+//       QString str = ret->at(i).at(0);
+//       this->m_testPaperName.at(i)->setText(str);
+       QByteArray arr =  ret->at(i).at(0).toLocal8Bit();
+       this->m_ClassIconPath = arr.data();
+       SetEvent(this->m_Event);
+       HANDLE thread =  (HANDLE)_beginthreadex(nullptr,0,&CMainMenueDlg::showClassIcon,this,0,nullptr);
+
+       WaitForSingleObject(this->m_Event_2,INFINITE);
+
+       //显示课程名称
+       QString str = ret->at(i).at(1);
+       this->m_classNameVec.at(i)->setText(str);
+
+       //显示创建时间
+       str = ret->at(i).at(2);
+       this->m_classCreateTimeVec.at(i)->setText(str);
+
+       //创建人
+       str = ret->at(i).at(3);
+       this->m_classCreatorVec.at(i)->setText(str);
+
+       //显示操作按钮
+       QList<QPushButton*> optButton = this->m_classOperationsVec.at(i)->findChildren<QPushButton*>();
+       for (QPushButton *button : optButton) {
+           button->setVisible(true);
+       }
+   }
+   if(ret != nullptr)
+   {
+       delete ret;
+   }
+   qDebug()<<"试卷表格UI显示完成!";
+}
+
+typedef struct getClassTableDataArg
+{
+    QString acount;
+    int curPageIndex;
+    CMainMenueDlg* thiz;
+}GetClassTableDataArg;
+
+void CMainMenueDlg::getClassTableData()
+{
+    GetClassTableDataArg* arg = new GetClassTableDataArg();
+    arg->acount = this->m_acount;
+    arg->curPageIndex = this->m_classCurPageIndex;
+    arg->thiz = this;
+    _beginthreadex(nullptr,0,&CMainMenueDlg::threadGetClassTableDataEntry,arg,0,nullptr);
+}
+
+unsigned WINAPI CMainMenueDlg::threadGetClassTableDataEntry(LPVOID arg)
+{
+    GetClassTableDataArg* dInfo = (GetClassTableDataArg*)arg;
+    std::vector<std::vector<std::string>>ret = dInfo->thiz->m_mainMenueContorller->getClassTableData(dInfo->thiz->m_acount,dInfo->curPageIndex);
+    //通过信号将结果显示到页面中
+    QVector<QVector<QString>>* result = new QVector<QVector<QString>>();
+    for(int i = 0 ; i < ret.size();i++)
+    {
+        QVector<QString> temp;
+        for(int j = 0 ; j < ret.at(i).size();j++)
+        {
+            QString str = QString::fromLocal8Bit(ret.at(i).at(j).c_str());
+            temp.push_back(str);
+        }
+        result->push_back(temp);
+    }
+    emit dInfo->thiz->startShowClassTable(result);
+    delete dInfo;
+    _endthreadex(0);
+    return 0;
 }
 
 void CMainMenueDlg::initClassTableDatabase()
@@ -1969,7 +2221,8 @@ void CMainMenueDlg::showHeadImageUI(QImage image)
 
 void CMainMenueDlg::threadShowHead()
 {
-    CClientSocket* clientSocket = CClientSocket::getInstance();
+//    CClientSocket* clientSocket = CClientSocket::getInstance();
+    CClientSocket* clientSocket = new CClientSocket();
     clientSocket->initSocket();
     bool ret2 =  clientSocket->connectToServer();
     if(!ret2)
@@ -1991,6 +2244,7 @@ void CMainMenueDlg::threadShowHead()
     size =  clientSocket->Recv(recvBuffer);
     qDebug()<<"recv size: "<<size;
     clientSocket->closeSocket();
+    delete clientSocket;
     //解包拿去数据
     char* p = recvBuffer;
     WORD head ;
@@ -2006,8 +2260,12 @@ void CMainMenueDlg::threadShowHead()
     memmove(pixmapData,p,length);
 
     QByteArray ba(pixmapData,length);
-    QImage image;
+    QImage image; 
     image.loadFromData(ba,"PNG");
+    if(image.isNull())
+    {
+        qDebug()<<"头像获取失败！";
+    }
     emit this->startShowHeadImage(image);
     delete[] pixmapData;
     delete[] recvBuffer;

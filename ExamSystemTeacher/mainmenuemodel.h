@@ -54,6 +54,7 @@ public:
     bool deleteFromJudge(const char* acount,const char* createTime);
     bool deleteFromShortAnswer(const char* acount,const char* createTime);
     bool initClassTableDatabase();
+    std::vector<std::vector<std::string>> getClassTableData(const char* acount,int curPageIndex);
 private:
       HANDLE m_mutex; //因为所有操作都是使用的一个CDBHelper对象，所以要给每一个执行sql的步骤进行上锁
 };

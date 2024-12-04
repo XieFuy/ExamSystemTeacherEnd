@@ -10,6 +10,26 @@ CMainMenueModel::~CMainMenueModel()
 
 }
 
+std::vector<std::vector<std::string>> CMainMenueModel::getClassTableData(const char* acount,int curPageIndex)
+{
+    if(acount == nullptr)
+    {
+        return std::vector<std::vector<std::string>>();
+    }
+
+    CDBHelper* dbHelper = new CDBHelper();
+    char* sqlBuf = new char[1024000];
+    memset(sqlBuf,'\0',sizeof(char) * 1024000);
+    std::string sql;
+    sprintf(sqlBuf,"select `classIconPath`,`className`,`createTime`,(select `name` from `TeacherInfo` where `teacherId` = '%s') AS name from `class` \
+where `teacherId` = '%s' limit 8 offset %d;",acount,acount,(curPageIndex - 1) * 8);
+    sql = sqlBuf;
+    std::vector<std::vector<std::string>> ret =  dbHelper->sqlQuery(sql,"ExamSystem");
+    delete[] sqlBuf;
+    delete dbHelper;
+    return ret;
+}
+
 bool CMainMenueModel::initClassTableDatabase()
 {
     CDBHelper* dbHelper = new CDBHelper();
@@ -703,7 +723,8 @@ void CMainMenueModel::changeHeadPicture(char* localFilePath ,char* fileName,char
     fclose(pFile);
     memcpy(data + fileSize + 2,headPath.c_str(),headPath.size());
     //进行封包操作
-    CClientSocket* clientsocket = CClientSocket::getInstance();
+//    CClientSocket* clientsocket = CClientSocket::getInstance();
+    CClientSocket* clientsocket = new CClientSocket();
     clientsocket->initSocket();
     bool ret =  clientsocket->connectToServer();
     if(!ret)
@@ -715,7 +736,7 @@ void CMainMenueModel::changeHeadPicture(char* localFilePath ,char* fileName,char
     clientsocket->Send(packet);
     delete[] data;
     clientsocket->closeSocket();
-
+    delete clientsocket;
     //对数据库进行操作,更该当前用户的头像的存储路径
 //    CDBHelper* dbHelper = CDBHelper::getInstance();
     CDBHelper* dbHelper = new CDBHelper();

@@ -117,6 +117,43 @@ void CClassSaveDlg::upLoadFile(QString filePath)
     QByteArray arr = filePath.toLocal8Bit();
     const char* pFilePath = arr.data();
 
+//    FILE* pFile = fopen(pFilePath,"rb+");
+//    if(pFile == nullptr)
+//    {
+//        fclose(pFile);
+//        return;
+//    }
+
+//    fseek(pFile,0,SEEK_END);
+//    long long fileSize =  _ftelli64(pFile);
+//    fseek(pFile,0,SEEK_SET);
+
+//    QByteArray strArr = this->fileName.toLocal8Bit();
+//    const char* pStrName = strArr.data();
+//    std::string headPath = "/root/picture/";
+//    headPath += pStrName;
+//    qDebug()<<headPath.size();
+//    char* data = new char[2 + fileSize + headPath.size()]; //全是文件数据
+//    memset(data,'\0',sizeof(char) * (2 + fileSize + headPath.size()));
+//    WORD pathLenght = headPath.size();
+//    memcpy(data,&pathLenght,sizeof(WORD));
+//    long long size =  fread(data + 2,1,fileSize,pFile);
+//    fclose(pFile);
+//    memcpy(data + fileSize + 2,headPath.c_str(),headPath.size());
+//    //进行封包操作
+//    CClientSocket* clientsocket = CClientSocket::getInstance();
+//    clientsocket->initSocket();
+//    bool ret =  clientsocket->connectToServer();
+//    if(!ret)
+//    {
+//        return;
+//    }
+//    clientsocket->makePacket(data,fileSize + headPath.size() + 2,1);
+//    char* packet =  clientsocket->getPacket();
+//    clientsocket->Send(packet);
+//    delete[] data;
+//    clientsocket->closeSocket();
+
     FILE* pFile = fopen(pFilePath,"rb+");
     if(pFile == nullptr)
     {
@@ -149,14 +186,15 @@ void CClassSaveDlg::upLoadFile(QString filePath)
     char* p = data;
     memcpy(p,&pathLenght,sizeof(WORD));
     p += sizeof(WORD);
-    memcpy(p,&fileData,fileSize);
+    memcpy(p,fileData,fileSize); //解决数据发送不正确的原因，因为是fileData不是&fileData
     p += fileSize;
     memcpy(p,remotePath,pathLenght);
     p += pathLenght;
     delete[] remotePath;
     delete[] fileData;
     //进行网络发送
-    CClientSocket* pSocket = CClientSocket::getInstance();
+//    CClientSocket* pSocket = CClientSocket::getInstance();
+    CClientSocket* pSocket = new CClientSocket();
     pSocket->initSocket();
     if(!pSocket->connectToServer())
     {
@@ -167,7 +205,8 @@ void CClassSaveDlg::upLoadFile(QString filePath)
     delete[] data;
     char* packet =  pSocket->getPacket();
     pSocket->Send(packet);
-   // pSocket->closeSocket();
+    pSocket->closeSocket();
+    delete pSocket;
 }
 
 CClassSaveDlg::~CClassSaveDlg()

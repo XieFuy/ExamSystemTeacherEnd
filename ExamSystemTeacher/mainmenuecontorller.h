@@ -56,6 +56,7 @@ public :
     static unsigned WINAPI threadDeleteFromShortAnswer(LPVOID arg);
     bool deleteMultiClickBtn(QString acount,QList<QString> createTimeLst);
     bool initClassTableDatabase();
+    std::vector<std::vector<std::string>> getClassTableData(QString acount,int curPageIndex);
  private:
     CMainMenueModel* m_mainMenueModel = nullptr;
 };
