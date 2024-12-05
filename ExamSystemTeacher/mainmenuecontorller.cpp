@@ -5,6 +5,13 @@ CMainMenueContorller::CMainMenueContorller()
  this->m_mainMenueModel = new CMainMenueModel();
 }
 
+int CMainMenueContorller::getClassTableCount(QString acount)
+{
+    QByteArray acountArr = acount.toUtf8();
+    const char* pAcount =  acountArr.data();
+    return this->m_mainMenueModel->getClassTableCount(pAcount);
+}
+
 std::vector<std::vector<std::string>> CMainMenueContorller::getClassTableData(QString acount,int curPageIndex)
 {
     QByteArray acountArr = acount.toUtf8();

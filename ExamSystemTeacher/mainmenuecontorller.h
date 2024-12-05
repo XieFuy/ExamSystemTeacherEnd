@@ -57,6 +57,7 @@ public :
     bool deleteMultiClickBtn(QString acount,QList<QString> createTimeLst);
     bool initClassTableDatabase();
     std::vector<std::vector<std::string>> getClassTableData(QString acount,int curPageIndex);
+    int getClassTableCount(QString acount);
  private:
     CMainMenueModel* m_mainMenueModel = nullptr;
 };

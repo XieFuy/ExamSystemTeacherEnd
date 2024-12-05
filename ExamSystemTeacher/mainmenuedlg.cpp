@@ -92,7 +92,8 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
     QObject::connect(this->ui->pushButton_6,&QPushButton::clicked,[=](){
         this->ui->stackedWidget->setCurrentIndex(3);
         this->m_classCurPageIndex = 1;
-        emit this->getClassTableData();
+        emit this->startGetClassTableInfo();
+        emit this->startGetClassTableIndex();
         this->ui->pushButton_6->setStyleSheet("QPushButton{border:1px solid #50b8f7;background-color:#50b8f7;color:#ffffff;border-radius:20;}");
         //其他的都要设置为原样
         this->ui->pushButton_3->setStyleSheet("QPushButton{border:none;border:1px solid #faa046;color:#faa046;border-radius:20;}QPushButton:hover{border:1px solid #50b8f7;color:#50b8f7;}");
@@ -497,14 +498,50 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
                 this->ui->pushButton_29->setEnabled(true);
                 this->m_classCurPageIndex = 1;
                 emit this->startGetClassTableInfo();
+                emit this->startGetClassTableIndex();
             });
         }
     });
     QObject::connect(this,&CMainMenueDlg::startGetClassTableInfo,this,&CMainMenueDlg::getClassTableData);
     QObject::connect(this,&CMainMenueDlg::startShowClassTable,this,&CMainMenueDlg::showClassTableInfo);
     QObject::connect(this,&CMainMenueDlg::startShowClassIcon,this,&CMainMenueDlg::showClassIconUI);
+    QObject::connect(this,&CMainMenueDlg::startShowClassTableIndex,&CMainMenueDlg::showClassTableIndex);
+    QObject::connect(this,&CMainMenueDlg::startGetClassTableIndex,this,&CMainMenueDlg::getClassTableCount);
 }
 
+void CMainMenueDlg::showClassTableIndex()
+{
+    QString first = QString::number(this->m_classCurPageIndex);
+    first += "/";
+    first += this->m_classCount;
+    this->ui->label_58->setText(first);
+}
+
+typedef struct getClassTableCountArg
+{
+    QString acount;
+    CMainMenueDlg* thiz;
+}GetClassTableCountArg;
+
+void CMainMenueDlg::getClassTableCount()
+{
+    GetClassTableCountArg* arg = new GetClassTableCountArg();
+    arg->acount = this->m_acount;
+    arg->thiz = this;
+    _beginthreadex(nullptr,0,&CMainMenueDlg::threadGetClassTableCountEntry,arg,0,nullptr);
+}
+
+unsigned WINAPI CMainMenueDlg::threadGetClassTableCountEntry(LPVOID arg)
+{
+    GetClassTableCountArg* gInfo = (GetClassTableCountArg*)arg;
+    int ret =  gInfo->thiz->m_mainMenueContorller->getClassTableCount(gInfo->acount);
+    gInfo->thiz->m_classCount = QString::number(ret);
+    //进行发送信号，进行显示总页数
+    emit gInfo->thiz->startShowClassTableIndex();
+    delete gInfo;
+    _endthreadex(0);
+    return 0;
+}
 
 void CMainMenueDlg::showClassIconUI(QImage* image)
 {
@@ -1209,8 +1246,8 @@ unsigned WINAPI CMainMenueDlg::threadGetTablePageCountPublishedEntry(LPVOID arg)
     int ret = gInfo->thiz->m_mainMenueContorller->getTablePageCountPublished(gInfo->acount,gInfo->status);
     gInfo->thiz->m_pageCount =QString::number(ret);
     emit gInfo->thiz->startShowPageIndex();
-    delete gInfo;
     _endthreadex(0);
+    delete gInfo;
     return 0;
 }
 

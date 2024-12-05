@@ -54,6 +54,8 @@ signals:
     void startInitClassTable(); //初始化课程表信号
     void startShowClassIcon(QImage* image);
     void startGetClassTableInfo();
+    void startGetClassTableIndex();
+    void startShowClassTableIndex(); //显示课程表页数信号
 private:
     CExitLoginDlg* m_exitLoginDlg = nullptr;
     QTreeWidgetItem* m_signalOperator = nullptr; //单选题父项
@@ -263,6 +265,13 @@ private:
     static unsigned WINAPI showClassIcon(LPVOID arg);//显示一行的课程图标,这个线程函数进行负责从服务器中进行接收图片数据
 
     void Dump(const BYTE* Data, size_t nSize);  //打印输出测试设计的包的数据是什么
+
+
+    void getClassTableCount();//进行获取课程表所有符合条件的总页数
+    static unsigned WINAPI threadGetClassTableCountEntry(LPVOID arg);
+
+    void showClassTableIndex(); //用于更新课程表的页数下标
+
 
 private:
     Ui::CMainMenueDlg *ui;
