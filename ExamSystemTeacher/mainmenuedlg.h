@@ -272,6 +272,14 @@ private:
 
     void showClassTableIndex(); //用于更新课程表的页数下标
 
+    //拿取课程表的下一页数据
+    void showClassTableNextPage(); //显示课程表的下一页
+
+    //拿到课程表的上一页数据
+    void showClassTableLastPage();//显示课程表的上一页数据
+
+
+
 
 private:
     Ui::CMainMenueDlg *ui;

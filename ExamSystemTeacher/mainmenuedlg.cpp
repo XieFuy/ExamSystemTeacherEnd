@@ -507,6 +507,57 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
     QObject::connect(this,&CMainMenueDlg::startShowClassIcon,this,&CMainMenueDlg::showClassIconUI);
     QObject::connect(this,&CMainMenueDlg::startShowClassTableIndex,&CMainMenueDlg::showClassTableIndex);
     QObject::connect(this,&CMainMenueDlg::startGetClassTableIndex,this,&CMainMenueDlg::getClassTableCount);
+
+    //课程表下一页点击
+    QObject::connect(this->ui->pushButton_31,&QPushButton::clicked,this,&CMainMenueDlg::showClassTableNextPage);
+
+    //课程表上一页点击
+    QObject::connect(this->ui->pushButton_30,&QPushButton::clicked,this,&CMainMenueDlg::showClassTableLastPage);
+}
+
+void CMainMenueDlg::showClassTableNextPage()
+{
+    if(this->m_classCount == "0") //如果查询的结果集为空则不进行操作
+    {
+        return;
+    }
+
+    if(QString::number(this->m_classCurPageIndex) == this->m_classCount)
+    {
+        return;
+    }
+    //清除当前表中的记录
+    this->clearClassTableControl();
+
+    //给当前页自增，并且不能超过总页
+    if(QString::number(this->m_classCurPageIndex) != this->m_classCount)
+    {
+        this->m_classCurPageIndex += 1;
+    }
+    emit this->startGetClassTableInfo();
+    emit this->startGetClassTableIndex();
+}
+
+void CMainMenueDlg::showClassTableLastPage()
+{
+    if(this->m_classCount == "0")
+    {
+        return;
+    }
+    //防止恶意刷新
+    if(this->m_classCurPageIndex <= 1)
+    {
+        return ;
+    }
+    //清除当前表中的记录
+   this->clearClassTableControl();
+    //给当前页递减，并且不能低于1
+    if(this->m_classCurPageIndex > 1)
+    {
+       this->m_classCurPageIndex -= 1;
+    }
+    emit this->startGetClassTableInfo();
+    emit this->startGetClassTableIndex();
 }
 
 void CMainMenueDlg::showClassTableIndex()
