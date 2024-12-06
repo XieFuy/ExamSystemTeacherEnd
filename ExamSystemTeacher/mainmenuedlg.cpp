@@ -28,6 +28,7 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
     this->m_pageCount = "";
     this->curPageIndex = 1;
     this->initTableWidgetHeader();
+
     //生成控制层
     this->m_mainMenueContorller = new CMainMenueContorller();
     //设置标题栏头像为圆形
@@ -515,6 +516,92 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
     QObject::connect(this->ui->pushButton_30,&QPushButton::clicked,this,&CMainMenueDlg::showClassTableLastPage);
 }
 
+void CMainMenueDlg::bindClassOperators()
+{
+
+    for(QVector<QWidget*>::iterator pos = this->m_classOperationsVec.begin(); pos != this->m_classOperationsVec.end();pos++)
+    {
+         QList<QPushButton*> ret = (*pos)->findChildren<QPushButton*>();
+         for(QPushButton* btn : ret)
+         {
+             if(btn->text() == "删除")
+             {
+                 //绑定的删除操作的槽函数
+                 QObject::connect(btn,&QPushButton::clicked,[=](){
+                     //进行遍历是哪一个按钮，并获取对应的行号
+                     int row = 0;
+                     for(int i = 0 ; i < this->m_operators.size();i++)
+                     {
+                         QList<QPushButton*> buttons = this->m_classOperationsVec.at(i)->findChildren<QPushButton*>();
+                         for(QPushButton* clickedBtn: buttons)
+                         {
+                             if(clickedBtn == btn)
+                             {
+                                 this->m_classCurPageIndex = 1;
+                                 this->deleteClassInfoByDateTime(row);
+                                 break;
+                             }
+                         }
+                         row++;
+                     }
+                 });
+
+             }else if(btn->text() == "查看详情")
+             {
+                 //绑定的发布操作的槽函数
+                 QObject::connect(btn,&QPushButton::clicked,[=](){
+                     int row = 0;
+                     for(int i = 0 ; i < this->m_classOperationsVec.size();i++)
+                     {
+                         QList<QPushButton*> buttons = this->m_classOperationsVec.at(i)->findChildren<QPushButton*>();
+                         for(QPushButton* clickedBtn: buttons)
+                         {
+                             if(clickedBtn == btn)
+                             {
+//                                 this->updateStatusClickBtn(row);
+                                 break;
+                             }
+                         }
+                         row++;
+                     }
+                 });
+             }
+         }
+    }
+}
+
+typedef struct deleteClassInfoByDateTimeArg
+{
+    CMainMenueDlg* thiz;
+    QString acount;
+    QString createTime;
+}DeleteClassInfoByDateTimeArg;
+
+void CMainMenueDlg::deleteClassInfoByDateTime(int row)
+{
+    //获取到同一行的创建时间
+    QString createTime = this->m_classCreateTimeVec.at(row)->text().trimmed();
+    qDebug()<<"createTime: "<<createTime;
+
+    DeleteClassInfoByDateTimeArg* arg = new DeleteClassInfoByDateTimeArg();
+    arg->thiz = this;
+    arg->acount = this->m_acount;
+    arg->createTime = createTime;
+    _beginthreadex(nullptr,0,&CMainMenueDlg::threadDeleteClassInfoByDateTimeEntry,arg,0,nullptr);
+}
+
+unsigned WINAPI CMainMenueDlg::threadDeleteClassInfoByDateTimeEntry(LPVOID arg)
+{
+    DeleteClassInfoByDateTimeArg* dInfo = (DeleteClassInfoByDateTimeArg*)arg;
+    dInfo->thiz->m_mainMenueContorller->deleteClassInfoByDateTime(dInfo->acount,dInfo->createTime);
+    //重新显示和请求数据
+    emit dInfo->thiz->startGetClassTableInfo();
+    emit dInfo->thiz->startGetClassTableIndex();
+    delete dInfo;
+    _endthreadex(0);
+    return 0;
+}
+
 void CMainMenueDlg::showClassTableNextPage()
 {
     if(this->m_classCount == "0") //如果查询的结果集为空则不进行操作
@@ -932,6 +1019,8 @@ void CMainMenueDlg::initClassTableControl()
         this->ui->tableWidget_2->setCellWidget(i,5,widget);
         this->m_classOperationsVec.push_back(widget);
     }
+
+    this->bindClassOperators();
 }
 
 void CMainMenueDlg::initClassTable()

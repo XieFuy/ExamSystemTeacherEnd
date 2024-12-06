@@ -5,6 +5,15 @@ CMainMenueContorller::CMainMenueContorller()
  this->m_mainMenueModel = new CMainMenueModel();
 }
 
+bool CMainMenueContorller::deleteClassInfoByDateTime(QString acount,QString createTime)
+{
+    QByteArray acountArr = acount.toUtf8();
+    QByteArray createTimeArr = createTime.toLocal8Bit();
+    const char* pAcount = acountArr.data();
+    const char* pCreateTime = createTimeArr.data();
+    return this->m_mainMenueModel->deleteClassInfoByDateTime(pAcount,pCreateTime);
+}
+
 int CMainMenueContorller::getClassTableCount(QString acount)
 {
     QByteArray acountArr = acount.toUtf8();

@@ -10,6 +10,24 @@ CMainMenueModel::~CMainMenueModel()
 
 }
 
+bool CMainMenueModel::deleteClassInfoByDateTime(const char* acount,const char* createTime)
+{
+    if(acount == nullptr || createTime == nullptr)
+    {
+        return false;
+    }
+    CDBHelper* dbHelper = new CDBHelper();
+    char* sqlBuf = new char[1024000];
+    memset(sqlBuf,'\0',sizeof(char)*1024000);
+    std::string sql;
+    sprintf(sqlBuf,"delete from `class`  where `createTime` = '%s' and `teacherId` = '%s';",createTime,acount);
+    sql = sqlBuf;
+    bool ret =  dbHelper->sqlExcute(sql,"ExamSystem");
+    delete[] sqlBuf;
+    delete dbHelper;
+    return ret;
+}
+
 int CMainMenueModel::getClassTableCount(const char* acount)
 {
     if(acount == nullptr)

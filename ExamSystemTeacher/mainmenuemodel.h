@@ -56,7 +56,7 @@ public:
     bool initClassTableDatabase();
     std::vector<std::vector<std::string>> getClassTableData(const char* acount,int curPageIndex);
     int getClassTableCount(const char* acount);
-
+    bool deleteClassInfoByDateTime(const char* acount,const char* createTime);
 private:
       HANDLE m_mutex; //因为所有操作都是使用的一个CDBHelper对象，所以要给每一个执行sql的步骤进行上锁
 };

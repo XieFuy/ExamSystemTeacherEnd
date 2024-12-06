@@ -58,6 +58,7 @@ public :
     bool initClassTableDatabase();
     std::vector<std::vector<std::string>> getClassTableData(QString acount,int curPageIndex);
     int getClassTableCount(QString acount);
+    bool deleteClassInfoByDateTime(QString acount,QString createTime);
  private:
     CMainMenueModel* m_mainMenueModel = nullptr;
 };
