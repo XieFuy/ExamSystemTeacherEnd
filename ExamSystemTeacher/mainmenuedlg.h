@@ -285,8 +285,12 @@ private:
     //绑定所有课程表的操作按钮的信号槽
     void bindClassOperators();
 
+    //将课程表当前页的所有选项进行设置状态
+    void changeClassCurPageCheckBoxStatus(bool status);
 
-
+    //实现课程表的批量删除
+    void deleteMultiClassInfo();
+    static unsigned WINAPI threadDeleteMultiClassInfo(LPVOID arg);
 
 private:
     Ui::CMainMenueDlg *ui;

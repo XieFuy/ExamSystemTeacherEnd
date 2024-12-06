@@ -514,6 +514,78 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
 
     //课程表上一页点击
     QObject::connect(this->ui->pushButton_30,&QPushButton::clicked,this,&CMainMenueDlg::showClassTableLastPage);
+
+    QObject::connect(this->ui->checkBox_8,&QCheckBox::toggled,this,&CMainMenueDlg::changeClassCurPageCheckBoxStatus);
+
+    QObject::connect(this->ui->pushButton_32,&QPushButton::clicked,this,&CMainMenueDlg::deleteMultiClassInfo);
+}
+
+typedef struct deleteMultiClassInfoArg
+{
+    QString acount;
+    QList<QString>* createTimeLst;
+    CMainMenueDlg* thiz;
+}DeleteMultiClassInfoArg;
+
+void CMainMenueDlg::deleteMultiClassInfo()
+{
+    DeleteMultiClassInfoArg*  arg = new DeleteMultiClassInfoArg();
+    arg->thiz = this;
+    arg->acount = this->m_acount;
+
+    QList<QString>* createTimeLst = new QList<QString>();
+    for(int i = 0 ; i < this->m_classCheckVec.size();i++)
+    {
+        QList<QCheckBox*> ret =  this->m_classCheckVec.at(i)->findChildren<QCheckBox*>();
+        for(QCheckBox* check :ret)
+        {
+            if(check->isChecked())
+            {
+                QString createTime = this->m_classCreateTimeVec.at(i)->text().trimmed();
+                if(createTime != "")
+                {
+                    createTimeLst->push_back(createTime);
+                }
+            }
+        }
+    }
+    arg->createTimeLst = createTimeLst;
+    _beginthreadex(nullptr,0,&CMainMenueDlg::threadDeleteMultiClassInfo,arg,0,nullptr);
+    //将复选框进行设置为未选中
+    for(int i = 0 ; i < this->m_classCheckVec.size();i++)
+    {
+        QList<QCheckBox*> ret =  this->m_classCheckVec.at(i)->findChildren<QCheckBox*>();
+        for(QCheckBox* check : ret)
+        {
+            check->setChecked(false);
+        }
+    }
+    this->ui->checkBox_8->setChecked(false);
+}
+
+unsigned WINAPI CMainMenueDlg::threadDeleteMultiClassInfo(LPVOID arg)
+{
+    DeleteMultiClassInfoArg* dInfo = (DeleteMultiClassInfoArg*)arg;
+    dInfo->thiz->m_mainMenueContorller->deleteMultiClassInfo(dInfo->acount,*dInfo->createTimeLst);
+//    dInfo->thiz->m_mainMenueContorller->deleteMultiClickBtn(dInfo->acount,*dInfo->createTimeLst);
+    delete dInfo->createTimeLst;
+    delete dInfo;
+    emit dInfo->thiz->startGetClassTableInfo();
+    emit dInfo->thiz->startGetClassTableIndex();
+    _endthreadex(0);
+    return 0;
+}
+
+void CMainMenueDlg::changeClassCurPageCheckBoxStatus(bool status)
+{
+    for(int i = 0 ; i < this->m_classCheckVec.size();i++)
+    {
+       QList<QCheckBox*> ret =  this->m_classCheckVec.at(i)->findChildren<QCheckBox*>();
+       for(QCheckBox* check : ret)
+       {
+          check->setChecked(status);
+       }
+    }
 }
 
 void CMainMenueDlg::bindClassOperators()

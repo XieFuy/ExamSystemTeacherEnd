@@ -5,6 +5,40 @@ CMainMenueContorller::CMainMenueContorller()
  this->m_mainMenueModel = new CMainMenueModel();
 }
 
+typedef struct deleteMultiClassInfoArg
+{
+    CMainMenueContorller*thiz;
+    const char* acount;
+    const char* createTime;
+}DeleteMultiClassInfoArg;
+
+bool CMainMenueContorller::deleteMultiClassInfo(QString acount,QList<QString>& createTimeLst)
+{
+    QByteArray acountArr = acount.toUtf8();
+    const char* pAcount = acountArr.data();
+    for(int i = 0 ; i < createTimeLst.size();i++)
+    {
+        QByteArray createTimeArr = createTimeLst.at(i).toLocal8Bit();
+        const char* pCreateTime = createTimeArr.data();
+        DeleteMultiClassInfoArg* arg = new DeleteMultiClassInfoArg();
+        arg->thiz = this;
+        arg->acount = pAcount;
+        arg->createTime = pCreateTime;
+        HANDLE thread = (HANDLE) _beginthreadex(nullptr,0,&CMainMenueContorller::threadDeleteMultiClassInfo,arg,0,nullptr);
+        WaitForSingleObject(thread,INFINITE);
+    }
+    return true;
+}
+
+unsigned WINAPI CMainMenueContorller::threadDeleteMultiClassInfo(LPVOID arg)
+{
+    DeleteMultiClassInfoArg* dInfo = (DeleteMultiClassInfoArg*)arg;
+    dInfo->thiz->m_mainMenueModel->deleteClassInfoByDateTime(dInfo->acount,dInfo->createTime);
+    delete dInfo;
+    _endthreadex(0);
+    return 0;
+}
+
 bool CMainMenueContorller::deleteClassInfoByDateTime(QString acount,QString createTime)
 {
     QByteArray acountArr = acount.toUtf8();
