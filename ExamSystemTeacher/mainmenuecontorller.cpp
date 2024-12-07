@@ -5,6 +5,18 @@ CMainMenueContorller::CMainMenueContorller()
  this->m_mainMenueModel = new CMainMenueModel();
 }
 
+std::vector<std::vector<std::string>> CMainMenueContorller::showClassIconInStudentRequest(
+                                                                    QString acount,
+                                                                    QString className)
+{
+    QByteArray acountArr = acount.toUtf8();
+    QByteArray classNameArr = className.toLocal8Bit();
+    const char* pAcount = acountArr.data();
+    const char* pClassName = classNameArr.data();
+    return this->m_mainMenueModel->showClassIconInStudentRequest(pAcount,pClassName);
+}
+
+
 typedef struct deleteMultiClassInfoArg
 {
     CMainMenueContorller*thiz;

@@ -518,6 +518,96 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
     QObject::connect(this->ui->checkBox_8,&QCheckBox::toggled,this,&CMainMenueDlg::changeClassCurPageCheckBoxStatus);
 
     QObject::connect(this->ui->pushButton_32,&QPushButton::clicked,this,&CMainMenueDlg::deleteMultiClassInfo);
+
+
+    QObject::connect(this->ui->pushButton_37,&QPushButton::clicked,[=](){
+        this->ui->stackedWidget->setCurrentIndex(3);
+        this->ui->label_56->setPixmap(QPixmap()); //返回的时候 清空课程图标
+    });
+
+    QObject::connect(this,&CMainMenueDlg::startShowClassIconInStudentRequest,this,&CMainMenueDlg::showClassIconInStudentRequestUI);
+
+}
+
+typedef struct showClassIconInStudentRequestArg
+{
+    CMainMenueDlg* thiz;
+    QString acount;
+    QString className;
+}ShowClassIconInStudentRequestArg;
+
+void CMainMenueDlg::showClassIconInStudentRequest()
+{
+    ShowClassIconInStudentRequestArg* arg = new ShowClassIconInStudentRequestArg();
+    arg->thiz = this;
+    arg->acount = this->m_acount;
+    arg->className = this->m_classInfoSelected;
+    _beginthreadex(nullptr,0,&CMainMenueDlg::threadShowClassIconInStudentRequest,arg,0,nullptr);
+}
+
+unsigned WINAPI CMainMenueDlg::threadShowClassIconInStudentRequest(LPVOID arg)
+{
+    ShowClassIconInStudentRequestArg* sInfo = (ShowClassIconInStudentRequestArg*)arg;
+    //访问数据库，拿到图片路径
+    std::vector<std::vector<std::string>> ret =  sInfo->thiz->m_mainMenueContorller->showClassIconInStudentRequest(sInfo->acount,sInfo->className);
+
+    const char* p = ret.at(0).at(0).c_str();
+    //进行网络访问拿到网络数据,生成QImage,并且进行信号发送QImage
+    CClientSocket* clientSocket = new CClientSocket();
+    clientSocket->initSocket();
+    bool ret2 =  clientSocket->connectToServer();
+    if(!ret2)
+    {
+        return 0;
+    }
+    //进行封包操作
+    char* data = new char[1024];
+    memset(data,'\0',sizeof(char) * 1024);
+    strcpy(data,p);
+    clientSocket->makePacket(data,strlen(data),2); //获取课程图标的指令为2
+    delete[] data;
+    //发送数据包
+    char* packet = clientSocket->getPacket();
+    long long packetSize = clientSocket->getPacketSize();
+    int size =  clientSocket->Send(packet);
+    qDebug()<<"send size: "<<size;
+
+    //先获取服务端发送的文件大小 8字节
+    char* fileSize = new char[8];
+    memset(fileSize,'\0',sizeof(char) * 8);
+    size = clientSocket->Recv(fileSize,8);
+    long long fileSizeNum;
+    memmove(&fileSizeNum,fileSize,8);
+    delete[] fileSize;
+    qDebug()<<"fileSize: "<<fileSizeNum;
+
+    char* recvBuffer = new char[fileSizeNum];
+    memset(recvBuffer,'\0',sizeof(char) * fileSizeNum);
+    size = clientSocket->Recv(recvBuffer,fileSizeNum); //直接接收到的就是图片文件数据，没有多余内容
+    qDebug()<<"recv size: "<<size;
+    clientSocket->closeSocket();
+    delete clientSocket;
+
+    QByteArray ba(recvBuffer,fileSizeNum);
+    QImage* image = new QImage();
+    bool ret3 = image->loadFromData(ba,"PNG");
+    if(!ret3)
+    {
+     qDebug()<<"返回false";
+    }
+    if(image->isNull())
+    {
+        qDebug()<<"原先获取的图像无效,";
+    }
+
+    //发送出显示图像的信号
+    emit  sInfo->thiz->startShowClassIconInStudentRequest(image);
+//    delete[] pixmapData;
+    delete[] recvBuffer;
+
+    delete sInfo;
+    _endthreadex(0);
+    return 0;
 }
 
 typedef struct deleteMultiClassInfoArg
@@ -630,7 +720,10 @@ void CMainMenueDlg::bindClassOperators()
                          {
                              if(clickedBtn == btn)
                              {
-//                                 this->updateStatusClickBtn(row);
+                                 this->ui->stackedWidget->setCurrentIndex(6);
+                                 this->m_classInfoSelected = this->m_classNameVec.at(row)->text().trimmed();
+                                 //进行显示学生申请动态数据
+                                 this->showStudentRequestInfo();
                                  break;
                              }
                          }
@@ -640,6 +733,16 @@ void CMainMenueDlg::bindClassOperators()
              }
          }
     }
+}
+
+void CMainMenueDlg::showStudentRequestInfo()
+{
+    //显示被选中的课程名称
+    this->ui->label_60->setText(this->m_classInfoSelected);
+
+    //显示课程图标
+     this->showClassIconInStudentRequest();
+
 }
 
 typedef struct deleteClassInfoByDateTimeArg
@@ -752,6 +855,18 @@ unsigned WINAPI CMainMenueDlg::threadGetClassTableCountEntry(LPVOID arg)
     _endthreadex(0);
     return 0;
 }
+
+void CMainMenueDlg::showClassIconInStudentRequestUI(QImage* image)
+{
+    if(image == nullptr)
+    {
+        return ;
+    }
+    this->ui->label_56->setPixmap(QPixmap::fromImage(*image));
+    this->ui->label_56->setScaledContents(true);
+    delete image;
+}
+
 
 void CMainMenueDlg::showClassIconUI(QImage* image)
 {

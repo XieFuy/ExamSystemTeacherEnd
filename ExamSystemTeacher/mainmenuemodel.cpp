@@ -10,6 +10,26 @@ CMainMenueModel::~CMainMenueModel()
 
 }
 
+std::vector<std::vector<std::string>> CMainMenueModel::showClassIconInStudentRequest(const char* acount,
+                                                                    const char* className)
+{
+    if(acount == nullptr || className == nullptr)
+    {
+        return std::vector<std::vector<std::string>>();
+    }
+    CDBHelper* dbHelepr = new CDBHelper();
+    char* sqlBuf = new char[1024000];
+    memset(sqlBuf,'\0',sizeof(char) * 1024000);
+    std::string sql;
+    sprintf(sqlBuf,"select `classIconPath` from `class` \
+where `className` = '%s' and `teacherId` = '%s';",className,acount);
+    sql = sqlBuf;
+    std::vector<std::vector<std::string>> ret = dbHelepr->sqlQuery(sql,"ExamSystem");
+    delete[] sqlBuf;
+    delete dbHelepr;
+    return ret;
+}
+
 bool CMainMenueModel::deleteClassInfoByDateTime(const char* acount,const char* createTime)
 {
     if(acount == nullptr || createTime == nullptr)
