@@ -5,6 +5,11 @@ CMainMenueContorller::CMainMenueContorller()
  this->m_mainMenueModel = new CMainMenueModel();
 }
 
+bool CMainMenueContorller::initStudentRequestDataBaseTable()
+{
+    return this->m_mainMenueModel->initStudentRequestDataBaseTable();
+}
+
 std::vector<std::vector<std::string>> CMainMenueContorller::showClassIconInStudentRequest(
                                                                     QString acount,
                                                                     QString className)
