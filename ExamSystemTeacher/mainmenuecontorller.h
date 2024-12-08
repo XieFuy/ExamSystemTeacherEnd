@@ -62,6 +62,7 @@ public :
     bool deleteMultiClassInfo(QString acount,QList<QString>& createTimeLst);
     static unsigned WINAPI threadDeleteMultiClassInfo(LPVOID arg);
     std::vector<std::vector<std::string>> showClassIconInStudentRequest(QString acount,QString className);
+    bool initStudentRequestDataBaseTable();
  private:
     CMainMenueModel* m_mainMenueModel = nullptr;
 };

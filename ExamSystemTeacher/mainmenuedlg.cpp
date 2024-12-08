@@ -12,6 +12,7 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
     this->m_classCurPageIndex = 1;
     this->m_Event = CreateEvent(nullptr,FALSE,FALSE,nullptr);
     this->m_Event_2 = CreateEvent(nullptr,FALSE,FALSE,nullptr);
+    this->m_sortNumStudentRequest = 0;
     this->sortNumberClass = 0;
     this->sortNUmber = 0;
     this->signalCount = 0;
@@ -45,6 +46,8 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
 
     this->initClassTable();
     this->initClassTableControl();
+    this->initStudentRequestTable();
+    this->initStudentRequestTableControl();
     //界面初始化的默认选中项
     this->ui->pushButton_3->setStyleSheet("QPushButton{border:1px solid #50b8f7;background-color:#50b8f7;color:#ffffff;border-radius:20;}");
     this->ui->pushButton_8->setStyleSheet("QPushButton{border:1px solid #50b8f7;background-color:#50b8f7;color:#ffffff;border-radius:20;}");
@@ -527,6 +530,48 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
 
     QObject::connect(this,&CMainMenueDlg::startShowClassIconInStudentRequest,this,&CMainMenueDlg::showClassIconInStudentRequestUI);
 
+    QObject::connect(this,&CMainMenueDlg::startInitStudentRequestDataBaseTable,this,&CMainMenueDlg::initStudentRequestDataBaseTable);
+    emit this->startInitStudentRequestDataBaseTable();
+
+}
+
+void CMainMenueDlg::initStudentRequestDataBaseTable()
+{
+    _beginthreadex(nullptr,0,&CMainMenueDlg::threadInitStudentRequestDataBaseTableEntry,this,0,nullptr);
+}
+
+unsigned WINAPI CMainMenueDlg::threadInitStudentRequestDataBaseTableEntry(LPVOID arg)
+{
+    CMainMenueDlg* thiz = (CMainMenueDlg*)arg;
+    thiz->m_mainMenueContorller->initStudentRequestDataBaseTable();
+    _endthreadex(0);
+    return 0;
+}
+
+void CMainMenueDlg::initStudentRequestTable()
+{
+    this->ui->tableWidget_3->setRowCount(8);
+    this->ui->tableWidget_3->setColumnCount(5);
+    this->ui->tableWidget_3->horizontalHeader()->hide();
+    this->ui->tableWidget_3->verticalHeader()->hide();
+
+    //设置列宽
+    int width = this->ui->tableWidget_3->width();
+    int heigth = this->ui->tableWidget_3->height();
+    this->ui->tableWidget_3->setColumnWidth(0,width / 15);
+    this->ui->tableWidget_3->setColumnWidth(1,width / 4.5);
+    this->ui->tableWidget_3->setColumnWidth(2,width / 4.5);
+    this->ui->tableWidget_3->setColumnWidth(3,width / 4.5);
+    this->ui->tableWidget_3->setColumnWidth(4,width / 3.8);
+
+    this->ui->tableWidget_3->setRowHeight(0,heigth/ 8);
+    this->ui->tableWidget_3->setRowHeight(1,heigth/ 8);
+    this->ui->tableWidget_3->setRowHeight(2,heigth/ 8);
+    this->ui->tableWidget_3->setRowHeight(3,heigth/ 8);
+    this->ui->tableWidget_3->setRowHeight(4,heigth/ 8);
+    this->ui->tableWidget_3->setRowHeight(5,heigth/ 8);
+    this->ui->tableWidget_3->setRowHeight(6,heigth/ 8);
+    this->ui->tableWidget_3->setRowHeight(7,heigth/ 8);
 }
 
 typedef struct showClassIconInStudentRequestArg
@@ -653,11 +698,85 @@ void CMainMenueDlg::deleteMultiClassInfo()
     this->ui->checkBox_8->setChecked(false);
 }
 
+void CMainMenueDlg::initStudentRequestTableControl()
+{
+//    //初始化序号
+    for(int i = 0 ; i < 8 ; i++)
+    {
+        QWidget* widget = new QWidget();
+        QHBoxLayout* layout = new QHBoxLayout();
+        widget->setLayout(layout);
+        QCheckBox* checkBox = new QCheckBox();
+        checkBox->setText(QString::number(++this->m_sortNumStudentRequest));
+        checkBox->setFont(QFont("黑体"));
+        checkBox->setStyleSheet("QCheckBox{margin-left:25px;}");
+        checkBox->setVisible(false);
+        layout->addWidget(checkBox);
+        checkBox->setParent(widget);
+        this->ui->tableWidget_3->setCellWidget(i,0,widget);
+        this->m_studentRequestCheckVec.push_back(widget);
+    }
+
+    //初始化显示学生姓名
+    for(int i = 0 ; i < 8 ; i++)
+    {
+        QLabel* testName = new QLabel();
+        testName->setText("");
+        testName->setFont(QFont("黑体",12));
+        this->ui->tableWidget_3->setCellWidget(i,1,testName);
+        testName->setAlignment(Qt::AlignCenter);
+        this->m_studentRequestNameVec.push_back(testName);
+    }
+
+    //初始化学生学号
+    for(int i = 0 ; i < 8 ; i++)
+    {
+        QLabel* testName = new QLabel();
+        testName->setText("");
+        testName->setFont(QFont("黑体",12));
+        this->ui->tableWidget_3->setCellWidget(i,2,testName);
+        testName->setAlignment(Qt::AlignCenter);
+        this->m_studentRequestStudentIdVec.push_back(testName);
+    }
+
+    //初始化申请时间
+    for(int i = 0 ; i < 8;i++)
+    {
+        QLabel* testName = new QLabel();
+        testName->setText("");
+        testName->setFont(QFont("黑体",12));
+        this->ui->tableWidget_3->setCellWidget(i,3,testName);
+        testName->setAlignment(Qt::AlignCenter);
+        this->m_studentRequestTimeVec.push_back(testName);
+    }
+
+
+    //初始化操作
+    for(int i = 0 ; i < 8 ; i++)
+    {
+        QWidget* widget = new QWidget();
+        QPushButton* deleteBtn = new QPushButton("同意");
+        deleteBtn->setStyleSheet("QPushButton{border:none; border:1px solid #faa046; color:#faa046;border-radius:5;}QPushButton:hover{border:1px solid #50b8f7;color:#50b8f7;}");
+        deleteBtn->setParent(widget);
+        QPushButton* release = new QPushButton("不同意");
+        release->setStyleSheet("QPushButton{border:none; border:1px solid #faa046; color:#faa046;border-radius:5;}QPushButton:hover{border:1px solid #50b8f7;color:#50b8f7;}");
+        release->setParent(widget);
+        deleteBtn->setGeometry(100,20,70,30);
+        release->setGeometry(deleteBtn->width() + 30 + deleteBtn->x() ,deleteBtn->y(),70,30);
+        deleteBtn->setFont(QFont("黑体",12));
+        release->setFont(QFont("黑体",12));
+        deleteBtn->setVisible(false);
+        release->setVisible(false);
+        this->ui->tableWidget_3->setCellWidget(i,4,widget);
+        this->m_studentRequestOpetators.push_back(widget);
+    }
+}
+
+
 unsigned WINAPI CMainMenueDlg::threadDeleteMultiClassInfo(LPVOID arg)
 {
     DeleteMultiClassInfoArg* dInfo = (DeleteMultiClassInfoArg*)arg;
     dInfo->thiz->m_mainMenueContorller->deleteMultiClassInfo(dInfo->acount,*dInfo->createTimeLst);
-//    dInfo->thiz->m_mainMenueContorller->deleteMultiClickBtn(dInfo->acount,*dInfo->createTimeLst);
     delete dInfo->createTimeLst;
     delete dInfo;
     emit dInfo->thiz->startGetClassTableInfo();
@@ -2823,6 +2942,52 @@ CMainMenueDlg::~CMainMenueDlg()
         }
     }
     this->m_classOperationsVec.clear();
+
+    for(QVector<QWidget*>::iterator pos = this->m_studentRequestCheckVec.begin(); pos != this->m_studentRequestCheckVec.end();pos++)
+    {
+        if(*pos != nullptr)
+        {
+           delete  *pos;
+        }
+    }
+    this->m_studentRequestCheckVec.clear();
+
+    for(QVector<QLabel*>::iterator pos =  this->m_studentRequestNameVec.begin(); pos !=  this->m_studentRequestNameVec.end();pos++)
+    {
+        if(*pos != nullptr)
+        {
+           delete  *pos;
+        }
+    }
+    this->m_studentRequestNameVec.clear();
+
+    for(QVector<QLabel*>::iterator pos =  this->m_studentRequestStudentIdVec.begin(); pos !=  this->m_studentRequestStudentIdVec.end();pos++)
+    {
+        if(*pos != nullptr)
+        {
+           delete  *pos;
+        }
+    }
+    this->m_studentRequestStudentIdVec.clear();
+
+    for(QVector<QLabel*>::iterator pos =  this->m_studentRequestTimeVec.begin(); pos !=  this->m_studentRequestTimeVec.end();pos++)
+    {
+        if(*pos != nullptr)
+        {
+           delete  *pos;
+        }
+    }
+    this->m_studentRequestTimeVec.clear();
+
+    for(QVector<QWidget*>::iterator pos =  this->m_studentRequestOpetators.begin(); pos !=  this->m_studentRequestOpetators.end();pos++)
+    {
+        if(*pos != nullptr)
+        {
+           delete  *pos;
+        }
+    }
+    this->m_studentRequestOpetators.clear();
+
     //如果关闭界面，接收头像信息的线程还在执行的话就等待接收后结束线程
     WaitForSingleObject(this->m_recvHeadThead,INFINITE); //找到退出崩溃的原因，因为关闭界面的时候，接收头像线程还在执行，但是UI已经释放导致异常
     //释放容器中的QTreeItem

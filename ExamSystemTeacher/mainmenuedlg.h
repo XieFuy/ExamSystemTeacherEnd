@@ -57,6 +57,7 @@ signals:
     void startGetClassTableIndex();
     void startShowClassTableIndex(); //显示课程表页数信号
     void startShowClassIconInStudentRequest(QImage* image);//显示课程详情图标
+    void startInitStudentRequestDataBaseTable();
 private:
     CExitLoginDlg* m_exitLoginDlg = nullptr;
     QTreeWidgetItem* m_signalOperator = nullptr; //单选题父项
@@ -118,6 +119,14 @@ private:
     QString m_classCount;//表示总记录的所有
 
     QString m_classInfoSelected; //记录点击查看的课程详情的名称
+
+    //学生请求表部分
+    int m_sortNumStudentRequest;
+    QVector<QWidget*> m_studentRequestCheckVec;
+    QVector<QLabel*>  m_studentRequestNameVec;
+    QVector<QLabel*>  m_studentRequestStudentIdVec;
+    QVector<QLabel*>  m_studentRequestTimeVec;
+    QVector<QWidget*> m_studentRequestOpetators;
 private:
     void showPageIndex();//显示分页查询的下标页
     void initTableWidgetHeader(); //初始化表头
@@ -303,6 +312,21 @@ private:
     static unsigned WINAPI threadShowClassIconInStudentRequest(LPVOID arg);
 
     void showClassIconInStudentRequestUI(QImage* image); //进行UI显示
+
+    //初始化学生申请记录表格UI
+    void initStudentRequestTable();
+
+    //初始化学生申请表的控件
+    void initStudentRequestTableControl();
+
+    //初始化学生申请数据库表
+    void initStudentRequestDataBaseTable();
+    static  unsigned WINAPI threadInitStudentRequestDataBaseTableEntry(LPVOID arg);
+
+    //显示对应课程详情的学生申请数据
+
+
+
 private:
     Ui::CMainMenueDlg *ui;
 };

@@ -7,6 +7,7 @@
 #include <QDebug>
 #include "clientsocket.h"
 #include <stdlib.h>
+#include <memory>
 class CMainMenueModel //主菜单页面模型层
 {
 public:
@@ -59,6 +60,7 @@ public:
     bool deleteClassInfoByDateTime(const char* acount,const char* createTime);
     std::vector<std::vector<std::string>> showClassIconInStudentRequest(const char* acount,
                                                                         const char* className);
+    bool initStudentRequestDataBaseTable();
 private:
       HANDLE m_mutex; //因为所有操作都是使用的一个CDBHelper对象，所以要给每一个执行sql的步骤进行上锁
 };

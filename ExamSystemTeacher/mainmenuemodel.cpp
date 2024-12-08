@@ -10,6 +10,37 @@ CMainMenueModel::~CMainMenueModel()
 
 }
 
+ bool CMainMenueModel::initStudentRequestDataBaseTable()
+ {
+     //对于std::shared_ptr管理单个对象内存使用make::shared进行分配内存，并且相对于new效率更高
+     //shared_ptr管理对象数组内存的时候就使用new的方式来进行管理内存，例如：std::shared_ptr<type[]> ptr (new type[1024000],std::default_delete<type[]>());
+     //std::unique_ptr更适合用于管理对象数组，只不过是独占式，只有一个指针指向对象，并且不能进行拷贝，但是能进行移动 例：std::unique_ptr<char[]> ptr(new char[1024000]);
+//      std::shared_ptr<CDBHelper> ptr = std::make_shared<CDBHelper>(); //std::shared_ptr用于管理单个对象的内存
+      CDBHelper* dbHelper = new CDBHelper();
+//      std::shared_ptr<char[]> sqlBuf(new char[1024000],std::default_delete<char[]>());
+//      std::unique_ptr<char[]> sqlBuf(new char[1024000]);
+      char* sqlBuf = new char[1024000];
+      memset(sqlBuf,'\0',sizeof(char) * 1024000);
+      std::string sql;
+      sprintf(sqlBuf,"create table if not exists `requestJoinClass`(\n\
+`id` integer primary key auto_increment,\n\
+`studentName` varchar(20) not null,\n\
+`studentId`  varchar(20) not null,\n\
+foreign key(`studentId`) references `Student`(`studentId`),\n\
+`requestTime` datetime not null,\n\
+`className` varchar(50) not null,\n\
+`teacherId` varchar(20)  not null,\n\
+foreign key(`teacherId`) references `Teacher`(`teacherId`)\n\
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;");
+//      sql = sqlBuf.get();
+      sql = sqlBuf;
+//      bool ret = ptr->sqlExcute(sql,"ExamSystem");
+      bool ret =  dbHelper->sqlExcute(sql,"ExamSystem");
+      delete dbHelper;
+      delete[] sqlBuf;
+      return ret;
+}
+
 std::vector<std::vector<std::string>> CMainMenueModel::showClassIconInStudentRequest(const char* acount,
                                                                     const char* className)
 {
