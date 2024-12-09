@@ -3439,7 +3439,7 @@ border-radius:20;
         <rect>
          <x>250</x>
          <y>60</y>
-         <width>481</width>
+         <width>731</width>
          <height>51</height>
         </rect>
        </property>
@@ -3462,7 +3462,7 @@ border-radius:20;
        <property name="geometry">
         <rect>
          <x>0</x>
-         <y>160</y>
+         <y>230</y>
          <width>1391</width>
          <height>80</height>
         </rect>
@@ -3588,9 +3588,9 @@ background-color: #F8FAF7;
        <property name="geometry">
         <rect>
          <x>0</x>
-         <y>240</y>
+         <y>310</y>
          <width>1391</width>
-         <height>491</height>
+         <height>421</height>
         </rect>
        </property>
       </widget>
@@ -3765,6 +3765,135 @@ color:#50b8f7;
        </property>
        <property name="text">
         <string>返回</string>
+       </property>
+      </widget>
+      <widget class="QComboBox" name="comboBox_3">
+       <property name="geometry">
+        <rect>
+         <x>440</x>
+         <y>180</y>
+         <width>401</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>黑体</family>
+         <pointsize>14</pointsize>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QComboBox{
+  color:#666666;
+  padding: 1px 15px 1px 3px;
+  border: 1px solid #50b8fd;
+}
+
+QComboBox::drop-down
+{
+border-image:url(:/icons/comboxDowm.png);
+min-width:30px;
+min-heigth:30px;
+}
+
+QComboBox#comboBox::drop-down:checked
+{
+border-image:url(:/icons/comboxUp.png);
+}
+
+QComboBox QAbstractItemView{
+	background:rgba(255,255,255,1);
+    border:1px solid rgba(228,228,228,1);
+    border-radius:0px 0px 5px 5px;
+	font-size:14px;
+    outline: 0px;  
+ }
+
+</string>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="lineEdit_11">
+       <property name="geometry">
+        <rect>
+         <x>850</x>
+         <y>180</y>
+         <width>441</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>黑体</family>
+         <pointsize>12</pointsize>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">#lineEdit_11
+{
+border:1px solid #646465;
+}</string>
+       </property>
+       <property name="placeholderText">
+        <string>输入试卷名称查找</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="pushButton_68">
+       <property name="geometry">
+        <rect>
+         <x>1300</x>
+         <y>180</y>
+         <width>81</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>黑体</family>
+         <pointsize>12</pointsize>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">#pushButton_68
+{
+border:1px solid #50b8fd;
+background-color:#FFFFFF;
+color:#50b8fd;
+border-radius:10;
+}
+
+#pushButton_68:hover
+{
+background-color: #50b8fd;
+color:#ffffff;
+}</string>
+       </property>
+       <property name="text">
+        <string>查询</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_130">
+       <property name="geometry">
+        <rect>
+         <x>300</x>
+         <y>180</y>
+         <width>141</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>黑体</family>
+         <pointsize>12</pointsize>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">#label_130
+{
+color:#646465;
+}</string>
+       </property>
+       <property name="text">
+        <string>    搜索条件：</string>
        </property>
       </widget>
      </widget>

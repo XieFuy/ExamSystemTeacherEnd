@@ -61,6 +61,9 @@ public:
     std::vector<std::vector<std::string>> showClassIconInStudentRequest(const char* acount,
                                                                         const char* className);
     bool initStudentRequestDataBaseTable();
+    std::vector<std::vector<std::string>> getStudentRequestTableData(const char* className
+                                                                     ,const char* acount,
+                                                                     int curIndex);
 private:
       HANDLE m_mutex; //因为所有操作都是使用的一个CDBHelper对象，所以要给每一个执行sql的步骤进行上锁
 };

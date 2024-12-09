@@ -9,6 +9,7 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
     this->setWindowTitle("在线考试系统-教师端");
     this->setWindowIcon(QIcon(":/icons/winIcon.png"));
 
+    this->m_curStudentRequestIndex = 1;
     this->m_classCurPageIndex = 1;
     this->m_Event = CreateEvent(nullptr,FALSE,FALSE,nullptr);
     this->m_Event_2 = CreateEvent(nullptr,FALSE,FALSE,nullptr);
@@ -532,7 +533,140 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
 
     QObject::connect(this,&CMainMenueDlg::startInitStudentRequestDataBaseTable,this,&CMainMenueDlg::initStudentRequestDataBaseTable);
     emit this->startInitStudentRequestDataBaseTable();
+    QObject::connect(this,&CMainMenueDlg::startGetStudentRequestTableData,this,&CMainMenueDlg::getStudentRequestTableData);
 
+    QObject::connect(this,&CMainMenueDlg::startShowStudentRequestTableUI,this,&CMainMenueDlg::showStudentRequestTableUI);
+
+}
+
+void CMainMenueDlg::clearStudentRequestTableUI()
+{
+    //隐藏序号
+    for(int i = 0 ; i < 8 ; i++)
+    {
+        QList<QCheckBox*> buttons = this->m_studentRequestCheckVec.at(i)->findChildren<QCheckBox*>();
+        for (QCheckBox *button : buttons) {
+            button->setVisible(false);
+        }
+    }
+
+    //清除学生姓名
+    for(int i = 0 ; i < 8 ; i++)
+    {
+       QList<QLabel*> labels = this->m_studentRequestNameVec.at(i)->findChildren<QLabel*>();
+       for(QLabel* lab : labels)
+       {
+           lab->setText("");
+       }
+    }
+
+    //清除学生学号
+    for(int i = 0 ; i < 8 ; i++)
+    {
+        for (QLabel *button : this->m_studentRequestStudentIdVec) {
+            button->setText("");
+        }
+    }
+
+    //清除申请时间
+    for(int i = 0 ; i < 8;i++)
+    {
+        for (QLabel *button : this->m_studentRequestTimeVec) {
+            button->setText("");
+        }
+    }
+
+    //清除化操作
+    for(int i = 0 ; i < 8 ; i++)
+    {
+        QList<QPushButton*> optButton = this->m_studentRequestOpetators.at(i)->findChildren<QPushButton*>();
+        for (QPushButton *button : optButton) {
+            button->setVisible(false);
+        }
+    }
+}
+
+void CMainMenueDlg::showStudentRequestTableUI(QVector<QVector<QString>>* ret)
+{
+    if(ret == nullptr)
+    {
+        return ;
+    }
+    //进行UI显示
+   this->clearStudentRequestTableUI();
+   //将数据进行插入到表格中
+   for(int i = 0 ; i < ret->size(); i++)
+   {
+       //显示序号
+       QList<QCheckBox*> buttons = this->m_studentRequestCheckVec.at(i)->findChildren<QCheckBox*>();
+       for (QCheckBox *button : buttons) {
+           button->setVisible(true);
+       }
+
+       //显示学生姓名
+       QString str = ret->at(i).at(0);
+       this->m_studentRequestNameVec.at(i)->setText(str);
+
+       //显示学生Id
+       str = ret->at(i).at(1);
+       this->m_studentRequestStudentIdVec.at(i)->setText(str);
+
+       //显示申请时间
+       str = ret->at(i).at(2);
+       this->m_studentRequestTimeVec.at(i)->setText(str);
+
+       //显示操作按钮
+       QList<QPushButton*> optButton = this->m_studentRequestOpetators.at(i)->findChildren<QPushButton*>();
+       for (QPushButton *button : optButton) {
+           button->setVisible(true);
+       }
+   }
+   if(ret != nullptr)
+   {
+       delete ret;
+   }
+   qDebug()<<"学生申请表格UI显示完成!";
+}
+
+
+typedef struct getStudentRequestTableDataArg{
+    int curIndex;
+    QString className;
+    QString acount;
+    CMainMenueDlg* thiz;
+}GetStudentRequestTableDataArg;
+
+void CMainMenueDlg:: getStudentRequestTableData()
+{
+    GetStudentRequestTableDataArg* arg = new GetStudentRequestTableDataArg();
+    arg->thiz = this;
+    arg->acount = this->m_acount;
+    arg->className = this->m_classInfoSelected;
+    arg->curIndex = this->m_curStudentRequestIndex;
+    _beginthreadex(nullptr,0,&CMainMenueDlg::threadGetStudentRequestTableDataEntry,arg,0,nullptr);
+}
+
+unsigned WINAPI CMainMenueDlg::threadGetStudentRequestTableDataEntry(LPVOID arg)
+{
+    GetStudentRequestTableDataArg* gInfo = (GetStudentRequestTableDataArg*)arg;
+    std::vector<std::vector<std::string>> ret =  gInfo->thiz->m_mainMenueContorller->getStudentRequestTableData(gInfo->className,gInfo->acount,gInfo->curIndex);
+    //处理结果集
+    QVector<QVector<QString>>* result = new QVector<QVector<QString>>();
+    for(int i = 0 ; i < ret.size();i++)
+    {
+        QVector<QString> temp;
+        for(int j = 0 ; j < ret.at(i).size();j++)
+        {
+            QString str = QString::fromLocal8Bit(ret.at(i).at(j).c_str());
+            temp.push_back(str);
+        }
+        result->push_back(temp);
+    }
+    //发送数据回显信号
+    emit gInfo->thiz->startShowStudentRequestTableUI(result);
+    delete gInfo;
+    _endthreadex(0);
+    return 0;
 }
 
 void CMainMenueDlg::initStudentRequestDataBaseTable()
@@ -761,7 +895,7 @@ void CMainMenueDlg::initStudentRequestTableControl()
         QPushButton* release = new QPushButton("不同意");
         release->setStyleSheet("QPushButton{border:none; border:1px solid #faa046; color:#faa046;border-radius:5;}QPushButton:hover{border:1px solid #50b8f7;color:#50b8f7;}");
         release->setParent(widget);
-        deleteBtn->setGeometry(100,20,70,30);
+        deleteBtn->setGeometry(100,10,70,30);
         release->setGeometry(deleteBtn->width() + 30 + deleteBtn->x() ,deleteBtn->y(),70,30);
         deleteBtn->setFont(QFont("黑体",12));
         release->setFont(QFont("黑体",12));
@@ -861,6 +995,9 @@ void CMainMenueDlg::showStudentRequestInfo()
 
     //显示课程图标
      this->showClassIconInStudentRequest();
+
+    //显示数据库表内容
+    emit this->startGetStudentRequestTableData();
 
 }
 

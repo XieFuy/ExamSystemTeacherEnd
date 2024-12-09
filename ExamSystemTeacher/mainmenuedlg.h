@@ -48,6 +48,7 @@ signals:
     void startInitTestPaperTable();
     void startInitTestPaperTableContorl();
     void startShowPageIndex();
+    void startShowStudentRequestTableUI(QVector<QVector<QString>>* ret);
     void startShowCurPageIndexTable(QVector<QVector<QString>>* ret);
     void startShowTeacherAcountInfo(std::vector<std::vector<std::string>>* ret);
     void startShowClassTable(QVector<QVector<QString>>* ret);
@@ -58,6 +59,7 @@ signals:
     void startShowClassTableIndex(); //显示课程表页数信号
     void startShowClassIconInStudentRequest(QImage* image);//显示课程详情图标
     void startInitStudentRequestDataBaseTable();
+    void startGetStudentRequestTableData();
 private:
     CExitLoginDlg* m_exitLoginDlg = nullptr;
     QTreeWidgetItem* m_signalOperator = nullptr; //单选题父项
@@ -127,6 +129,7 @@ private:
     QVector<QLabel*>  m_studentRequestStudentIdVec;
     QVector<QLabel*>  m_studentRequestTimeVec;
     QVector<QWidget*> m_studentRequestOpetators;
+    int m_curStudentRequestIndex;
 private:
     void showPageIndex();//显示分页查询的下标页
     void initTableWidgetHeader(); //初始化表头
@@ -324,8 +327,14 @@ private:
     static  unsigned WINAPI threadInitStudentRequestDataBaseTableEntry(LPVOID arg);
 
     //显示对应课程详情的学生申请数据
+    void getStudentRequestTableData();
+    static unsigned WINAPI threadGetStudentRequestTableDataEntry(LPVOID arg);
 
+    //显示学生申请的记录信息
+    void showStudentRequestTableUI(QVector<QVector<QString>>* ret);
 
+    //清除学生申请表的记录UI显示信息
+    void clearStudentRequestTableUI();
 
 private:
     Ui::CMainMenueDlg *ui;

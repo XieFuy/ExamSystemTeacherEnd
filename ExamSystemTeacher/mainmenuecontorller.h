@@ -63,6 +63,7 @@ public :
     static unsigned WINAPI threadDeleteMultiClassInfo(LPVOID arg);
     std::vector<std::vector<std::string>> showClassIconInStudentRequest(QString acount,QString className);
     bool initStudentRequestDataBaseTable();
+    std::vector<std::vector<std::string>> getStudentRequestTableData(QString className,QString acount,int curIndex);
  private:
     CMainMenueModel* m_mainMenueModel = nullptr;
 };

@@ -5,6 +5,17 @@ CMainMenueContorller::CMainMenueContorller()
  this->m_mainMenueModel = new CMainMenueModel();
 }
 
+std::vector<std::vector<std::string>> CMainMenueContorller::getStudentRequestTableData(QString className
+                                                                                       ,QString acount
+                                                                                       ,int curIndex)
+{
+    QByteArray classNameArr = className.toLocal8Bit();
+    QByteArray acountArr = acount.toUtf8();
+    const char* pAcount = acountArr.data();
+    const char* pClassName = classNameArr.data();
+    return this->m_mainMenueModel->getStudentRequestTableData(pClassName,pAcount,curIndex);
+}
+
 bool CMainMenueContorller::initStudentRequestDataBaseTable()
 {
     return this->m_mainMenueModel->initStudentRequestDataBaseTable();

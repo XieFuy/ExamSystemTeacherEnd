@@ -10,6 +10,27 @@ CMainMenueModel::~CMainMenueModel()
 
 }
 
+std::vector<std::vector<std::string>> CMainMenueModel::getStudentRequestTableData(const char* className
+                                                                 ,const char* acount
+                                                                 ,int curIndex)
+{
+    if(className == nullptr || acount == nullptr)
+    {
+        return std::vector<std::vector<std::string>>();
+    }
+    CDBHelper* dbHelper = new CDBHelper();
+    char* sqlBuf = new char[1024000];
+    memset(sqlBuf,'\0',sizeof(char) * 1024000);
+    std::string sql;
+    sprintf(sqlBuf,"select  `studentName`,`studentId`,`requestTime` from `requestJoinClass`\
+ where `teacherId` = '%s' and `className` = '%s' limit 8 offset %d;",acount,className,(curIndex - 1) * 8);
+    sql = sqlBuf;
+    std::vector<std::vector<std::string>> ret =  dbHelper->sqlQuery(sql,"ExamSystem");
+    delete[] sqlBuf;
+    delete dbHelper;
+    return ret;
+}
+
  bool CMainMenueModel::initStudentRequestDataBaseTable()
  {
      //对于std::shared_ptr管理单个对象内存使用make::shared进行分配内存，并且相对于new效率更高
