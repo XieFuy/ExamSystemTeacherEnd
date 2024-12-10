@@ -23,6 +23,7 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
     this->m_multiCorrectOptions = "";
     this->m_testPaperStatusChoise = 0;
 
+    this->m_studentRequestCount = "";
     this->m_judgeAnswer = "";
     this->ui->comboBox->addItem("全部",0);
     this->ui->comboBox->addItem("已发布",1);
@@ -527,6 +528,7 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
     QObject::connect(this->ui->pushButton_37,&QPushButton::clicked,[=](){
         this->ui->stackedWidget->setCurrentIndex(3);
         this->ui->label_56->setPixmap(QPixmap()); //返回的时候 清空课程图标
+        this->clearStudentRequestTableUI();
     });
 
     QObject::connect(this,&CMainMenueDlg::startShowClassIconInStudentRequest,this,&CMainMenueDlg::showClassIconInStudentRequestUI);
@@ -536,6 +538,58 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
     QObject::connect(this,&CMainMenueDlg::startGetStudentRequestTableData,this,&CMainMenueDlg::getStudentRequestTableData);
 
     QObject::connect(this,&CMainMenueDlg::startShowStudentRequestTableUI,this,&CMainMenueDlg::showStudentRequestTableUI);
+
+    QObject::connect(this,&CMainMenueDlg:: startShowStudentRequestIndexUI,this,&CMainMenueDlg::showStudentRequestIndexUI);
+
+    QObject::connect(this,&CMainMenueDlg::startGetStudentRequestCount,this,&CMainMenueDlg::getStudentRequestTableCount);
+
+}
+
+void CMainMenueDlg::showStudentRequestIndexUI()
+{
+    QString first = QString::number(this->m_curStudentRequestIndex);
+    first += "/";
+    first += this->m_studentRequestCount;
+    this->ui->label_65->setText(first);
+}
+
+typedef struct getStudentRequestTableCountArg{
+    QString className;
+    QString acount;
+    int curIndex;
+    CMainMenueDlg* thiz;
+}GetStudentRequestTableCountArg;
+
+void CMainMenueDlg::getStudentRequestTableCount()
+{
+    GetStudentRequestTableCountArg* arg = new GetStudentRequestTableCountArg();
+    arg->thiz = this;
+    arg->acount = this->m_acount;
+    arg->className = this->m_classInfoSelected;
+    arg->curIndex = this->m_curStudentRequestIndex;
+    _beginthreadex(nullptr,0,&CMainMenueDlg::threadGetStudentRequestTableCountEntry,arg,0,nullptr);
+}
+
+unsigned WINAPI CMainMenueDlg::threadGetStudentRequestTableCountEntry(LPVOID arg)
+{
+    GetStudentRequestTableCountArg* gInfo = (GetStudentRequestTableCountArg*)arg;
+    int ret =  gInfo->thiz->m_mainMenueContorller->getStudentRequestTableCount(gInfo->acount,gInfo->className,gInfo->curIndex);
+    gInfo->thiz->m_studentRequestCount = QString::number(ret);
+    //发送显示当前页的信号
+    emit gInfo->thiz->startShowStudentRequestIndexUI();
+    delete gInfo;
+    _endthreadex(0);
+    return 0;
+}
+
+void CMainMenueDlg::showStudentRequestNextPage()
+{
+
+
+}
+
+void CMainMenueDlg::showStudentRequestLastPage()
+{
 
 }
 
@@ -998,7 +1052,7 @@ void CMainMenueDlg::showStudentRequestInfo()
 
     //显示数据库表内容
     emit this->startGetStudentRequestTableData();
-
+    emit this->startGetStudentRequestCount();
 }
 
 typedef struct deleteClassInfoByDateTimeArg

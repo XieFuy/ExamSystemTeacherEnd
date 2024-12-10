@@ -5,6 +5,15 @@ CMainMenueContorller::CMainMenueContorller()
  this->m_mainMenueModel = new CMainMenueModel();
 }
 
+int CMainMenueContorller::getStudentRequestTableCount(QString acount,QString className,int curIndex)
+{
+    QByteArray acountArr = acount.toUtf8();
+    QByteArray classNameArr = className.toLocal8Bit();
+    const char* pAcount = acountArr.data();
+    const char* pClassName = classNameArr.data();
+    return this->m_mainMenueModel->getStudentRequestTableCount(pAcount,pClassName,curIndex);
+}
+
 std::vector<std::vector<std::string>> CMainMenueContorller::getStudentRequestTableData(QString className
                                                                                        ,QString acount
                                                                                        ,int curIndex)

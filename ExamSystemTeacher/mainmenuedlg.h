@@ -60,6 +60,8 @@ signals:
     void startShowClassIconInStudentRequest(QImage* image);//显示课程详情图标
     void startInitStudentRequestDataBaseTable();
     void startGetStudentRequestTableData();
+    void startShowStudentRequestIndexUI();
+    void startGetStudentRequestCount();
 private:
     CExitLoginDlg* m_exitLoginDlg = nullptr;
     QTreeWidgetItem* m_signalOperator = nullptr; //单选题父项
@@ -130,6 +132,7 @@ private:
     QVector<QLabel*>  m_studentRequestTimeVec;
     QVector<QWidget*> m_studentRequestOpetators;
     int m_curStudentRequestIndex;
+    QString m_studentRequestCount;
 private:
     void showPageIndex();//显示分页查询的下标页
     void initTableWidgetHeader(); //初始化表头
@@ -335,6 +338,19 @@ private:
 
     //清除学生申请表的记录UI显示信息
     void clearStudentRequestTableUI();
+
+    //获取学生申请表的总页数
+    void getStudentRequestTableCount();
+    static unsigned WINAPI threadGetStudentRequestTableCountEntry(LPVOID arg);
+
+    //显示学生申请当前页下标
+    void showStudentRequestIndexUI();
+
+    //显示学生申请表的下一页
+    void showStudentRequestNextPage();
+
+    //显示学生申请表的上一页
+    void showStudentRequestLastPage();
 
 private:
     Ui::CMainMenueDlg *ui;

@@ -64,6 +64,7 @@ public :
     std::vector<std::vector<std::string>> showClassIconInStudentRequest(QString acount,QString className);
     bool initStudentRequestDataBaseTable();
     std::vector<std::vector<std::string>> getStudentRequestTableData(QString className,QString acount,int curIndex);
+    int getStudentRequestTableCount(QString acount,QString className,int curIndex);
  private:
     CMainMenueModel* m_mainMenueModel = nullptr;
 };
