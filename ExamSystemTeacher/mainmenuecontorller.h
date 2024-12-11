@@ -65,6 +65,10 @@ public :
     bool initStudentRequestDataBaseTable();
     std::vector<std::vector<std::string>> getStudentRequestTableData(QString className,QString acount,int curIndex);
     int getStudentRequestTableCount(QString acount,QString className,int curIndex);
+    std::vector<std::vector<std::string>> getStudentRequestByStudentName(QString acount
+                                                                         ,QString className
+                                                                         ,int curIndex,QString studentName);
+    int getStudentRequestByStudentNameCount(QString acount,QString className,QString studentName);
  private:
     CMainMenueModel* m_mainMenueModel = nullptr;
 };

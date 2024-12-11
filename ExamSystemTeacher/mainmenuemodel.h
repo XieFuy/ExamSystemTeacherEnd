@@ -65,6 +65,10 @@ public:
                                                                      ,const char* acount,
                                                                      int curIndex);
     int getStudentRequestTableCount(const char* acount,const char* className,int curIndex);
+    std::vector<std::vector<std::string>> getStudentRequestByStudentName(const char* acount
+                                                                         ,const char* className
+                                                                         ,int curIndex,const char* studentName);
+    int getStudentRequestByStudentNameCount(const char* acount,const char* className,const char* studentName);
 private:
       HANDLE m_mutex; //因为所有操作都是使用的一个CDBHelper对象，所以要给每一个执行sql的步骤进行上锁
 };

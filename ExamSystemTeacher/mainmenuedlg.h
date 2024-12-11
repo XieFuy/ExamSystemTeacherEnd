@@ -352,6 +352,18 @@ private:
     //显示学生申请表的上一页
     void showStudentRequestLastPage();
 
+    //根据查询的条件进行对条件进行模糊查询
+    void getStudentRequestByCondition();
+    static unsigned WINAPI threadGetStudentRequestByCondition(LPVOID arg);
+
+    //根据学生申请姓名进行模糊查询
+    void getStudentRequestByStudentName(QString studentName);
+    static unsigned WINAPI threadGetStudentRequestByStudentName(LPVOID arg);
+
+    //获取学生申请姓名进行模糊查询的总页数
+    void getStudentRequestByStudentNameCount(QString studentName);
+    static unsigned WINAPI threadGetStudentRequestByStudentNameCount(LPVOID arg);
+
 private:
     Ui::CMainMenueDlg *ui;
 };

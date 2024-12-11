@@ -3796,7 +3796,7 @@ min-width:30px;
 min-heigth:30px;
 }
 
-QComboBox#comboBox::drop-down:checked
+QComboBox#comboBox_3::drop-down:checked
 {
 border-image:url(:/icons/comboxUp.png);
 }
@@ -3834,7 +3834,7 @@ border:1px solid #646465;
 }</string>
        </property>
        <property name="placeholderText">
-        <string>输入试卷名称查找</string>
+        <string>按条件输入查找(不输入查询则为查询全部)</string>
        </property>
       </widget>
       <widget class="QPushButton" name="pushButton_68">

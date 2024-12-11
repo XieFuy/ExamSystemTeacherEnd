@@ -10,6 +10,66 @@ CMainMenueModel::~CMainMenueModel()
 
 }
 
+int CMainMenueModel::getStudentRequestByStudentNameCount(const char* acount
+                                        ,const char* className
+                                        ,const char* studentName)
+{
+    if(acount == nullptr || className == nullptr || studentName == nullptr)
+    {
+        return -1;
+    }
+    CDBHelper* dbHelper = new CDBHelper();
+    char* sqlBuf = new char[1024000];
+    memset(sqlBuf,'\0',sizeof(char) * 1024000);
+    std::string sql;
+    sprintf(sqlBuf,"select count(*) from `requestJoinClass` \
+where `teacherId` = '%s' and `className` = '%s' \
+and `studentName` like '%%%s%%';",acount,className,studentName);
+    sql = sqlBuf;
+    int tableCount =  dbHelper->sqlQueryCount(sql,"ExamSystem"); //获取的是表的记录条数
+    tableCount -= 1; //减去最上面的一条记录
+    delete[] sqlBuf;
+    int result = (tableCount / 8) ;
+
+    if(result < 0) //表示总的记录条数小于8
+    {
+         result += 1;
+    }else
+    {
+       int yuShu = tableCount - (result * 8);
+        if(yuShu >= 0)
+        {
+            result += 1;
+        }
+    }
+    delete dbHelper;
+    return result;
+}
+
+
+std::vector<std::vector<std::string>> CMainMenueModel::getStudentRequestByStudentName(const char* acount
+                                                                     ,const char* className
+                                                                     ,int curIndex,const char* studentName)
+{
+    if(acount == nullptr || className == nullptr || studentName == nullptr || curIndex == -1)
+    {
+        return std::vector<std::vector<std::string>>();
+    }
+    CDBHelper* dbHelper = new CDBHelper();
+    char* sqlBuf = new char[1024000];
+    memset(sqlBuf,'\0',sizeof(char) * 1024000);
+    std::string sql;
+    sprintf(sqlBuf,"select `studentName`,`studentId`,`requestTime` from `requestJoinClass` \
+where  `teacherId` = '%s' and  `className` = '%s' and `studentName` like '%%%s%%' \
+limit 8 offset %d;",acount,className,studentName,(curIndex - 1) * 8);
+    sql = sqlBuf;
+    std::vector<std::vector<std::string>> ret =  dbHelper->sqlQuery(sql,"ExamSystem");
+    delete[] sqlBuf;
+    delete dbHelper;
+    return ret;
+}
+
+
 int CMainMenueModel::getStudentRequestTableCount(const char* acount,const char* className,int curIndex)
 {
     if(acount == nullptr || className == nullptr)
