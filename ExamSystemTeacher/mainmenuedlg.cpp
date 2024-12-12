@@ -583,6 +583,83 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
     QObject::connect(this->ui->pushButton_68,&QPushButton::clicked,this,&CMainMenueDlg::getStudentRequestByCondition);
 }
 
+typedef struct getStudentRequestByStudentIdCountArg
+{
+    CMainMenueDlg* thiz;
+    QString acount;
+    QString className;
+    QString studentId;
+}GetStudentRequestByStudentIdCountArg;
+
+void CMainMenueDlg::getStudentRequestByStudentIdCount(QString studentId)
+{
+    GetStudentRequestByStudentIdCountArg* arg = new GetStudentRequestByStudentIdCountArg();
+    arg->thiz = this;
+    arg->acount = this->m_acount;
+    arg->className = this->m_classInfoSelected;
+    arg->studentId = studentId;
+    _beginthreadex(nullptr,0,&CMainMenueDlg::threadGetStudentRequestByStudentIdCount,arg,0,nullptr);
+}
+
+unsigned WINAPI CMainMenueDlg::threadGetStudentRequestByStudentIdCount(LPVOID arg)
+{
+     GetStudentRequestByStudentIdCountArg* gInfo = ( GetStudentRequestByStudentIdCountArg*)arg;
+    int ret =  gInfo->thiz->m_mainMenueContorller->getStudentRequestByStudentIdCount(gInfo->acount
+                                                                            ,gInfo->className
+                                                                            ,gInfo->studentId);
+    gInfo->thiz->m_studentRequestCount = QString::number(ret);
+    emit gInfo->thiz->startShowStudentRequestIndexUI();
+    delete gInfo;
+    _endthreadex(0);
+    return 0;
+}
+
+typedef struct getStudentRequestByStudentIdArg
+{
+    CMainMenueDlg* thiz;
+    QString studentId;
+    QString className;
+    QString acount;
+    int curIndex;
+}GetStudentRequestByStudentIdArg;
+
+void CMainMenueDlg::getStudentRequestByStudentId(QString studentId)
+{
+    GetStudentRequestByStudentIdArg* arg = new GetStudentRequestByStudentIdArg();
+    arg->thiz = this;
+    arg->studentId = studentId;
+    arg->className =  this->m_classInfoSelected;
+    arg->curIndex = this->m_curStudentRequestIndex;
+    arg->acount = this->m_acount;
+    _beginthreadex(nullptr,0,&CMainMenueDlg::threadGetStudentRequestByStudentId,arg,0,nullptr);
+}
+
+unsigned WINAPI CMainMenueDlg::threadGetStudentRequestByStudentId(LPVOID arg)
+{
+    GetStudentRequestByStudentIdArg* gInfo =(GetStudentRequestByStudentIdArg*)arg;
+    std::vector<std::vector<std::string>> ret =  gInfo->thiz->m_mainMenueContorller->
+            getStudentRequestByStudentId(gInfo->acount
+                                           ,gInfo->className,
+                                           gInfo->curIndex
+                                           ,gInfo->studentId);
+    QVector<QVector<QString>>* result = new QVector<QVector<QString>>();
+    for(int i = 0 ; i < ret.size();i++)
+    {
+        QVector<QString> temp;
+        for(int j = 0 ; j < ret.at(i).size();j++)
+        {
+            QString str = QString::fromLocal8Bit(ret.at(i).at(j).c_str());
+            temp.push_back(str);
+        }
+        result->push_back(temp);
+    }
+    //发送数据回显信号
+    emit gInfo->thiz->startShowStudentRequestTableUI(result);
+    delete gInfo;
+    _endthreadex(0);
+    return 0;
+}
+
 void CMainMenueDlg::showStudentRequestByStudentNameLastPage(QString studentName)
 {
     if(this->m_studentRequestCount == "0")
@@ -699,7 +776,8 @@ unsigned WINAPI CMainMenueDlg::threadGetStudentRequestByCondition(LPVOID arg)
         return 0;
     }else if(strCondition != "" && value == 1)//按学生学号
     {
-
+        gInfo->thiz->getStudentRequestByStudentId(strCondition);
+        gInfo->thiz->getStudentRequestByStudentIdCount(strCondition);
         delete gInfo;
         _endthreadex(0);
         return 0;

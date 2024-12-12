@@ -5,6 +5,32 @@ CMainMenueContorller::CMainMenueContorller()
  this->m_mainMenueModel = new CMainMenueModel();
 }
 
+int CMainMenueContorller::getStudentRequestByStudentIdCount(QString acount
+                                                            ,QString className
+                                                            ,QString studentId)
+{
+    QByteArray acountArr = acount.toLocal8Bit();
+    QByteArray classNameArr = className.toLocal8Bit();
+    QByteArray studentNameArr = studentId.toLocal8Bit();
+    const char* pAcount = acountArr.data();
+    const char* pClassName = classNameArr.data();
+    const char* pStudentName = studentNameArr.data();
+    return this->m_mainMenueModel->getStudentRequestByStudentIdCount(pAcount,pClassName,pStudentName);
+}
+
+std::vector<std::vector<std::string>> CMainMenueContorller::getStudentRequestByStudentId(QString acount
+                                                                   ,QString className
+                                                                   ,int curIndex,QString studentId)
+{
+    QByteArray acountArr = acount.toUtf8();
+    QByteArray classNameArr = className.toLocal8Bit();
+    QByteArray studentNameArr = studentId.toLocal8Bit();
+
+    const char* pAcount = acountArr.data();
+    const char* pClassName = classNameArr.data();
+    const char* pStudentName = studentNameArr.data();
+    return this->m_mainMenueModel->getStudentRequestByStudentId(pAcount,pClassName,curIndex,pStudentName);
+}
 
 int CMainMenueContorller::getStudentRequestByStudentNameCount(QString acount,QString className,QString studentName)
 {
