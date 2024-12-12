@@ -364,6 +364,12 @@ private:
     void getStudentRequestByStudentNameCount(QString studentName);
     static unsigned WINAPI threadGetStudentRequestByStudentNameCount(LPVOID arg);
 
+    //根据学生姓名进行模糊查询的结果集的下一页操作
+    void showStudentRequestByStudentNameNextPage(QString studentName);
+
+    //根据学生姓名进行模糊查询的结果集的上一页操作
+    void showStudentRequestByStudentNameLastPage(QString studentName);
+
 private:
     Ui::CMainMenueDlg *ui;
 };

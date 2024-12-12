@@ -548,14 +548,88 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
 
     QObject::connect(this,&CMainMenueDlg::startGetStudentRequestCount,this,&CMainMenueDlg::getStudentRequestTableCount);
 
-    //学生申请表下一页
-    QObject::connect(this->ui->pushButton_34,&QPushButton::clicked,this,&CMainMenueDlg::showStudentRequestNextPage);
+    //学生申请表下一页   
+    QObject::connect(this->ui->pushButton_34,&QPushButton::clicked,[=](){
+        QString strCondition = this->ui->lineEdit_11->text().trimmed();
+        int index = this->ui->comboBox_3->currentIndex();
+        int value = this->ui->comboBox_3->itemData(index).toInt();
+
+        if(strCondition == "")
+        {
+            //执行的是全部结果的下一页操作
+            this->showStudentRequestNextPage();
+        }else if(strCondition != "" && value == 0)
+        {
+            this->showStudentRequestByStudentNameNextPage(strCondition);
+        }
+    });
+
 
     //学生申请表上一页
-    QObject::connect(this->ui->pushButton_35,&QPushButton::clicked,this,&CMainMenueDlg::showStudentRequestLastPage);
+    QObject::connect(this->ui->pushButton_35,&QPushButton::clicked,[=](){
+        QString strCondition = this->ui->lineEdit_11->text().trimmed();
+        int index = this->ui->comboBox_3->currentIndex();
+        int value = this->ui->comboBox_3->itemData(index).toInt();
+        if(strCondition == "")
+        {
+            //执行的是全部结果的上一页操作
+            this->showStudentRequestLastPage();
+        }else if(strCondition != "" && value == 0)
+        {
+            this->showStudentRequestByStudentNameLastPage(strCondition);
+        }
+    });
 
     QObject::connect(this->ui->pushButton_68,&QPushButton::clicked,this,&CMainMenueDlg::getStudentRequestByCondition);
 }
+
+void CMainMenueDlg::showStudentRequestByStudentNameLastPage(QString studentName)
+{
+    if(this->m_studentRequestCount == "0")
+    {
+        return;
+    }
+    //防止恶意刷新
+    if(this->m_curStudentRequestIndex <= 1)
+    {
+        return ;
+    }
+    //清除当前表中的记录
+    this->clearStudentRequestTableUI();
+    //给当前页递减，并且不能低于1
+    if(this->m_curStudentRequestIndex > 1)
+    {
+       this->m_curStudentRequestIndex -= 1;
+    }
+    this->getStudentRequestByStudentName(studentName);
+    this->getStudentRequestByStudentNameCount(studentName);
+}
+
+
+void CMainMenueDlg::showStudentRequestByStudentNameNextPage(QString studentName)
+{
+    if(this->m_studentRequestCount == "0") //如果查询的结果集为空则不进行操作
+    {
+        return;
+    }
+
+    if(QString::number(this->m_curStudentRequestIndex) == this->m_studentRequestCount)
+    {
+        return;
+    }
+    //清除当前表中的记录
+    this->clearStudentRequestTableUI();
+
+    //给当前页自增，并且不能超过总页
+    if(QString::number(this->m_curStudentRequestIndex) != this->m_studentRequestCount)
+    {
+        this->m_curStudentRequestIndex += 1;
+    }
+    this->getStudentRequestByStudentName(studentName);
+    this->getStudentRequestByStudentNameCount(studentName);
+}
+
+
 
 typedef struct getStudentRequestByStudentNameCountArg
 {
