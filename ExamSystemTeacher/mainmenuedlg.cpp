@@ -564,6 +564,9 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
         }else if(strCondition != "" && value == 1)
         {
             this->showStudentRequestByStudentIdNextPage(strCondition);
+        }else if(strCondition != "" && value == 2)
+        {
+            this->showStudentRequestByRequestTimeNextPage(strCondition);
         }
     });
 
@@ -583,10 +586,89 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
         }else if(strCondition != "" && value == 1) //按学生学号
         {
             this->showStudentRequestByStudentIdLastPage(strCondition);
+        }else if(strCondition != "" && value == 2)
+        {
+            this->showStudentRequestByRequestTimeLastPage(strCondition);
         }
     });
 
     QObject::connect(this->ui->pushButton_68,&QPushButton::clicked,this,&CMainMenueDlg::getStudentRequestByCondition);
+}
+
+void CMainMenueDlg::showStudentRequestByRequestTimeNextPage(QString createTime)
+{
+    if(this->m_studentRequestCount == "0") //如果查询的结果集为空则不进行操作
+    {
+        return;
+    }
+
+    if(QString::number(this->m_curStudentRequestIndex) == this->m_studentRequestCount)
+    {
+        return;
+    }
+    //清除当前表中的记录
+    this->clearStudentRequestTableUI();
+
+    //给当前页自增，并且不能超过总页
+    if(QString::number(this->m_curStudentRequestIndex) != this->m_studentRequestCount)
+    {
+        this->m_curStudentRequestIndex += 1;
+    }
+    this->getStudentRequestByRequestTime(createTime);
+    this->getStudentRequestByRequestTimeCount(createTime);
+}
+
+void CMainMenueDlg::showStudentRequestByRequestTimeLastPage(QString createTime)
+{
+    if(this->m_studentRequestCount == "0")
+    {
+        return;
+    }
+    //防止恶意刷新
+    if(this->m_curStudentRequestIndex <= 1)
+    {
+        return ;
+    }
+    //清除当前表中的记录
+    this->clearStudentRequestTableUI();
+    //给当前页递减，并且不能低于1
+    if(this->m_curStudentRequestIndex > 1)
+    {
+       this->m_curStudentRequestIndex -= 1;
+    }
+    this->getStudentRequestByRequestTime(createTime);
+    this->getStudentRequestByRequestTimeCount(createTime);
+}
+
+typedef struct getStudentRequestByRequestTimeCountArg
+{
+   CMainMenueDlg* thiz;
+   QString acount;
+   QString className;
+   QString requestTime;
+}GetStudentRequestByRequestTimeCountArg;
+
+void CMainMenueDlg::getStudentRequestByRequestTimeCount(QString createTime)
+{
+    GetStudentRequestByRequestTimeCountArg* arg = new GetStudentRequestByRequestTimeCountArg();
+    arg->thiz = this;
+    arg->acount = this->m_acount;
+    arg->className = this->m_classInfoSelected;
+    arg->requestTime = createTime;
+    _beginthreadex(nullptr,0,&CMainMenueDlg::threadGetStudentRequestByRequestTimeCount,arg,0,nullptr);
+}
+
+unsigned WINAPI CMainMenueDlg::threadGetStudentRequestByRequestTimeCount(LPVOID arg)
+{
+   GetStudentRequestByRequestTimeCountArg* gInfo = (GetStudentRequestByRequestTimeCountArg*)arg;
+   int ret =  gInfo->thiz->m_mainMenueContorller->getStudentRequestByRequestTimeCount(gInfo->acount
+                                                                           ,gInfo->className
+                                                                           ,gInfo->requestTime);
+   gInfo->thiz->m_studentRequestCount = QString::number(ret);
+   emit gInfo->thiz->startShowStudentRequestIndexUI();
+   delete gInfo;
+   _endthreadex(0);
+   return 0;
 }
 
 typedef struct getStudentRequestByRequestTimeArg
@@ -882,6 +964,7 @@ unsigned WINAPI CMainMenueDlg::threadGetStudentRequestByCondition(LPVOID arg)
     }else if(strCondition != "" && value == 2)//按申请时间
     {
         gInfo->thiz->getStudentRequestByRequestTime(strCondition);
+        gInfo->thiz->getStudentRequestByRequestTimeCount(strCondition);
         delete gInfo;
         _endthreadex(0);
         return 0;

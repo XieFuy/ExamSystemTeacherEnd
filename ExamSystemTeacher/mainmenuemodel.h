@@ -76,6 +76,9 @@ public:
     std::vector<std::vector<std::string>> getStudentRequestByRequestTime(const char* acount
                                                                          ,const char* className
                                                                          ,int curIndex,const char* requestTime);
+    int getStudentRequestByRequestTimeCount(const char* acount
+                                            ,const char* className
+                                            ,const char* requestTime);
 private:
       HANDLE m_mutex; //因为所有操作都是使用的一个CDBHelper对象，所以要给每一个执行sql的步骤进行上锁
 };
