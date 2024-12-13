@@ -589,6 +589,52 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
     QObject::connect(this->ui->pushButton_68,&QPushButton::clicked,this,&CMainMenueDlg::getStudentRequestByCondition);
 }
 
+typedef struct getStudentRequestByRequestTimeArg
+{
+    CMainMenueDlg* thiz;
+    QString className;
+    QString acount;
+    QString requestTime;
+    int curIndex;
+}GetStudentRequestByRequestTimeArg;
+
+void  CMainMenueDlg::getStudentRequestByRequestTime(QString createTime)
+{
+    GetStudentRequestByRequestTimeArg* arg = new GetStudentRequestByRequestTimeArg();
+    arg->thiz = this;
+    arg->requestTime = createTime;
+    arg->className =  this->m_classInfoSelected;
+    arg->curIndex = this->m_curStudentRequestIndex;
+    arg->acount = this->m_acount;
+    _beginthreadex(nullptr,0,&CMainMenueDlg::threadGetStudentRequestByRequestTime,arg,0,nullptr);
+}
+
+unsigned WINAPI CMainMenueDlg::threadGetStudentRequestByRequestTime(LPVOID arg)
+{
+    GetStudentRequestByRequestTimeArg* gInfo =(GetStudentRequestByRequestTimeArg*)arg;
+    std::vector<std::vector<std::string>> ret =  gInfo->thiz->m_mainMenueContorller->
+            getStudentRequestByRequestTime(gInfo->acount
+                                           ,gInfo->className,
+                                           gInfo->curIndex
+                                           ,gInfo->requestTime);
+    QVector<QVector<QString>>* result = new QVector<QVector<QString>>();
+    for(int i = 0 ; i < ret.size();i++)
+    {
+        QVector<QString> temp;
+        for(int j = 0 ; j < ret.at(i).size();j++)
+        {
+            QString str = QString::fromLocal8Bit(ret.at(i).at(j).c_str());
+            temp.push_back(str);
+        }
+        result->push_back(temp);
+    }
+    //发送数据回显信号
+    emit gInfo->thiz->startShowStudentRequestTableUI(result);
+    delete gInfo;
+    _endthreadex(0);
+    return 0;
+}
+
 void CMainMenueDlg::showStudentRequestByStudentIdLastPage(QString studentId)
 {
     if(this->m_studentRequestCount == "0")
@@ -835,7 +881,7 @@ unsigned WINAPI CMainMenueDlg::threadGetStudentRequestByCondition(LPVOID arg)
         return 0;
     }else if(strCondition != "" && value == 2)//按申请时间
     {
-
+        gInfo->thiz->getStudentRequestByRequestTime(strCondition);
         delete gInfo;
         _endthreadex(0);
         return 0;

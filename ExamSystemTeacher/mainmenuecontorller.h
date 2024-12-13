@@ -73,6 +73,9 @@ public :
                                                                        ,QString className
                                                                        ,int curIndex,QString studentId);
    int getStudentRequestByStudentIdCount(QString acount,QString className,QString studentId);
+   std::vector<std::vector<std::string>> getStudentRequestByRequestTime(QString acount
+                                                                        ,QString className
+                                                                        ,int curIndex,QString requestTime);
  private:
     CMainMenueModel* m_mainMenueModel = nullptr;
 };

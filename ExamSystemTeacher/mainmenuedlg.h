@@ -384,6 +384,19 @@ private:
      //根据学生学号进行模糊查询的结果集的上一页操作
     void showStudentRequestByStudentIdLastPage(QString studentId);
 
+    //根据申请时间进行模糊查询
+    void  getStudentRequestByRequestTime(QString createTime);
+    static unsigned WINAPI threadGetStudentRequestByRequestTime(LPVOID arg);
+
+    //获取学生申请时间进行模糊查询的总页数
+    void  getStudentRequestByRequestTimeCount(QString createTime);
+    static unsigned WINAPI threadGetStudentRequestByRequestTimeCount(LPVOID arg);
+
+    //根据学生申请时间进行模糊查询的结果集的下一页操作
+    void showStudentRequestByRequestTimeNextPage(QString createTime);
+
+     //根据学生申请时间进行模糊查询的结果集的上一页操作
+    void showStudentRequestByRequestTimeLastPage(QString createTime);
 private:
     Ui::CMainMenueDlg *ui;
 };
