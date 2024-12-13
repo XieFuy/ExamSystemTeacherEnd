@@ -561,6 +561,9 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
         }else if(strCondition != "" && value == 0)
         {
             this->showStudentRequestByStudentNameNextPage(strCondition);
+        }else if(strCondition != "" && value == 1)
+        {
+            this->showStudentRequestByStudentIdNextPage(strCondition);
         }
     });
 
@@ -574,14 +577,63 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
         {
             //执行的是全部结果的上一页操作
             this->showStudentRequestLastPage();
-        }else if(strCondition != "" && value == 0)
+        }else if(strCondition != "" && value == 0) //按学生姓名
         {
             this->showStudentRequestByStudentNameLastPage(strCondition);
+        }else if(strCondition != "" && value == 1) //按学生学号
+        {
+            this->showStudentRequestByStudentIdLastPage(strCondition);
         }
     });
 
     QObject::connect(this->ui->pushButton_68,&QPushButton::clicked,this,&CMainMenueDlg::getStudentRequestByCondition);
 }
+
+void CMainMenueDlg::showStudentRequestByStudentIdLastPage(QString studentId)
+{
+    if(this->m_studentRequestCount == "0")
+    {
+        return;
+    }
+    //防止恶意刷新
+    if(this->m_curStudentRequestIndex <= 1)
+    {
+        return ;
+    }
+    //清除当前表中的记录
+    this->clearStudentRequestTableUI();
+    //给当前页递减，并且不能低于1
+    if(this->m_curStudentRequestIndex > 1)
+    {
+       this->m_curStudentRequestIndex -= 1;
+    }
+    this->getStudentRequestByStudentId(studentId);
+    this->getStudentRequestByStudentIdCount(studentId);
+}
+
+void CMainMenueDlg::showStudentRequestByStudentIdNextPage(QString studentId)
+{
+    if(this->m_studentRequestCount == "0") //如果查询的结果集为空则不进行操作
+    {
+        return;
+    }
+
+    if(QString::number(this->m_curStudentRequestIndex) == this->m_studentRequestCount)
+    {
+        return;
+    }
+    //清除当前表中的记录
+    this->clearStudentRequestTableUI();
+
+    //给当前页自增，并且不能超过总页
+    if(QString::number(this->m_curStudentRequestIndex) != this->m_studentRequestCount)
+    {
+        this->m_curStudentRequestIndex += 1;
+    }
+    this->getStudentRequestByStudentId(studentId);
+    this->getStudentRequestByStudentIdCount(studentId);
+}
+
 
 typedef struct getStudentRequestByStudentIdCountArg
 {

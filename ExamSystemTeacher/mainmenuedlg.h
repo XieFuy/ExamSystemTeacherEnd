@@ -377,6 +377,13 @@ private:
      //获取学生申请进行模糊查询的总页数
     void getStudentRequestByStudentIdCount(QString studentId);
     static unsigned WINAPI threadGetStudentRequestByStudentIdCount(LPVOID arg);
+
+    //根据学生学号进行模糊查询的结果集的下一页操作
+    void showStudentRequestByStudentIdNextPage(QString studentId);
+
+     //根据学生学号进行模糊查询的结果集的上一页操作
+    void showStudentRequestByStudentIdLastPage(QString studentId);
+
 private:
     Ui::CMainMenueDlg *ui;
 };
