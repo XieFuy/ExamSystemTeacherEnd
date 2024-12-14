@@ -62,6 +62,7 @@ signals:
     void startGetStudentRequestTableData();
     void startShowStudentRequestIndexUI();
     void startGetStudentRequestCount();
+    void startInitJoinClassStudentManeageTable();
 private:
     CExitLoginDlg* m_exitLoginDlg = nullptr;
     QTreeWidgetItem* m_signalOperator = nullptr; //单选题父项
@@ -397,6 +398,23 @@ private:
 
      //根据学生申请时间进行模糊查询的结果集的上一页操作
     void showStudentRequestByRequestTimeLastPage(QString createTime);
+
+    //学生申请表当前页的所有选项进行设置状态
+    void changeStudentRequestCurPageCheckBoxStatus(bool status);
+
+    //绑定所有申请表的操作按钮的信号槽
+    void bindStudentRequestOperators();
+
+    //学生申请的同意单条记录
+    void agreeStudentRequestByStudentId(int row);
+    static unsigned WINAPI threadAgreeStudentRequestByStudentId(LPVOID arg);
+
+    //学生申请的不同意单条记录
+    void degreeStudentRequestByStudentId();
+    static unsigned WINAPI threadDegreeStudentRequestByStudentId(LPVOID arg);
+
+    void initJoinClassStudentManeageTable();
+    static unsigned WINAPI threadInitJoinClassStudentManeageTable(LPVOID arg);
 private:
     Ui::CMainMenueDlg *ui;
 };

@@ -61,6 +61,8 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
     this->ui->stackedWidget->setCurrentIndex(0);
     this->ui->stackedWidget_2->setCurrentIndex(0);
 
+    this->bindStudentRequestOperators();
+
     QObject::connect(this,&CMainMenueDlg::startInitTeacherInfoTable,this,&CMainMenueDlg::initTeacherInfoTable);
     emit this->startInitTeacherInfoTable();
 
@@ -593,6 +595,126 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
     });
 
     QObject::connect(this->ui->pushButton_68,&QPushButton::clicked,this,&CMainMenueDlg::getStudentRequestByCondition);
+    QObject::connect(this->ui->checkBox_9,&QCheckBox::toggled,this,&CMainMenueDlg::changeStudentRequestCurPageCheckBoxStatus);
+    QObject::connect(this,&CMainMenueDlg::startInitJoinClassStudentManeageTable,this,&CMainMenueDlg::initJoinClassStudentManeageTable);
+    emit this->startInitJoinClassStudentManeageTable();
+}
+
+void CMainMenueDlg::initJoinClassStudentManeageTable()
+{
+    _beginthreadex(nullptr,0,&CMainMenueDlg::threadInitJoinClassStudentManeageTable,this,0,nullptr);
+}
+
+unsigned WINAPI CMainMenueDlg::threadInitJoinClassStudentManeageTable(LPVOID arg)
+{
+    CMainMenueDlg* thiz = (CMainMenueDlg*)arg;
+    thiz->m_mainMenueContorller->initJoinClassStudentManeageTable();
+    _endthreadex(0);
+    return 0;
+}
+
+
+typedef struct agreeStudentRequestByStudentIdArg
+{
+    CMainMenueDlg* thiz;
+    QString acount;
+    QString className;
+    QString studentId;
+}AgreeStudentRequestByStudentIdArg;
+
+void CMainMenueDlg::agreeStudentRequestByStudentId(int row)
+{
+    QString studentId = this->m_studentRequestStudentIdVec.at(row)->text().trimmed();
+
+    AgreeStudentRequestByStudentIdArg* arg = new AgreeStudentRequestByStudentIdArg();
+    arg->thiz = this;
+    arg->acount  = this->m_acount;
+    arg->className = this->m_classInfoSelected;
+    arg->studentId = studentId;
+    _beginthreadex(nullptr,0,&CMainMenueDlg::threadAgreeStudentRequestByStudentId,arg,0,nullptr);
+}
+
+unsigned WINAPI CMainMenueDlg::threadAgreeStudentRequestByStudentId(LPVOID arg)
+{
+   AgreeStudentRequestByStudentIdArg* aInfo = (AgreeStudentRequestByStudentIdArg*)arg;
+   aInfo->thiz->m_mainMenueContorller->agreeStudentRequestByStudentId(aInfo->acount
+                                                                      ,aInfo->className
+                                                                      ,aInfo->studentId);
+   //进行回显数据
+   aInfo->thiz->getStudentRequestTableData();
+   aInfo->thiz->getStudentRequestTableCount();
+   delete aInfo;
+   _endthreadex(0);
+   return 0;
+}
+
+void CMainMenueDlg::bindStudentRequestOperators()
+{
+    for(QVector<QWidget*>::iterator pos = this->m_studentRequestOpetators.begin(); pos != this->m_studentRequestOpetators.end();pos++)
+    {
+         QList<QPushButton*> ret = (*pos)->findChildren<QPushButton*>();
+         for(QPushButton* btn : ret)
+         {
+             if(btn->text() == "同意")
+             {
+                 //绑定的同意操作的槽函数
+                 QObject::connect(btn,&QPushButton::clicked,[=](){
+                     //进行遍历是哪一个按钮，并获取对应的行号
+                     int row = 0;
+                     for(int i = 0 ; i < this->m_studentRequestOpetators.size();i++)
+                     {
+                         QList<QPushButton*> buttons = this->m_studentRequestOpetators.at(i)->findChildren<QPushButton*>();
+                         for(QPushButton* clickedBtn: buttons)
+                         {
+                             if(clickedBtn == btn)
+                             {
+                                 this->m_curStudentRequestIndex = 1;
+                                 this->agreeStudentRequestByStudentId(row);
+                                 break;
+                             }
+                         }
+                         row++;
+                     }
+                 });
+
+             }else if(btn->text() == "不同意")
+             {
+                 //绑定的发布操作的槽函数
+                 QObject::connect(btn,&QPushButton::clicked,[=](){
+                     int row = 0;
+                     for(int i = 0 ; i < this->m_studentRequestOpetators.size();i++)
+                     {
+                         QList<QPushButton*> buttons = this->m_studentRequestOpetators.at(i)->findChildren<QPushButton*>();
+                         for(QPushButton* clickedBtn: buttons)
+                         {
+                             if(clickedBtn == btn)
+                             {
+                                 this->m_curStudentRequestIndex = 1;
+//                                 this->ui->stackedWidget->setCurrentIndex(6);
+//                                 this->m_classInfoSelected = this->m_classNameVec.at(row)->text().trimmed();
+                                 //进行显示学生申请动态数据
+//                                 this->showStudentRequestInfo();
+                                 break;
+                             }
+                         }
+                         row++;
+                     }
+                 });
+             }
+         }
+    }
+}
+
+void CMainMenueDlg::changeStudentRequestCurPageCheckBoxStatus(bool status)
+{
+    for(int i = 0 ; i < this->m_studentRequestCheckVec.size();i++)
+    {
+       QList<QCheckBox*> ret =  this->m_studentRequestCheckVec.at(i)->findChildren<QCheckBox*>();
+       for(QCheckBox* check : ret)
+       {
+          check->setChecked(status);
+       }
+    }
 }
 
 void CMainMenueDlg::showStudentRequestByRequestTimeNextPage(QString createTime)

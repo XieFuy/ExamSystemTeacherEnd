@@ -10,6 +10,56 @@ CMainMenueModel::~CMainMenueModel()
 
 }
 
+bool CMainMenueModel::initJoinClassStudentManeageTable()
+{
+    CDBHelper* dbHelper = new CDBHelper();
+    char* sqlBuf = new char[1024000];
+    memset(sqlBuf,'\0',sizeof(char) * 1024000);
+    std::string sql;
+    sprintf(sqlBuf,"create table if not exists `joinClassStudentManeage`(\n\
+            `id`  integer primary key auto_increment,\n\
+            `studentId`  varchar(20) not null,\n\
+            foreign key(`studentId`) references `Student`(`studentId`),\n\
+            `joinTime` datetime not null,\n\
+            `className` varchar(50) not null,\n\
+            `teacherId` varchar(20)  not null,\n\
+            foreign key(`teacherId`) references `Teacher`(`teacherId`)\n\
+            )ENGINE=InnoDB DEFAULT CHARSET=utf8;");
+    sql = sqlBuf;
+    bool ret =  dbHelper->sqlExcute(sql,"ExamSystem");
+    delete[] sqlBuf;
+    delete dbHelper;
+    return ret;
+}
+
+bool CMainMenueModel::agreeStudentRequestByStudentId(const char* acount
+                                    ,const char* className
+                                    ,const char* studentId)
+{
+    if(acount == nullptr || className == nullptr || studentId == nullptr)
+    {
+        return false;
+    }
+    CDBHelper* dbHelper = new CDBHelper();
+    char* sqlBuf = new char[1024000];
+    memset(sqlBuf,'\0',sizeof(char) * 1024000);
+    std::string sql;
+    sprintf(sqlBuf,"delete from `requestJoinClass` \
+where `studentId` = '%s' and `className` = '%s' and `teacherId` = '%s';"
+            ,studentId,className,acount);
+    sql = sqlBuf;
+    bool ret =  dbHelper->sqlExcute(sql,"ExamSystem");
+
+    //进行添加成员信息到该教师的课程表中
+    memset(sqlBuf,'\0',sizeof(char)*1024000);
+    sprintf(sqlBuf,"insert into `joinClassStudentManeage` (`studentId`,`joinTime`,`className`,`teacherId`) values('%s',now(),'%s','%s');",studentId,className,acount);
+    sql = sqlBuf;
+    ret = dbHelper->sqlExcute(sql,"ExamSystem");
+    delete[] sqlBuf;
+    delete dbHelper;
+    return ret;
+}
+
 int CMainMenueModel::getStudentRequestByRequestTimeCount(const char* acount
                                         ,const char* className
                                         ,const char* requestTime)
