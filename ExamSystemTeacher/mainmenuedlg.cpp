@@ -598,6 +598,54 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
     QObject::connect(this->ui->checkBox_9,&QCheckBox::toggled,this,&CMainMenueDlg::changeStudentRequestCurPageCheckBoxStatus);
     QObject::connect(this,&CMainMenueDlg::startInitJoinClassStudentManeageTable,this,&CMainMenueDlg::initJoinClassStudentManeageTable);
     emit this->startInitJoinClassStudentManeageTable();
+    QObject::connect(this->ui->pushButton_33,&QPushButton::clicked,this,&CMainMenueDlg::agreeMultiRequestByStudentId);
+}
+
+typedef struct agreeMultiRequestByStudentIdArg
+{
+    CMainMenueDlg* thiz;
+    QString acount;
+    QString className;
+    QList<QString>* studentIdLst;
+}AgreeMultiRequestByStudentIdArg;
+
+void CMainMenueDlg::agreeMultiRequestByStudentId()
+{
+    AgreeMultiRequestByStudentIdArg* arg = new AgreeMultiRequestByStudentIdArg();
+    arg->acount = this->m_acount;
+    arg->className = this->m_classInfoSelected;
+    arg->studentIdLst = new QList<QString>();
+    arg->thiz = this;
+    //将选中的记录的学生学号进行存储
+    for(int i = 0 ; i < this->m_studentRequestCheckVec.size();i++)
+    {
+        QList<QCheckBox*> checkLst = this->m_studentRequestCheckVec.at(i)->findChildren<QCheckBox*>();
+        for(QCheckBox* check : checkLst)
+        {
+            if(check->isChecked())
+            {
+                //获取到同一行的学号
+                QString studentId = this->m_studentRequestStudentIdVec.at(i)->text().trimmed();
+                arg->studentIdLst->push_back(studentId);
+            }
+        }
+    }
+    _beginthreadex(nullptr,0,&CMainMenueDlg::threadAgreeMultiRequestByStudentId,arg,0,nullptr);
+}
+
+unsigned WINAPI CMainMenueDlg::threadAgreeMultiRequestByStudentId(LPVOID arg)
+{
+    AgreeMultiRequestByStudentIdArg* aInfo = (AgreeMultiRequestByStudentIdArg*)arg;
+    aInfo->thiz->m_mainMenueContorller->agreeMultiRequestByStudentId(aInfo->acount
+                                                                     ,aInfo->className
+                                                                     ,aInfo->studentIdLst);
+    //进行回显数据  回显的是全部的数据
+    aInfo->thiz->getStudentRequestTableData();
+    aInfo->thiz->getStudentRequestTableCount();
+    delete aInfo->studentIdLst;
+    delete aInfo;
+    _endthreadex(0);
+    return 0;
 }
 
 typedef struct degreeStudentRequestByStudentIdArg

@@ -80,6 +80,8 @@ public :
    bool agreeStudentRequestByStudentId(QString acount,QString className,QString studentId);
    bool initJoinClassStudentManeageTable();
    bool degreeStudentRequestByStudentId(QString acount,QString className,QString studentId);
+   bool agreeMultiRequestByStudentId(QString acount,QString className,QList<QString>* studentIdLst);
+   static unsigned WINAPI threadAgreeMultiRequestByStudentId(LPVOID arg);
  private:
     CMainMenueModel* m_mainMenueModel = nullptr;
 };

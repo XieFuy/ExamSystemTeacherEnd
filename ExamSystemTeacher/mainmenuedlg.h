@@ -415,6 +415,15 @@ private:
 
     void initJoinClassStudentManeageTable();
     static unsigned WINAPI threadInitJoinClassStudentManeageTable(LPVOID arg);
+
+    //批量同意功能
+    void agreeMultiRequestByStudentId();
+    static unsigned WINAPI threadAgreeMultiRequestByStudentId(LPVOID arg);
+
+    //批量不同意功能
+    void degreeMultiRequestByStudentId();
+    static unsigned WINAPI threadDegreeMultiRequestByStudentId(LPVOID arg);
+
 private:
     Ui::CMainMenueDlg *ui;
 };
