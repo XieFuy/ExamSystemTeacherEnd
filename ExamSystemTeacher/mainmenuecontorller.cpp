@@ -5,6 +5,18 @@ CMainMenueContorller::CMainMenueContorller()
  this->m_mainMenueModel = new CMainMenueModel();
 }
 
+bool CMainMenueContorller::degreeStudentRequestByStudentId(QString acount,QString className,QString studentId)
+{
+    QByteArray acountArr = acount.toUtf8();
+    QByteArray classNameArr = className.toLocal8Bit();
+    QByteArray studentIdArr = studentId.toLocal8Bit();
+
+    const char* pAcount = acountArr.data();
+    const char* pClassName = classNameArr.data();
+    const char* pStudentId = studentIdArr.data();
+    return this->m_mainMenueModel->degreeStudentRequestByStudentId(pAcount,pClassName,pStudentId);
+}
+
 bool CMainMenueContorller::initJoinClassStudentManeageTable()
 {
     return this->m_mainMenueModel->initJoinClassStudentManeageTable();

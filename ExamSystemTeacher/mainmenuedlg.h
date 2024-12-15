@@ -410,7 +410,7 @@ private:
     static unsigned WINAPI threadAgreeStudentRequestByStudentId(LPVOID arg);
 
     //学生申请的不同意单条记录
-    void degreeStudentRequestByStudentId();
+    void degreeStudentRequestByStudentId(int row);
     static unsigned WINAPI threadDegreeStudentRequestByStudentId(LPVOID arg);
 
     void initJoinClassStudentManeageTable();

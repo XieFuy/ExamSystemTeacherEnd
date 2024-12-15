@@ -83,6 +83,9 @@ public:
                                         ,const char* className
                                         ,const char* studentId);
     bool initJoinClassStudentManeageTable();
+    bool degreeStudentRequestByStudentId(const char* acount
+                                         ,const char* className
+                                         ,const char* studentId);
 private:
       HANDLE m_mutex; //因为所有操作都是使用的一个CDBHelper对象，所以要给每一个执行sql的步骤进行上锁
 };

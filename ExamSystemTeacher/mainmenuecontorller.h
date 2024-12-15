@@ -79,6 +79,7 @@ public :
    int getStudentRequestByRequestTimeCount(QString acount,QString className,QString requestTime);
    bool agreeStudentRequestByStudentId(QString acount,QString className,QString studentId);
    bool initJoinClassStudentManeageTable();
+   bool degreeStudentRequestByStudentId(QString acount,QString className,QString studentId);
  private:
     CMainMenueModel* m_mainMenueModel = nullptr;
 };

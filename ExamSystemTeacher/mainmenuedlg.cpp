@@ -600,6 +600,39 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
     emit this->startInitJoinClassStudentManeageTable();
 }
 
+typedef struct degreeStudentRequestByStudentIdArg
+{
+    CMainMenueDlg* thiz;
+    QString className;
+    QString acount;
+    QString studentId;
+}DegreeStudentRequestByStudentIdArg;
+
+void CMainMenueDlg::degreeStudentRequestByStudentId(int row)
+{
+    QString studentId = this->m_studentRequestStudentIdVec.at(row)->text().trimmed();
+    DegreeStudentRequestByStudentIdArg* arg = new DegreeStudentRequestByStudentIdArg();
+    arg->acount = this->m_acount;
+    arg->studentId = studentId;
+    arg->className = this->m_classInfoSelected;
+    arg->thiz = this;
+    _beginthreadex(nullptr,0,&CMainMenueDlg::threadDegreeStudentRequestByStudentId,arg,0,nullptr);
+}
+
+unsigned WINAPI CMainMenueDlg::threadDegreeStudentRequestByStudentId(LPVOID arg)
+{
+    DegreeStudentRequestByStudentIdArg* dInfo = (DegreeStudentRequestByStudentIdArg*)arg;
+    dInfo->thiz->m_mainMenueContorller->degreeStudentRequestByStudentId(dInfo->acount
+                                                                        ,dInfo->className
+                                                                        ,dInfo->studentId);
+    //进行回显数据
+    dInfo->thiz->getStudentRequestTableData();
+    dInfo->thiz->getStudentRequestTableCount();
+    delete dInfo;
+    _endthreadex(0);
+    return 0;
+}
+
 void CMainMenueDlg::initJoinClassStudentManeageTable()
 {
     _beginthreadex(nullptr,0,&CMainMenueDlg::threadInitJoinClassStudentManeageTable,this,0,nullptr);
@@ -690,10 +723,7 @@ void CMainMenueDlg::bindStudentRequestOperators()
                              if(clickedBtn == btn)
                              {
                                  this->m_curStudentRequestIndex = 1;
-//                                 this->ui->stackedWidget->setCurrentIndex(6);
-//                                 this->m_classInfoSelected = this->m_classNameVec.at(row)->text().trimmed();
-                                 //进行显示学生申请动态数据
-//                                 this->showStudentRequestInfo();
+                                 this->degreeStudentRequestByStudentId(row);
                                  break;
                              }
                          }

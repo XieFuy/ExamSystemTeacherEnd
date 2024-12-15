@@ -10,6 +10,29 @@ CMainMenueModel::~CMainMenueModel()
 
 }
 
+bool CMainMenueModel::degreeStudentRequestByStudentId(const char* acount
+                                     ,const char* className
+                                     ,const char* studentId)
+{
+    if(acount == nullptr || className == nullptr || studentId == nullptr)
+    {
+        return false;
+    }
+    CDBHelper* dbHelper = new CDBHelper();
+    char* sqlBuf = new char[1024000];
+    memset(sqlBuf,'\0',sizeof(char) * 1024000);
+    std::string sql;
+    //不同意直接从申请表中删除即可
+    sprintf(sqlBuf,"delete from `requestJoinClass` \
+where `studentId` = '%s' and `className` = '%s' and `teacherId` = '%s';",studentId
+            ,className,acount);
+    sql = sqlBuf;
+    bool ret =  dbHelper->sqlExcute(sql,"ExamSystem");
+    delete[] sqlBuf;
+    delete dbHelper;
+    return ret;
+}
+
 bool CMainMenueModel::initJoinClassStudentManeageTable()
 {
     CDBHelper* dbHelper = new CDBHelper();
