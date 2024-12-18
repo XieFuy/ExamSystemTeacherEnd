@@ -5,6 +5,72 @@ CMainMenueContorller::CMainMenueContorller()
  this->m_mainMenueModel = new CMainMenueModel();
 }
 
+int CMainMenueContorller::getStudentMenberCountData(QString acount,QString className)
+{
+    QByteArray acountArr = acount.toUtf8();
+    QByteArray classNameArr = className.toLocal8Bit();
+    const char* pAcount = acountArr.data();
+    const char* pClassName = classNameArr.data();
+    return this->m_mainMenueModel->getStudentMenberCountData(pAcount,pClassName);
+}
+
+
+std::vector<std::vector<std::string>> CMainMenueContorller::showClassIconInStudentManeger(QString acount
+                                                                                          ,QString className)
+{
+    QByteArray acountArr = acount.toUtf8();
+    QByteArray classNameArr = className.toLocal8Bit();
+    const char* pAcount = acountArr.data();
+    const char* pClassName = classNameArr.data();
+    return this->m_mainMenueModel->showClassIconInStudentManeger(pAcount,pClassName);
+}
+
+typedef  struct degreeMultiRequestByStudentIdArg{
+    const char* acount;
+    const char* className;
+    const char* studentId;
+    CMainMenueContorller* thiz;
+}DegreeMultiRequestByStudentIdArg;
+
+bool CMainMenueContorller::degreeMultiRequestByStudentId(QString acount
+                                                         ,QString className
+                                                         ,QList<QString>* studentIdLst)
+{
+    if(studentIdLst == nullptr)
+    {
+        return false;
+    }
+    QByteArray acountArr = acount.toUtf8();
+    QByteArray classNameArr = className.toLocal8Bit();
+    const char* pAcount = acountArr.data();
+    const char* pClassName = classNameArr.data();
+
+    HANDLE handleArr[studentIdLst->size()];
+    QByteArray studentIdArr[studentIdLst->size()];
+    for(int i = 0 ; i < studentIdLst->size();i++)
+    {
+        studentIdArr[i] = studentIdLst->at(i).toLocal8Bit();
+        const char* pStudentId = studentIdArr[i].data();
+        DegreeMultiRequestByStudentIdArg* arg = new DegreeMultiRequestByStudentIdArg();
+        arg->acount = pAcount;
+        arg->className = pClassName;
+        arg->studentId = pStudentId;
+        arg->thiz = this;
+        handleArr[i] = (HANDLE)_beginthreadex(nullptr,0,&CMainMenueContorller::threadDegreeMultiRequestByStudentId,arg,0,nullptr);
+    }
+    WaitForMultipleObjects(studentIdLst->size(),handleArr,TRUE,INFINITE);
+    return true;
+}
+
+unsigned WINAPI CMainMenueContorller::threadDegreeMultiRequestByStudentId(LPVOID arg)
+{
+    DegreeMultiRequestByStudentIdArg* aInfo = (DegreeMultiRequestByStudentIdArg*)arg;
+    aInfo->thiz->m_mainMenueModel->degreeStudentRequestByStudentId(aInfo->acount,aInfo->className,aInfo->studentId);
+    delete aInfo;
+    _endthreadex(0);
+    return 0;
+}
+
 typedef  struct agreeMultiRequestByStudentIdArg{
     const char* acount;
     const char* className;

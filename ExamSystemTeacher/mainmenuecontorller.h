@@ -82,6 +82,11 @@ public :
    bool degreeStudentRequestByStudentId(QString acount,QString className,QString studentId);
    bool agreeMultiRequestByStudentId(QString acount,QString className,QList<QString>* studentIdLst);
    static unsigned WINAPI threadAgreeMultiRequestByStudentId(LPVOID arg);
+   bool degreeMultiRequestByStudentId(QString acount,QString className,QList<QString>* studentIdLst);
+   static unsigned WINAPI threadDegreeMultiRequestByStudentId(LPVOID arg);
+   std::vector<std::vector<std::string>>  showClassIconInStudentManeger(QString acount
+                                                                        ,QString className);
+   int getStudentMenberCountData(QString acount,QString className);
  private:
     CMainMenueModel* m_mainMenueModel = nullptr;
 };

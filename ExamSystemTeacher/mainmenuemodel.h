@@ -86,6 +86,9 @@ public:
     bool degreeStudentRequestByStudentId(const char* acount
                                          ,const char* className
                                          ,const char* studentId);
+    std::vector<std::vector<std::string>>  showClassIconInStudentManeger(const char* acount
+                                                                         ,const char* className);
+    int getStudentMenberCountData(const char* acount,const char* className);
 private:
       HANDLE m_mutex; //因为所有操作都是使用的一个CDBHelper对象，所以要给每一个执行sql的步骤进行上锁
 };

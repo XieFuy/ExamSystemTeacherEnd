@@ -63,6 +63,7 @@ signals:
     void startShowStudentRequestIndexUI();
     void startGetStudentRequestCount();
     void startInitJoinClassStudentManeageTable();
+    void startShowClassIconInStudentManagerUI(QImage* image);
 private:
     CExitLoginDlg* m_exitLoginDlg = nullptr;
     QTreeWidgetItem* m_signalOperator = nullptr; //单选题父项
@@ -134,6 +135,16 @@ private:
     QVector<QWidget*> m_studentRequestOpetators;
     int m_curStudentRequestIndex;
     QString m_studentRequestCount;
+
+    //学生管理部分
+    int m_sortNumStudentManeger;
+    QVector<QWidget*> m_studentManegerCheckVec;
+    QVector<QWidget*> m_studentManegerHeadIconVec;
+    QVector<QLabel*>  m_studentManagerStudentNameVec;
+    QVector<QLabel*>  m_studentManagerStudentIdVec;
+    QVector<QLabel*>  m_studentManegerPhoneNumberVec;
+    QVector<QLabel*>  m_studentManegerJoinTimeVec;
+    QVector<QWidget*> m_studentManegerOperators;
 private:
     void showPageIndex();//显示分页查询的下标页
     void initTableWidgetHeader(); //初始化表头
@@ -423,6 +434,25 @@ private:
     //批量不同意功能
     void degreeMultiRequestByStudentId();
     static unsigned WINAPI threadDegreeMultiRequestByStudentId(LPVOID arg);
+
+    //进行初始化显示学生信息管理页的动态数据信息
+    void initStudentInfoManagerData(int index);
+
+    //进行回显学生管理页课程图标
+    void showClassIconInStudentManeger();
+    static unsigned WINAPI threadShowClassIconInStudentManeger(LPVOID arg);
+
+    void showClassIconInStudentManagerUI(QImage* image); //进行学生信息管理UI显示
+
+    void getStudentMenberCountData(); //获取学生管理总人数
+    static unsigned WINAPI threadGetStudentMenberCountData(LPVOID arg);
+
+    //初始化学生管理表格
+    void  initStudentManegerTable();
+
+    //初始化学生管理表控件
+    void initStudentManegerTableContorl();
+
 
 private:
     Ui::CMainMenueDlg *ui;
