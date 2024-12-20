@@ -66,6 +66,7 @@ signals:
     void startShowClassIconInStudentManagerUI(QImage* image);
     void startShowStudentHeadIconUI(QImage* image);
     void startShowStudentManegerCurPagaUI(QVector<QVector<QString>>* ret);
+    void startShowStudentManegerTableIndex();
 private:
     CExitLoginDlg* m_exitLoginDlg = nullptr;
     QTreeWidgetItem* m_signalOperator = nullptr; //单选题父项
@@ -153,6 +154,7 @@ private:
     int m_studentManegerCurPageIndex;
     int m_studentManegerClassIconIndex;
     std::string m_studentManegerHeadIconPath;
+    QString m_studentManegerCount;
 private:
     void showPageIndex();//显示分页查询的下标页
     void initTableWidgetHeader(); //初始化表头
@@ -475,6 +477,13 @@ private:
 
     //显示学生头像
     static unsigned WINAPI  showStudentHeadIcon(LPVOID arg);
+
+    //获取学生管理表的总页数
+    void getStudentManegerTableCount();
+    static unsigned WINAPI threadGetStudentManegerTableCountEntry(LPVOID arg);
+
+    void showStudentManegerTableIndex(); //显示学生管理总页数下表
+
 private:
     Ui::CMainMenueDlg *ui;
 };

@@ -5,6 +5,15 @@ CMainMenueContorller::CMainMenueContorller()
  this->m_mainMenueModel = new CMainMenueModel();
 }
 
+int CMainMenueContorller::getStudentManegerTableCount(QString acount,QString className)
+{
+    QByteArray acountArr = acount.toLocal8Bit();
+    QByteArray classNameArr = className.toLocal8Bit();
+    const char* pAcount = acountArr.data();
+    const char* pClassName = classNameArr.data();
+    return this->m_mainMenueModel->getStudentManegerTableCount(pAcount,pClassName);
+}
+
 std::vector<std::vector<std::string>> CMainMenueContorller::getStudentManegerCurPageData(QString acount
                                                                                          ,QString className
                                                                                          ,int curIndex)

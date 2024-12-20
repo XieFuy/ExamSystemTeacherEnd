@@ -50,6 +50,7 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
     this->ui->label_name->installEventFilter(this);
     this->m_exitLoginDlg->installEventFilter(this);
 
+    this->m_studentManegerCount = "";
     this->m_acount = "";
 
     this->initClassTable();
@@ -620,6 +621,42 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
 
     QObject::connect(this,&CMainMenueDlg::startShowStudentManegerCurPagaUI,this,&CMainMenueDlg::showStudentManegerCurPagaUI);
 
+    QObject::connect(this,&CMainMenueDlg::startShowStudentManegerTableIndex,this,&CMainMenueDlg::showStudentManegerTableIndex);
+}
+
+void CMainMenueDlg::showStudentManegerTableIndex()
+{
+    QString first = QString::number(this->m_studentManegerCurPageIndex);
+    first += "/";
+    first += this->m_studentManegerCount;
+    this->ui->label_74->setText(first);
+}
+
+typedef struct getStudentManegerTableCountArg{
+    QString acount;
+    QString className;
+    CMainMenueDlg* thiz;
+}GetStudentManegerTableCountArg;
+
+void CMainMenueDlg::getStudentManegerTableCount()
+{
+     GetStudentManegerTableCountArg* arg = new GetStudentManegerTableCountArg();
+     arg->thiz = this;
+     arg->acount = this->m_acount;
+     arg->className = this->m_classInfoSelected;
+     _beginthreadex(nullptr,0,&CMainMenueDlg::threadGetStudentManegerTableCountEntry,arg,0,nullptr);
+}
+
+unsigned WINAPI CMainMenueDlg::threadGetStudentManegerTableCountEntry(LPVOID arg)
+{
+    GetStudentManegerTableCountArg* gInfo = (GetStudentManegerTableCountArg*)arg;
+    int ret =  gInfo->thiz->m_mainMenueContorller->getStudentManegerTableCount(gInfo->acount,gInfo->className);
+    gInfo->thiz->m_studentManegerCount = QString::number(ret);
+    //进行发送信号，进行显示总页数
+    emit gInfo->thiz->startShowStudentManegerTableIndex();
+    delete gInfo;
+    _endthreadex(0);
+    return 0;
 }
 
 void CMainMenueDlg::clearStudentManegerTableUI()
@@ -1066,6 +1103,7 @@ void CMainMenueDlg::initStudentInfoManagerData(int index)
        this->ui->label_68->setText(this->m_classInfoSelected);
        this->getStudentMenberCountData();
        this->getStudentManegerCurPageData();
+       this->getStudentManegerTableCount();
     }
 }
 
