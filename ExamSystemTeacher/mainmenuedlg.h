@@ -487,6 +487,11 @@ private:
     //显示学生管理表的下一页，注意下一页的逻辑，避免bug
     void  showStudentManegerTableNextPage();
 
+    //显示学生管理表的上一页
+    void  showStudentManegerTableLastPage();
+
+
+
 
 private:
     Ui::CMainMenueDlg *ui;
