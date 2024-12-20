@@ -87,6 +87,7 @@ public :
    std::vector<std::vector<std::string>>  showClassIconInStudentManeger(QString acount
                                                                         ,QString className);
    int getStudentMenberCountData(QString acount,QString className);
+   std::vector<std::vector<std::string>> getStudentManegerCurPageData(QString acount,QString className,int curIndex);
  private:
     CMainMenueModel* m_mainMenueModel = nullptr;
 };

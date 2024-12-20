@@ -65,6 +65,9 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
     this->bindStudentRequestOperators();
     this->initStudentManegerTable();
     this->initStudentManegerTableContorl();
+    this->m_studentManegerCurPageIndex = 1;
+    this->m_studentManegerEvent = CreateEvent(nullptr,false,false,nullptr);
+    this->m_studentManegerEvent_2 = CreateEvent(nullptr,false,false,nullptr);
 
     QObject::connect(this,&CMainMenueDlg::startInitTeacherInfoTable,this,&CMainMenueDlg::initTeacherInfoTable);
     emit this->startInitTeacherInfoTable();
@@ -521,6 +524,7 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
     QObject::connect(this,&CMainMenueDlg::startGetClassTableInfo,this,&CMainMenueDlg::getClassTableData);
     QObject::connect(this,&CMainMenueDlg::startShowClassTable,this,&CMainMenueDlg::showClassTableInfo);
     QObject::connect(this,&CMainMenueDlg::startShowClassIcon,this,&CMainMenueDlg::showClassIconUI);
+    QObject::connect(this,&CMainMenueDlg::startShowStudentHeadIconUI,this,&CMainMenueDlg::showStudentHeadIconUI);
     QObject::connect(this,&CMainMenueDlg::startShowClassTableIndex,&CMainMenueDlg::showClassTableIndex);
     QObject::connect(this,&CMainMenueDlg::startGetClassTableIndex,this,&CMainMenueDlg::getClassTableCount);
 
@@ -539,6 +543,8 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
         this->ui->stackedWidget->setCurrentIndex(3);
         this->ui->label_56->setPixmap(QPixmap()); //返回的时候 清空课程图标
         this->clearStudentRequestTableUI();
+        this->ui->label_67->setPixmap(QPixmap());
+        this->clearStudentManegerTableUI();
     });
 
     QObject::connect(this,&CMainMenueDlg::startShowClassIconInStudentRequest,this,&CMainMenueDlg::showClassIconInStudentRequestUI);
@@ -611,6 +617,218 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
     QObject::connect(this->ui->tabWidget,&QTabWidget::currentChanged,this,&CMainMenueDlg::initStudentInfoManagerData);
 
     QObject::connect(this,&CMainMenueDlg::startShowClassIconInStudentManagerUI,this,&CMainMenueDlg::showClassIconInStudentManagerUI);
+
+    QObject::connect(this,&CMainMenueDlg::startShowStudentManegerCurPagaUI,this,&CMainMenueDlg::showStudentManegerCurPagaUI);
+
+}
+
+void CMainMenueDlg::clearStudentManegerTableUI()
+{
+    //隐藏序号
+    for(int i = 0 ; i < 8 ; i++)
+    {
+        QList<QCheckBox*> buttons = this->m_studentManegerCheckVec.at(i)->findChildren<QCheckBox*>();
+        for (QCheckBox *button : buttons) {
+            button->setVisible(false);
+        }
+    }
+
+    //清除学生头像
+    for(int i = 0 ; i < 8 ; i++)
+    {
+        QList<QLabel*> buttons = this->m_studentManegerHeadIconVec.at(i)->findChildren<QLabel*>();
+        for (QLabel *button : buttons) {
+            button->setPixmap(QPixmap());
+        }
+    }
+
+    //清除学生姓名
+    for (QLabel *button : this->m_studentManagerStudentNameVec) {
+        button->setText("");
+    }
+
+    //清除学生学号
+    for (QLabel *button : this->m_studentManagerStudentIdVec) {
+        button->setText("");
+    }
+
+    //清除学生电话
+    for (QLabel *button : this->m_studentManegerPhoneNumberVec) {
+        button->setText("");
+    }
+
+    //清除加入时间
+    for (QLabel *button : this->m_studentManegerJoinTimeVec) {
+        button->setText("");
+    }
+
+    //清除操作
+    for(int i = 0 ; i < 8 ; i++)
+    {
+        QList<QPushButton*> optButton = this->m_studentManegerOperators.at(i)->findChildren<QPushButton*>();
+        for (QPushButton *button : optButton) {
+            button->setVisible(false);
+        }
+    }
+}
+
+unsigned WINAPI  CMainMenueDlg::showStudentHeadIcon(LPVOID arg)
+{
+    CMainMenueDlg* thiz = (CMainMenueDlg*)arg;
+    //进行接收图片并且显示到UI上
+    CClientSocket* clientSocket = new CClientSocket();
+    clientSocket->initSocket();
+    bool ret2 =  clientSocket->connectToServer();
+    if(!ret2)
+    {
+        return 0;
+    }
+    //进行封包操作
+    char* data = new char[1024];
+    memset(data,'\0',sizeof(char) * 1024);
+    WaitForSingleObject(thiz->m_studentManegerEvent,INFINITE);
+    strcpy(data,thiz->m_studentManegerHeadIconPath.c_str());
+    ResetEvent(thiz->m_studentManegerEvent);
+    SetEvent(thiz->m_studentManegerEvent_2);
+    ResetEvent(thiz->m_studentManegerEvent_2);
+    clientSocket->makePacket(data,strlen(data),2); //获取课程图标的指令为2
+    delete[] data;
+    //发送数据包
+    char* packet = clientSocket->getPacket();
+    long long packetSize = clientSocket->getPacketSize();
+    int size =  clientSocket->Send(packet);
+    qDebug()<<"send size: "<<size;
+
+    //先获取服务端发送的文件大小 8字节
+    char* fileSize = new char[8];
+    memset(fileSize,'\0',sizeof(char) * 8);
+    size = clientSocket->Recv(fileSize,8);
+    long long fileSizeNum;
+    memmove(&fileSizeNum,fileSize,8);
+    delete[] fileSize;
+    qDebug()<<"fileSize: "<<fileSizeNum;
+
+    char* recvBuffer = new char[fileSizeNum];
+    memset(recvBuffer,'\0',sizeof(char) * fileSizeNum);
+    size = clientSocket->Recv(recvBuffer,fileSizeNum); //直接接收到的就是图片文件数据，没有多余内容
+    qDebug()<<"recv size: "<<size;
+    clientSocket->closeSocket();
+    delete clientSocket;
+
+    QByteArray ba(recvBuffer,fileSizeNum);
+    QImage* image = new QImage();
+    bool ret3 = image->loadFromData(ba,"PNG");
+    if(!ret3)
+    {
+     qDebug()<<"返回false";
+    }
+    if(image->isNull())
+    {
+        qDebug()<<"原先获取的图像无效,";
+    }
+    emit  thiz->startShowStudentHeadIconUI(image);
+    delete[] recvBuffer;
+    _endthreadex(0);
+    return 0;
+}
+
+
+void CMainMenueDlg::showStudentManegerCurPagaUI(QVector<QVector<QString>>* ret)
+{
+    if(ret == nullptr)
+    {
+        return ;
+    }
+    this->m_studentManegerClassIconIndex = 0;
+    //进行UI显示
+    this->clearStudentManegerTableUI();
+   //将数据进行插入到表格中
+   for(int i = 0 ; i < ret->size(); i++)
+   {
+       //显示序号
+       QList<QCheckBox*> buttons = this->m_studentManegerCheckVec.at(i)->findChildren<QCheckBox*>();
+       for (QCheckBox *button : buttons) {
+           button->setVisible(true);
+       }
+
+       //显示学生头像
+       QByteArray arr =  ret->at(i).at(0).toLocal8Bit();
+       this->m_studentManegerHeadIconPath = arr.data();
+       SetEvent(this->m_studentManegerEvent);
+       HANDLE thread =  (HANDLE)_beginthreadex(nullptr,0,&CMainMenueDlg::showStudentHeadIcon,this,0,nullptr);
+
+       WaitForSingleObject(this->m_studentManegerEvent_2,INFINITE);
+
+       //显示学生姓名
+       QString str = ret->at(i).at(1);
+       this->m_studentManagerStudentNameVec .at(i)->setText(str);
+
+       //显示学生学号
+       str = ret->at(i).at(2);
+       this->m_studentManagerStudentIdVec.at(i)->setText(str);
+
+       //显示学生电话
+       str = ret->at(i).at(3);
+       this->m_studentManegerPhoneNumberVec.at(i)->setText(str);
+
+       //显示加入时间
+       str = ret->at(i).at(4);
+       this->m_studentManegerJoinTimeVec.at(i)->setText(str);
+
+       //显示操作按钮
+       QList<QPushButton*> optButton = this->m_studentManegerOperators.at(i)->findChildren<QPushButton*>();
+       for (QPushButton *button : optButton) {
+           button->setVisible(true);
+       }
+   }
+   if(ret != nullptr)
+   {
+       delete ret;
+   }
+   qDebug()<<"学生管理UI显示完成!";
+}
+
+typedef  struct getStudentManegerCurPageDataArg{
+    CMainMenueDlg* thiz;
+    QString acount;
+    QString className;
+    int curIndex;
+}GetStudentManegerCurPageDataArg;
+
+void CMainMenueDlg::getStudentManegerCurPageData()
+{    
+    GetStudentManegerCurPageDataArg* arg = new GetStudentManegerCurPageDataArg();
+//    std::shared_ptr<GetStudentManegerCurPageDataArg> arg = std::make_shared<GetStudentManegerCurPageDataArg>();
+    arg->acount = this->m_acount;
+    arg->className = this->m_classInfoSelected;
+    arg->thiz = this;
+    arg->curIndex = this->m_studentManegerCurPageIndex;
+    _beginthreadex(nullptr,0,&CMainMenueDlg::threadGetStudentManegerCurPageData,arg,0,nullptr);
+}
+
+unsigned WINAPI CMainMenueDlg::threadGetStudentManegerCurPageData(LPVOID arg)
+{
+    GetStudentManegerCurPageDataArg* gInfo = (GetStudentManegerCurPageDataArg*)arg;
+//    std::shared_ptr<GetStudentManegerCurPageDataArg> gInfo = *(std::shared_ptr<GetStudentManegerCurPageDataArg>*)arg;
+    std::vector<std::vector<std::string>> ret =  gInfo->thiz->m_mainMenueContorller->getStudentManegerCurPageData(gInfo->acount
+                                                                                                                  ,gInfo->className
+                                                                                                                  ,gInfo->curIndex);
+    QVector<QVector<QString>>* result = new QVector<QVector<QString>>();
+    for(int i = 0 ; i < ret.size();i++)
+    {
+        QVector<QString> temp;
+        for(int j = 0 ; j < ret.at(i).size();j++)
+        {
+            QString str = QString::fromLocal8Bit(ret.at(i).at(j).c_str());
+            temp.push_back(str);
+        }
+        result->push_back(temp);
+    }
+    //发送数据回显信号
+    emit gInfo->thiz->startShowStudentManegerCurPagaUI(result);
+    //emit gInfo->thiz->startShowStudentRequestTableUI(result);
+    _endthreadex(0);
+    return 0;
 }
 
 void CMainMenueDlg::initStudentManegerTableContorl()
@@ -847,6 +1065,7 @@ void CMainMenueDlg::initStudentInfoManagerData(int index)
        this->showClassIconInStudentManeger();
        this->ui->label_68->setText(this->m_classInfoSelected);
        this->getStudentMenberCountData();
+       this->getStudentManegerCurPageData();
     }
 }
 
@@ -1931,6 +2150,9 @@ unsigned WINAPI CMainMenueDlg::threadDeleteMultiClassInfo(LPVOID arg)
     dInfo->thiz->m_mainMenueContorller->deleteMultiClassInfo(dInfo->acount,*dInfo->createTimeLst);
     delete dInfo->createTimeLst;
     delete dInfo;
+
+    //批量操作后需要将下表进行设置为1
+    dInfo->thiz->m_classCurPageIndex = 1;
     emit dInfo->thiz->startGetClassTableInfo();
     emit dInfo->thiz->startGetClassTableIndex();
     _endthreadex(0);
@@ -2071,6 +2293,10 @@ void CMainMenueDlg::showClassTableNextPage()
     {
         this->m_classCurPageIndex += 1;
     }
+
+    //清除选中项
+    emit this->ui->checkBox_8->toggled(false);
+    this->ui->checkBox_8->setChecked(false);
     emit this->startGetClassTableInfo();
     emit this->startGetClassTableIndex();
 }
@@ -2093,6 +2319,8 @@ void CMainMenueDlg::showClassTableLastPage()
     {
        this->m_classCurPageIndex -= 1;
     }
+    emit this->ui->checkBox_8->toggled(false);
+    this->ui->checkBox_8->setChecked(false);
     emit this->startGetClassTableInfo();
     emit this->startGetClassTableIndex();
 }
@@ -2151,6 +2379,21 @@ void CMainMenueDlg::showClassIconInStudentManagerUI(QImage* image)
     this->ui->label_67->setPixmap(QPixmap::fromImage(*image));
     this->ui->label_67->setScaledContents(true);
     delete image;
+}
+
+void  CMainMenueDlg::showStudentHeadIconUI(QImage* image)
+{
+    QList<QLabel*> ret =  this->m_studentManegerHeadIconVec.at(this->m_studentManegerClassIconIndex++)->findChildren<QLabel*>();
+    for(QLabel* lab : ret)
+    {
+        if(image->isNull())
+        {
+            qDebug()<<"图像无效";
+        }
+        lab->setPixmap(QPixmap::fromImage(*image));
+        lab->setScaledContents(true);
+        delete image;
+    }
 }
 
 void CMainMenueDlg::showClassIconUI(QImage* image)
@@ -2728,6 +2971,7 @@ unsigned WINAPI CMainMenueDlg::threadDeleteClickBtnEntry(LPVOID arg)
    DeleteClickBtnArg* dInfo = (DeleteClickBtnArg*)arg;
    dInfo->thiz->m_mainMenueContorller->deleteClickBtn(dInfo->acount,dInfo->createTime);
    //进行删除完成后重新进行查询和显示结果
+   dInfo->thiz->curPageIndex = 1;
    dInfo->thiz->getCurPageIndexTableData();
    dInfo->thiz->getTablePageCount();
    delete dInfo;

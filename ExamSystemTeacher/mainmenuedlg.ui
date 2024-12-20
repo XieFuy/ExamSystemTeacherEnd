@@ -3402,7 +3402,7 @@ color:white;
       <enum>QTabWidget::Rounded</enum>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab">
       <property name="font">
@@ -4312,9 +4312,9 @@ color:#ffffff;
       <widget class="QLabel" name="label_77">
        <property name="geometry">
         <rect>
-         <x>390</x>
+         <x>300</x>
          <y>150</y>
-         <width>141</width>
+         <width>231</width>
          <height>51</height>
         </rect>
        </property>
@@ -4325,7 +4325,7 @@ color:#ffffff;
         </font>
        </property>
        <property name="text">
-        <string> 班级总人数：</string>
+        <string>  加入课程总人数：</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>

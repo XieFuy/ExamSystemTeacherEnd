@@ -64,6 +64,8 @@ signals:
     void startGetStudentRequestCount();
     void startInitJoinClassStudentManeageTable();
     void startShowClassIconInStudentManagerUI(QImage* image);
+    void startShowStudentHeadIconUI(QImage* image);
+    void startShowStudentManegerCurPagaUI(QVector<QVector<QString>>* ret);
 private:
     CExitLoginDlg* m_exitLoginDlg = nullptr;
     QTreeWidgetItem* m_signalOperator = nullptr; //单选题父项
@@ -121,6 +123,9 @@ private:
     HANDLE m_Event;
     HANDLE m_Event_2;
 
+    HANDLE m_studentManegerEvent;
+    HANDLE m_studentManegerEvent_2;
+
     int m_classCurPageIndex;//课程表 表示当前的页数
     QString m_classCount;//表示总记录的所有
 
@@ -145,6 +150,9 @@ private:
     QVector<QLabel*>  m_studentManegerPhoneNumberVec;
     QVector<QLabel*>  m_studentManegerJoinTimeVec;
     QVector<QWidget*> m_studentManegerOperators;
+    int m_studentManegerCurPageIndex;
+    int m_studentManegerClassIconIndex;
+    std::string m_studentManegerHeadIconPath;
 private:
     void showPageIndex();//显示分页查询的下标页
     void initTableWidgetHeader(); //初始化表头
@@ -291,6 +299,8 @@ private:
     void clearClassTableControl(); //清除课程表UI
 
     void showClassIconUI(QImage* image);
+
+    void showStudentHeadIconUI(QImage* image);
 
     static unsigned WINAPI showClassIcon(LPVOID arg);//显示一行的课程图标,这个线程函数进行负责从服务器中进行接收图片数据
 
@@ -453,7 +463,18 @@ private:
     //初始化学生管理表控件
     void initStudentManegerTableContorl();
 
+    //获取学生管理当前页数据
+    void getStudentManegerCurPageData();
+    static unsigned WINAPI threadGetStudentManegerCurPageData(LPVOID arg);
 
+    //显示当前页的学生管理数据UI
+    void showStudentManegerCurPagaUI(QVector<QVector<QString>>* ret);//TODO:明天接着这个函数继续进行写
+
+    //清除学生管理表UI
+    void clearStudentManegerTableUI();
+
+    //显示学生头像
+    static unsigned WINAPI  showStudentHeadIcon(LPVOID arg);
 private:
     Ui::CMainMenueDlg *ui;
 };
