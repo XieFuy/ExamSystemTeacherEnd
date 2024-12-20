@@ -484,6 +484,10 @@ private:
 
     void showStudentManegerTableIndex(); //显示学生管理总页数下表
 
+    //显示学生管理表的下一页，注意下一页的逻辑，避免bug
+    void  showStudentManegerTableNextPage();
+
+
 private:
     Ui::CMainMenueDlg *ui;
 };

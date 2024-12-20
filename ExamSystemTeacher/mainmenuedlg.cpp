@@ -622,6 +622,38 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
     QObject::connect(this,&CMainMenueDlg::startShowStudentManegerCurPagaUI,this,&CMainMenueDlg::showStudentManegerCurPagaUI);
 
     QObject::connect(this,&CMainMenueDlg::startShowStudentManegerTableIndex,this,&CMainMenueDlg::showStudentManegerTableIndex);
+
+    QObject::connect(this->ui->pushButton_41,&QPushButton::clicked,this,&CMainMenueDlg::showStudentManegerTableNextPage);
+}
+
+void  CMainMenueDlg::showStudentManegerTableNextPage()
+{
+    if(this->m_studentManegerCount == "0") //如果查询的结果集为空则不进行操作
+    {
+        return;
+    }
+
+    if(QString::number(this->m_studentManegerCurPageIndex) == this->m_studentManegerCount)
+    {
+        return;
+    }
+    //清除当前表中的记录
+    this->clearStudentManegerTableUI();
+
+    //给当前页自增，并且不能超过总页
+    if(QString::number(this->m_studentManegerCurPageIndex) != this->m_studentManegerCount)
+    {
+        this->m_studentManegerCurPageIndex += 1;
+    }
+
+    //清除选中项
+    emit this->ui->checkBox_10->toggled(false);
+    this->ui->checkBox_10->setChecked(false);
+
+    this->getStudentManegerCurPageData();
+    this->getStudentManegerTableCount();
+//    emit this->startGetClassTableInfo();
+//    emit this->startGetClassTableIndex();
 }
 
 void CMainMenueDlg::showStudentManegerTableIndex()
