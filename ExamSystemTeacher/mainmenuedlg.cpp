@@ -69,6 +69,7 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
     this->m_studentManegerCurPageIndex = 1;
     this->m_studentManegerEvent = CreateEvent(nullptr,false,false,nullptr);
     this->m_studentManegerEvent_2 = CreateEvent(nullptr,false,false,nullptr);
+    this->bindStudentManegerOperators();
 
     QObject::connect(this,&CMainMenueDlg::startInitTeacherInfoTable,this,&CMainMenueDlg::initTeacherInfoTable);
     emit this->startInitTeacherInfoTable();
@@ -626,6 +627,139 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
     QObject::connect(this->ui->pushButton_41,&QPushButton::clicked,this,&CMainMenueDlg::showStudentManegerTableNextPage);
 
     QObject::connect(this->ui->pushButton_40,&QPushButton::clicked,this,&CMainMenueDlg::showStudentManegerTableLastPage);
+
+    QObject::connect(this->ui->checkBox_10,&QCheckBox::toggled,this,&CMainMenueDlg::changeStudentManegerCurPageCheckBoxStatus);
+
+    QObject::connect(this->ui->pushButton_39,&QPushButton::clicked,this,&CMainMenueDlg::deleteMultiManegerByStudentId);
+}
+
+typedef struct deleteMultiManegerByStudentIdArg{
+    QString acount;
+    QString className;
+    QList<QString>* studentIdLst;
+    CMainMenueDlg* thiz;
+}DeleteMultiManegerByStudentIdArg;
+
+void CMainMenueDlg::deleteMultiManegerByStudentId()
+{
+    this->m_studentManegerCurPageIndex = 1;
+    DeleteMultiManegerByStudentIdArg* arg = new DeleteMultiManegerByStudentIdArg();
+    arg->acount = this->m_acount;
+    arg->className = this->m_classInfoSelected;
+    arg->studentIdLst = new QList<QString>();
+    arg->thiz = this;
+    //将选中的记录的学生学号进行存储
+    for(int i = 0 ; i < this->m_studentManegerCheckVec.size();i++)
+    {
+        QList<QCheckBox*> checkLst = this->m_studentManegerCheckVec.at(i)->findChildren<QCheckBox*>();
+        for(QCheckBox* check : checkLst)
+        {
+            if(check->isChecked())
+            {
+                //获取到同一行的学号
+                QString studentId = this->m_studentManagerStudentIdVec.at(i)->text().trimmed();
+                arg->studentIdLst->push_back(studentId);
+            }
+        }
+    }
+    _beginthreadex(nullptr,0,&CMainMenueDlg::threadDeleteMultiManegerByStudentId,arg,0,nullptr);
+}
+
+unsigned WINAPI CMainMenueDlg::threadDeleteMultiManegerByStudentId(LPVOID arg)
+{
+    //TODO:接着继续
+    DeleteMultiManegerByStudentIdArg* aInfo = (DeleteMultiManegerByStudentIdArg*)arg;
+    aInfo->thiz->m_mainMenueContorller->deleteMultiManegerByStudentId(aInfo->acount
+                                                                     ,aInfo->className
+                                                                     ,aInfo->studentIdLst);
+    //进行回显数据  回显的是全部的数据
+    aInfo->thiz->getStudentManegerCurPageData();
+    aInfo->thiz->getStudentMenberCountData();
+    aInfo->thiz->getStudentManegerTableCount();
+    emit aInfo->thiz->ui->checkBox_10->toggled(false);
+    aInfo->thiz->ui->checkBox_10->setChecked(false);
+    delete aInfo->studentIdLst;
+    delete aInfo;
+    _endthreadex(0);
+    return 0;
+}
+
+typedef  struct deleteStudentManegerByStudentIdArg{
+    QString studentId;
+    QString acount;
+    QString className;
+    CMainMenueDlg* thiz;
+}DeleteStudentManegerByStudentIdArg;
+
+void CMainMenueDlg::deleteStudentManegerByStudentId(QString studentId)
+{
+    DeleteStudentManegerByStudentIdArg* arg = new DeleteStudentManegerByStudentIdArg();
+    arg->acount = this->m_acount;
+    arg->className = this->m_classInfoSelected;
+    arg->studentId = studentId;
+    arg->thiz = this;
+    _beginthreadex(nullptr,0,&CMainMenueDlg::threadDeleteStudentManegerByStudentId,arg,0,nullptr);
+}
+
+unsigned WINAPI CMainMenueDlg::threadDeleteStudentManegerByStudentId(LPVOID arg)
+{
+    DeleteStudentManegerByStudentIdArg* dInfo = (DeleteStudentManegerByStudentIdArg*)arg;
+    dInfo->thiz->m_mainMenueContorller->deleteStudentManegerByStudentId(dInfo->acount
+                                                                        ,dInfo->className
+                                                                        ,dInfo->studentId);
+    //重新回显数据 进行单条操作或者批量操作后都要将当前页下标进行重置为1
+    dInfo->thiz->getStudentManegerCurPageData();
+    dInfo->thiz->getStudentManegerTableCount();
+    dInfo->thiz->getStudentMenberCountData();
+    delete dInfo;
+    _endthreadex(0);
+    return 0;
+}
+
+void CMainMenueDlg::bindStudentManegerOperators()
+{
+    for(QVector<QWidget*>::iterator pos = this->m_studentManegerOperators.begin(); pos != this->m_studentManegerOperators.end();pos++)
+    {
+        QList<QPushButton*> ret = (*pos)->findChildren<QPushButton*>();
+        for(QPushButton* btn : ret)
+        {
+            if(btn->text() == "删除")
+            {
+                //绑定的删除操作的槽函数
+                QObject::connect(btn,&QPushButton::clicked,[=](){
+                    //进行遍历是哪一个按钮，并获取对应的行号
+                    int row = 0;
+                    for(int i = 0 ; i < this->m_studentManegerOperators.size();i++)
+                    {
+                        QList<QPushButton*> buttons = this->m_studentManegerOperators.at(i)->findChildren<QPushButton*>();
+                        for(QPushButton* clickedBtn: buttons)
+                        {
+                            if(clickedBtn == btn)
+                            {
+                                QString studentId = this->m_studentManagerStudentIdVec.at(row)->text().trimmed();
+                                this->m_studentManegerCurPageIndex = 1;
+                                this->deleteStudentManegerByStudentId(studentId);
+                                break;
+                            }
+                        }
+                        row++;
+                    }
+                });
+            }
+        }
+    }
+}
+
+void CMainMenueDlg::changeStudentManegerCurPageCheckBoxStatus(bool status)
+{
+    for(int i = 0 ; i < this->m_studentManegerCheckVec.size();i++)
+    {
+       QList<QCheckBox*> ret =  this->m_studentManegerCheckVec.at(i)->findChildren<QCheckBox*>();
+       for(QCheckBox* check : ret)
+       {
+          check->setChecked(status);
+       }
+    }
 }
 
 void  CMainMenueDlg::showStudentManegerTableLastPage()

@@ -10,6 +10,27 @@ CMainMenueModel::~CMainMenueModel()
 
 }
 
+bool CMainMenueModel::deleteStudentManegerByStudentId(const char* acount
+                                     ,const char* className
+                                     ,const char* studentId)
+{
+    if(acount == nullptr || className == nullptr || studentId == nullptr)
+    {
+        return false;
+    }
+    std::shared_ptr<CDBHelper> dbHelper = std::make_shared<CDBHelper>();
+    char* sqlBuf = new char[1024000];
+    memset(sqlBuf,'\0',sizeof(char) * 1024000);
+    std::string sql;
+    sprintf(sqlBuf,"delete from `joinClassStudentManeage` \
+where `teacherId` = '%s' and `studentId` = '%s' and `className` = '%s';",acount,studentId,className);
+    sql = sqlBuf;
+    std::cout<<sql.c_str()<<std::endl;
+    bool ret =  dbHelper->sqlExcute(sql,"ExamSystem");
+    delete[] sqlBuf;
+    return ret;
+}
+
 int  CMainMenueModel::getStudentManegerTableCount(const char* acount,const char* className)
 {
     if(acount == nullptr || className == nullptr)

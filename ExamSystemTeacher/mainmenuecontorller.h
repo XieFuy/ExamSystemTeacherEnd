@@ -91,6 +91,9 @@ public :
                                                                       ,QString className
                                                                       ,int curIndex);
    int getStudentManegerTableCount(QString acount,QString className);
+   bool deleteStudentManegerByStudentId(QString acount,QString className,QString studentId);
+   bool deleteMultiManegerByStudentId(QString acount,QString className,QList<QString>* studentIdLst);
+   static unsigned WINAPI threadDeleteMultiManegerByStudentId(LPVOID arg);
  private:
     CMainMenueModel* m_mainMenueModel = nullptr;
 };

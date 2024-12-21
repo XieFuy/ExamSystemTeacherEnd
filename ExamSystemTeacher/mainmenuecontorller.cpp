@@ -5,6 +5,64 @@ CMainMenueContorller::CMainMenueContorller()
  this->m_mainMenueModel = new CMainMenueModel();
 }
 
+typedef struct deleteMultiManegerByStudentIdArg{
+    CMainMenueContorller* thiz;
+    const char* acount;
+    const char* className;
+    const char* studentId;
+}DeleteMultiManegerByStudentIdArg;
+
+bool CMainMenueContorller::deleteMultiManegerByStudentId(QString acount,QString className,QList<QString>* studentIdLst)
+{
+    if(studentIdLst == nullptr)
+    {
+        return false;
+    }
+    QByteArray acountArr = acount.toUtf8();
+    QByteArray classNameArr = className.toLocal8Bit();
+    const char* pAcount = acountArr.data();
+    const char* pClassName = classNameArr.data();
+
+    HANDLE handleArr[studentIdLst->size()];
+    QByteArray studentIdArr[studentIdLst->size()];
+    for(int i = 0 ; i < studentIdLst->size();i++)
+    {
+        studentIdArr[i] = studentIdLst->at(i).toLocal8Bit();
+        const char* pStudentId = studentIdArr[i].data();
+        DeleteMultiManegerByStudentIdArg* arg = new DeleteMultiManegerByStudentIdArg();
+        arg->acount = pAcount;
+        arg->className = pClassName;
+        arg->studentId = pStudentId;
+        arg->thiz = this;
+        handleArr[i] = (HANDLE)_beginthreadex(nullptr,0,&CMainMenueContorller::threadDeleteMultiManegerByStudentId,arg,0,nullptr);
+    }
+    WaitForMultipleObjects(studentIdLst->size(),handleArr,TRUE,INFINITE);
+    return true;
+}
+
+unsigned WINAPI CMainMenueContorller::threadDeleteMultiManegerByStudentId(LPVOID arg)
+{
+    DeleteMultiManegerByStudentIdArg* aInfo = (DeleteMultiManegerByStudentIdArg*)arg;
+    aInfo->thiz->m_mainMenueModel->deleteStudentManegerByStudentId(aInfo->acount,aInfo->className,aInfo->studentId);
+    delete aInfo;
+    _endthreadex(0);
+    return 0;
+}
+
+bool CMainMenueContorller::deleteStudentManegerByStudentId(QString acount
+                                                           ,QString className
+                                                           ,QString studentId)
+{
+    QByteArray acountArr = acount.toUtf8();
+    QByteArray classNameArr = className.toLocal8Bit();
+    QByteArray studentIdArr = studentId.toLocal8Bit();
+
+    const char* pAcount = acountArr.data();
+    const char* pClassName = classNameArr.data();
+    const char* pStudentId = studentIdArr.data();
+    return this->m_mainMenueModel->deleteStudentManegerByStudentId(pAcount,pClassName,pStudentId);
+}
+
 int CMainMenueContorller::getStudentManegerTableCount(QString acount,QString className)
 {
     QByteArray acountArr = acount.toLocal8Bit();

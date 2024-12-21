@@ -490,9 +490,18 @@ private:
     //显示学生管理表的上一页
     void  showStudentManegerTableLastPage();
 
+    void changeStudentManegerCurPageCheckBoxStatus(bool status);
 
+    //完成学生管理操作绑定
+    void bindStudentManegerOperators();
 
+    //删除单条学生管理记录
+    void deleteStudentManegerByStudentId(QString studentId);
+    static unsigned WINAPI threadDeleteStudentManegerByStudentId(LPVOID arg);
 
+    //批量当前页的删除学生管理记录
+    void deleteMultiManegerByStudentId();
+    static unsigned WINAPI threadDeleteMultiManegerByStudentId(LPVOID arg);
 private:
     Ui::CMainMenueDlg *ui;
 };
