@@ -502,6 +502,11 @@ private:
     //批量当前页的删除学生管理记录
     void deleteMultiManegerByStudentId();
     static unsigned WINAPI threadDeleteMultiManegerByStudentId(LPVOID arg);
+
+    //根据学生姓名进行模糊查询当前页的结果集
+    void getStudentManegerCurPageDataByStudentName(QString studentName);
+    static unsigned WINAPI threadGetStudentManegerCurPageDataByStudentName(LPVOID arg);
+
 private:
     Ui::CMainMenueDlg *ui;
 };

@@ -624,13 +624,82 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
 
     QObject::connect(this,&CMainMenueDlg::startShowStudentManegerTableIndex,this,&CMainMenueDlg::showStudentManegerTableIndex);
 
-    QObject::connect(this->ui->pushButton_41,&QPushButton::clicked,this,&CMainMenueDlg::showStudentManegerTableNextPage);
+    QObject::connect(this->ui->pushButton_41,&QPushButton::clicked,[=](){
+        QString studentName = this->ui->lineEdit_12->text().trimmed();
+        if(studentName == "")
+        {
+            //执行全部结果集的下一页操作
+            this->showStudentManegerTableNextPage();
+        }else
+        {
+            //执行按姓名模糊查询结果集的下一页
+
+        }
+    });
 
     QObject::connect(this->ui->pushButton_40,&QPushButton::clicked,this,&CMainMenueDlg::showStudentManegerTableLastPage);
 
     QObject::connect(this->ui->checkBox_10,&QCheckBox::toggled,this,&CMainMenueDlg::changeStudentManegerCurPageCheckBoxStatus);
 
     QObject::connect(this->ui->pushButton_39,&QPushButton::clicked,this,&CMainMenueDlg::deleteMultiManegerByStudentId);
+
+    QObject::connect(this->ui->pushButton_69,&QPushButton::clicked,[=](){
+        //进行按姓名进行模糊查询
+        this->m_studentManegerCurPageIndex =1;
+        QString studentName = this->ui->lineEdit_12->text().trimmed();
+        if(studentName == "")
+        {
+            this->getStudentManegerCurPageData();
+            this->getStudentManegerTableCount();
+        }else
+        {
+          this->getStudentManegerCurPageDataByStudentName(studentName);
+        }
+    });
+}
+
+typedef struct getStudentManegerCurPageDataByStudentNameArg{
+    QString acount;
+    QString className;
+    CMainMenueDlg* thiz;
+    int curIndex;
+    QString studentName;
+}GetStudentManegerCurPageDataByStudentNameArg;
+
+void CMainMenueDlg::getStudentManegerCurPageDataByStudentName(QString studentName)
+{
+    //TODO:明天接着这里继续
+    GetStudentManegerCurPageDataByStudentNameArg* arg = new GetStudentManegerCurPageDataByStudentNameArg();
+    arg->acount = this->m_acount;
+    arg->className = this->m_classInfoSelected;
+    arg->thiz = this;
+    arg->curIndex = this->m_studentManegerCurPageIndex;
+    arg->studentName = studentName;
+    _beginthreadex(nullptr,0,&CMainMenueDlg::threadGetStudentManegerCurPageDataByStudentName,arg,0,nullptr);
+}
+
+unsigned WINAPI CMainMenueDlg::threadGetStudentManegerCurPageDataByStudentName(LPVOID arg)
+{
+    GetStudentManegerCurPageDataByStudentNameArg* gInfo = ( GetStudentManegerCurPageDataByStudentNameArg*)arg;
+    std::vector<std::vector<std::string>> ret =  gInfo->thiz->m_mainMenueContorller->getStudentManegerCurPageDataByStudentName(gInfo->acount
+                                                                                                                               ,gInfo->className
+                                                                                                                               ,gInfo->studentName
+                                                                                                                               ,gInfo->curIndex);
+    QVector<QVector<QString>>* result = new QVector<QVector<QString>>();
+    for(int i = 0 ; i < ret.size();i++)
+    {
+        QVector<QString> temp;
+        for(int j = 0 ; j < ret.at(i).size();j++)
+        {
+            QString str = QString::fromLocal8Bit(ret.at(i).at(j).c_str());
+            temp.push_back(str);
+        }
+        result->push_back(temp);
+    }
+    //发送数据回显信号
+    emit gInfo->thiz->startShowStudentManegerCurPagaUI(result);
+    _endthreadex(0);
+    return 0;
 }
 
 typedef struct deleteMultiManegerByStudentIdArg{

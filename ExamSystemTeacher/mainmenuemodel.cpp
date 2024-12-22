@@ -10,6 +10,44 @@ CMainMenueModel::~CMainMenueModel()
 
 }
 
+std::vector<std::vector<std::string>> CMainMenueModel::getStudentManegerCurPageDataByStudentName(const char* acount
+                                                                                ,const char* className
+                                                                                ,const char* studentName
+                                                                                ,int curIndex)
+{
+    if(acount == nullptr || className == nullptr || studentName == nullptr || curIndex == -1)
+    {
+        return std::vector<std::vector<std::string>>();
+    }
+    std::shared_ptr<CDBHelper> dbHelper = std::make_shared<CDBHelper>();
+    char* sqlBuf = new char[1024000];
+    memset(sqlBuf,'\0',sizeof(char) * 1024000);
+    std::string sql;
+    sprintf(sqlBuf,"SELECT \n\
+si.profilePicture AS headIconPath,\n\
+si.name,\n\
+jm.studentId,\n\
+si.phoneNumber AS phoneNumber,\n\
+jm.joinTime \n\
+FROM \n\
+`joinClassStudentManeage` jm\n\
+JOIN \n\
+`StudentInfo` si ON jm.studentId = si.studentId\n\
+WHERE \n\
+jm.teacherId = '%s'\n\
+AND \n\
+jm.className = '%s'\n\
+AND \n\
+si.name like '%%%s%%'\n\
+ORDER BY \n\
+jm.id\n\
+LIMIT 8 OFFSET %d;",acount,className,studentName,(curIndex -1) * 8);
+    sql = sqlBuf;
+    std::vector<std::vector<std::string>> ret =  dbHelper->sqlQuery(sql,"ExamSystem");
+    delete[] sqlBuf;
+    return ret;
+}
+
 bool CMainMenueModel::deleteStudentManegerByStudentId(const char* acount
                                      ,const char* className
                                      ,const char* studentId)

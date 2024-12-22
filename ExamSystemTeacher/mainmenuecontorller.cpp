@@ -5,6 +5,21 @@ CMainMenueContorller::CMainMenueContorller()
  this->m_mainMenueModel = new CMainMenueModel();
 }
 
+
+std::vector<std::vector<std::string>> CMainMenueContorller::getStudentManegerCurPageDataByStudentName(QString acount
+                                                                                ,QString className
+                                                                                ,QString studentName
+                                                                                ,int curIndex)
+{
+    QByteArray acountArr = acount.toUtf8();
+    QByteArray classNameArr = className.toLocal8Bit();
+    QByteArray studentNameArr = studentName.toLocal8Bit();
+    const char* pAcount = acountArr.data();
+    const char* pClassName = classNameArr.data();
+    const char* pStudentName = studentNameArr.data();
+    return this->m_mainMenueModel->getStudentManegerCurPageDataByStudentName(pAcount,pClassName,pStudentName,curIndex);
+}
+
 typedef struct deleteMultiManegerByStudentIdArg{
     CMainMenueContorller* thiz;
     const char* acount;

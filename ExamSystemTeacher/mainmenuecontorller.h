@@ -94,6 +94,10 @@ public :
    bool deleteStudentManegerByStudentId(QString acount,QString className,QString studentId);
    bool deleteMultiManegerByStudentId(QString acount,QString className,QList<QString>* studentIdLst);
    static unsigned WINAPI threadDeleteMultiManegerByStudentId(LPVOID arg);
+   std::vector<std::vector<std::string>> getStudentManegerCurPageDataByStudentName(QString acount
+                                                                                   ,QString className
+                                                                                   ,QString studentName
+                                                                                   ,int curIndex);
  private:
     CMainMenueModel* m_mainMenueModel = nullptr;
 };
