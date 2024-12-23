@@ -100,6 +100,9 @@ public:
                                                                                     ,const char* className
                                                                                     ,const char* studentName
                                                                                     ,int curIndex);
+    int getStudentManegerTableCountByStudentName(const char* acount
+                                                 ,const char* className
+                                                 ,const char* studentName);
 
 private:
       HANDLE m_mutex; //因为所有操作都是使用的一个CDBHelper对象，所以要给每一个执行sql的步骤进行上锁

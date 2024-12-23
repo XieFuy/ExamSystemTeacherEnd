@@ -10,6 +10,50 @@ CMainMenueModel::~CMainMenueModel()
 
 }
 
+int CMainMenueModel::getStudentManegerTableCountByStudentName(const char* acount
+                                             ,const char* className
+                                             ,const char* studentName)
+{
+    if(acount == nullptr || className == nullptr || studentName == nullptr)
+    {
+        return -1;
+    }
+    std::shared_ptr<CDBHelper> dbHelper = std::make_shared<CDBHelper>();
+    char* sqlBuf = new char[1024000];
+    memset(sqlBuf,'\0',sizeof(char) * 1024000);
+    std::string sql;
+    sprintf(sqlBuf,"SELECT \n\
+COUNT(*) AS totalRowCount\n\
+FROM \n\
+`joinClassStudentManeage` jm\n\
+JOIN \n\
+`StudentInfo` si ON jm.studentId = si.studentId\n\
+WHERE \n\
+jm.teacherId = '%s'\n\
+AND \n\
+jm.className = '%s'\n\
+AND  \n\
+si.name like '%%%s%%';",acount,className,studentName);
+    sql = sqlBuf;
+    int tableCount =  dbHelper->sqlQueryCount(sql,"ExamSystem"); //获取的是表的记录条数
+    tableCount -= 1; //减去最上面的一条记录
+    delete[] sqlBuf;
+    int result = (tableCount / 8) ;
+
+    if(result < 0) //表示总的记录条数小于8
+    {
+        result += 1;
+    }else
+    {
+        int yuShu = tableCount - (result * 8);
+        if(yuShu >= 0)
+        {
+            result += 1;
+        }
+    }
+    return result;
+}
+
 std::vector<std::vector<std::string>> CMainMenueModel::getStudentManegerCurPageDataByStudentName(const char* acount
                                                                                 ,const char* className
                                                                                 ,const char* studentName

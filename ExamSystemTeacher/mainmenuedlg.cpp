@@ -633,11 +633,22 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
         }else
         {
             //执行按姓名模糊查询结果集的下一页
-
+            this->showStudentManegerTableNextPageByStudentName(studentName);
         }
     });
 
-    QObject::connect(this->ui->pushButton_40,&QPushButton::clicked,this,&CMainMenueDlg::showStudentManegerTableLastPage);
+    QObject::connect(this->ui->pushButton_40,&QPushButton::clicked,[=](){
+        QString studentName = this->ui->lineEdit_12->text().trimmed();
+        if(studentName == "")
+        {
+            //执行全部结果集的上一页操作
+            this->showStudentManegerTableLastPage();
+        }else
+        {
+            //执行按姓名模糊查询结果集的上一页
+            this->showStudentManegerTableLastPageByStudentName(studentName);
+        }
+    });
 
     QObject::connect(this->ui->checkBox_10,&QCheckBox::toggled,this,&CMainMenueDlg::changeStudentManegerCurPageCheckBoxStatus);
 
@@ -654,8 +665,94 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
         }else
         {
           this->getStudentManegerCurPageDataByStudentName(studentName);
+          this->getStudentManegerTableCountByStudentName(studentName);
         }
     });
+}
+
+void CMainMenueDlg::showStudentManegerTableLastPageByStudentName(QString studentName)
+{
+    if(this->m_studentManegerCount == "0")
+    {
+        return;
+    }
+    //防止恶意刷新
+    if(this->m_studentManegerCurPageIndex <= 1)
+    {
+        return ;
+    }
+    //清除当前表中的记录
+    this->clearStudentManegerTableUI();
+    //给当前页递减，并且不能低于1
+    if(this->m_studentManegerCurPageIndex > 1)
+    {
+       this->m_studentManegerCurPageIndex -= 1;
+    }
+    emit this->ui->checkBox_10->toggled(false);
+    this->ui->checkBox_10->setChecked(false);
+
+    this->getStudentManegerCurPageDataByStudentName(studentName);
+    this->getStudentManegerTableCountByStudentName(studentName);
+}
+
+void  CMainMenueDlg::showStudentManegerTableNextPageByStudentName(QString studentName)
+{
+    if(this->m_studentManegerCount == "0") //如果查询的结果集为空则不进行操作
+    {
+        return;
+    }
+
+    if(QString::number(this->m_studentManegerCurPageIndex) == this->m_studentManegerCount)
+    {
+        return;
+    }
+    //清除当前表中的记录
+    this->clearStudentManegerTableUI();
+
+    //给当前页自增，并且不能超过总页
+    if(QString::number(this->m_studentManegerCurPageIndex) != this->m_studentManegerCount)
+    {
+        this->m_studentManegerCurPageIndex += 1;
+    }
+
+    //清除选中项
+    emit this->ui->checkBox_10->toggled(false);
+    this->ui->checkBox_10->setChecked(false);
+
+    this->getStudentManegerCurPageDataByStudentName(studentName);
+    this->getStudentManegerTableCountByStudentName(studentName);
+}
+
+typedef struct getStudentManegerTableCountByStudentNameArg{
+    CMainMenueDlg* thiz;
+    QString acount;
+    QString className;
+    QString studentName;
+}GetStudentManegerTableCountByStudentNameArg;
+
+void CMainMenueDlg::getStudentManegerTableCountByStudentName(QString studentName)
+{
+    GetStudentManegerTableCountByStudentNameArg* arg = new GetStudentManegerTableCountByStudentNameArg();
+    arg->thiz = this;
+    arg->acount = this->m_acount;
+    arg->className = this->m_classInfoSelected;
+    arg->studentName  = studentName;
+    _beginthreadex(nullptr,0,&CMainMenueDlg::threadGetStudentManegerTableCountByStudentNameEntry,arg,0,nullptr);
+}
+
+unsigned WINAPI CMainMenueDlg::threadGetStudentManegerTableCountByStudentNameEntry(LPVOID arg)
+{
+    GetStudentManegerTableCountByStudentNameArg* gInfo = (GetStudentManegerTableCountByStudentNameArg*)arg;
+    int ret =  gInfo->thiz->m_mainMenueContorller->getStudentManegerTableCountByStudentName(gInfo->acount
+                                                                                            ,gInfo->className
+                                                                                            ,gInfo->studentName);
+
+    gInfo->thiz->m_studentManegerCount = QString::number(ret);
+    //进行发送信号，进行显示总页数
+    emit gInfo->thiz->startShowStudentManegerTableIndex();
+    delete gInfo;
+    _endthreadex(0);
+    return 0;
 }
 
 typedef struct getStudentManegerCurPageDataByStudentNameArg{
@@ -777,9 +874,20 @@ unsigned WINAPI CMainMenueDlg::threadDeleteStudentManegerByStudentId(LPVOID arg)
                                                                         ,dInfo->className
                                                                         ,dInfo->studentId);
     //重新回显数据 进行单条操作或者批量操作后都要将当前页下标进行重置为1
-    dInfo->thiz->getStudentManegerCurPageData();
-    dInfo->thiz->getStudentManegerTableCount();
-    dInfo->thiz->getStudentMenberCountData();
+
+    //如果有文本则显示学生姓名查询的否则显示全部
+    QString studentName = dInfo->thiz->ui->lineEdit_12->text().trimmed();
+    if(studentName == "")
+    {
+        dInfo->thiz->getStudentManegerCurPageData();
+        dInfo->thiz->getStudentManegerTableCount();
+        dInfo->thiz->getStudentMenberCountData();
+    }else
+    {
+        dInfo->thiz->getStudentManegerCurPageDataByStudentName(studentName);
+        dInfo->thiz->getStudentManegerTableCountByStudentName(studentName);
+        dInfo->thiz->getStudentMenberCountData();
+    }
     delete dInfo;
     _endthreadex(0);
     return 0;

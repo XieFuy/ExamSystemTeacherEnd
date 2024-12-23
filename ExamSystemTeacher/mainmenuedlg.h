@@ -507,6 +507,17 @@ private:
     void getStudentManegerCurPageDataByStudentName(QString studentName);
     static unsigned WINAPI threadGetStudentManegerCurPageDataByStudentName(LPVOID arg);
 
+    //获取学生姓名模糊查询的结果集的总页数
+    void getStudentManegerTableCountByStudentName(QString studentName);
+    static unsigned WINAPI threadGetStudentManegerTableCountByStudentNameEntry(LPVOID arg);
+
+    //显示学生管理表的姓名模糊查询结果集下一页，注意下一页的逻辑，避免bug
+    void  showStudentManegerTableNextPageByStudentName(QString studentName);
+
+    //显示学生管理表的姓名模糊查询结果集的上一页
+    void  showStudentManegerTableLastPageByStudentName(QString studentName);
+
+
 private:
     Ui::CMainMenueDlg *ui;
 };

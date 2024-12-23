@@ -98,6 +98,7 @@ public :
                                                                                    ,QString className
                                                                                    ,QString studentName
                                                                                    ,int curIndex);
+   int getStudentManegerTableCountByStudentName(QString acount,QString className,QString studentName);
  private:
     CMainMenueModel* m_mainMenueModel = nullptr;
 };
