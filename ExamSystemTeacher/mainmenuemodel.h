@@ -57,7 +57,7 @@ public:
     bool initClassTableDatabase();
     std::vector<std::vector<std::string>> getClassTableData(const char* acount,int curPageIndex);
     int getClassTableCount(const char* acount);
-    bool deleteClassInfoByDateTime(const char* acount,const char* createTime);
+    bool deleteClassInfoByDateTime(const char* acount,const char* createTime,const char* className);
     std::vector<std::vector<std::string>> showClassIconInStudentRequest(const char* acount,
                                                                         const char* className);
     bool initStudentRequestDataBaseTable();

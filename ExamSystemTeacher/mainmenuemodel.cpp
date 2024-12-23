@@ -583,19 +583,33 @@ where `className` = '%s' and `teacherId` = '%s';",className,acount);
     return ret;
 }
 
-bool CMainMenueModel::deleteClassInfoByDateTime(const char* acount,const char* createTime)
+bool CMainMenueModel::deleteClassInfoByDateTime(const char* acount,const char* createTime,const char* className)
 {
-    if(acount == nullptr || createTime == nullptr)
+    if(acount == nullptr || createTime == nullptr || className == nullptr)
     {
         return false;
     }
     CDBHelper* dbHelper = new CDBHelper();
     char* sqlBuf = new char[1024000];
-    memset(sqlBuf,'\0',sizeof(char)*1024000);
+
     std::string sql;
-    sprintf(sqlBuf,"delete from `class`  where `createTime` = '%s' and `teacherId` = '%s';",createTime,acount);
+
+    //先删除该课程相关的申请表的所有记录
+    memset(sqlBuf,'\0',sizeof(char)*1024000);
+    sprintf(sqlBuf,"delete from `requestJoinClass`  where `className` = '%s' and `teacherId` = '%s';",className,acount);
     sql = sqlBuf;
     bool ret =  dbHelper->sqlExcute(sql,"ExamSystem");
+
+    //删除该课程相关的学生管理记录
+    memset(sqlBuf,'\0',sizeof(char)*1024000);
+    sprintf(sqlBuf,"delete from `joinClassStudentManeage`  where `className` = '%s' and `teacherId` = '%s';",className,acount);
+    sql = sqlBuf;
+    ret =  dbHelper->sqlExcute(sql,"ExamSystem");
+
+    memset(sqlBuf,'\0',sizeof(char)*1024000);
+    sprintf(sqlBuf,"delete from `class`  where `createTime` = '%s' and `teacherId` = '%s';",createTime,acount);
+    sql = sqlBuf;
+    ret =  dbHelper->sqlExcute(sql,"ExamSystem");
     delete[] sqlBuf;
     delete dbHelper;
     return ret;

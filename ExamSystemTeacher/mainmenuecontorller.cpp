@@ -375,9 +375,10 @@ typedef struct deleteMultiClassInfoArg
     CMainMenueContorller*thiz;
     const char* acount;
     const char* createTime;
+    const char* className;
 }DeleteMultiClassInfoArg;
 
-bool CMainMenueContorller::deleteMultiClassInfo(QString acount,QList<QString>& createTimeLst)
+bool CMainMenueContorller::deleteMultiClassInfo(QString acount,QList<QString>& createTimeLst,QList<QString>& classNameLst)
 {
     QByteArray acountArr = acount.toUtf8();
     const char* pAcount = acountArr.data();
@@ -385,10 +386,14 @@ bool CMainMenueContorller::deleteMultiClassInfo(QString acount,QList<QString>& c
     {
         QByteArray createTimeArr = createTimeLst.at(i).toLocal8Bit();
         const char* pCreateTime = createTimeArr.data();
+        QByteArray classNameArr = classNameLst.at(i).toLocal8Bit();
+        const char* pClassName = classNameArr.data();
+
         DeleteMultiClassInfoArg* arg = new DeleteMultiClassInfoArg();
         arg->thiz = this;
         arg->acount = pAcount;
         arg->createTime = pCreateTime;
+        arg->className = pClassName;
         HANDLE thread = (HANDLE) _beginthreadex(nullptr,0,&CMainMenueContorller::threadDeleteMultiClassInfo,arg,0,nullptr);
         WaitForSingleObject(thread,INFINITE);
     }
@@ -398,19 +403,21 @@ bool CMainMenueContorller::deleteMultiClassInfo(QString acount,QList<QString>& c
 unsigned WINAPI CMainMenueContorller::threadDeleteMultiClassInfo(LPVOID arg)
 {
     DeleteMultiClassInfoArg* dInfo = (DeleteMultiClassInfoArg*)arg;
-    dInfo->thiz->m_mainMenueModel->deleteClassInfoByDateTime(dInfo->acount,dInfo->createTime);
+    dInfo->thiz->m_mainMenueModel->deleteClassInfoByDateTime(dInfo->acount,dInfo->createTime,dInfo->className);
     delete dInfo;
     _endthreadex(0);
     return 0;
 }
 
-bool CMainMenueContorller::deleteClassInfoByDateTime(QString acount,QString createTime)
+bool CMainMenueContorller::deleteClassInfoByDateTime(QString acount,QString createTime,QString className)
 {
     QByteArray acountArr = acount.toUtf8();
     QByteArray createTimeArr = createTime.toLocal8Bit();
+    QByteArray classNameArr = className.toLocal8Bit();
     const char* pAcount = acountArr.data();
     const char* pCreateTime = createTimeArr.data();
-    return this->m_mainMenueModel->deleteClassInfoByDateTime(pAcount,pCreateTime);
+    const char* pClassName = classNameArr.data();
+    return this->m_mainMenueModel->deleteClassInfoByDateTime(pAcount,pCreateTime,pClassName);
 }
 
 int CMainMenueContorller::getClassTableCount(QString acount)
