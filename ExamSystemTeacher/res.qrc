@@ -14,5 +14,7 @@
         <file>icons/comboxUp.png</file>
         <file>icons/class.png</file>
         <file>icons/upLoad.png</file>
+        <file>icons/setup.png</file>
+        <file>icons/dateTime.png</file>
     </qresource>
 </RCC>

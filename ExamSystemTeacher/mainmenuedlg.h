@@ -21,6 +21,7 @@
 #include <QHBoxLayout>
 #include "threadpool.h"
 #include "classsavedlg.h"
+#include "testpaperreleasedlg.h"
 
 namespace Ui {
 class CMainMenueDlg;  //主菜单管理页面
@@ -68,6 +69,7 @@ signals:
     void startShowStudentManegerCurPagaUI(QVector<QVector<QString>>* ret);
     void startShowStudentManegerTableIndex();
 private:
+    CTestPaperReleaseDlg* m_testPaperReleaseDlg = nullptr;
     CExitLoginDlg* m_exitLoginDlg = nullptr;
     QTreeWidgetItem* m_signalOperator = nullptr; //单选题父项
     QTreeWidgetItem* m_multiOerator = nullptr;//多选题父项

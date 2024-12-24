@@ -3358,7 +3358,21 @@ void CMainMenueDlg::changeCurPageCheckBoxStatus(bool status)
 
 void CMainMenueDlg::updateStatusClickBtn(int row)
 {
-
+    QString testPaperName =  this->m_testPaperName.at(row)->text().trimmed();
+    //进行试卷发布操作
+    if(this->m_testPaperReleaseDlg == nullptr)  //生成对话框
+    {
+        this->m_testPaperReleaseDlg = new CTestPaperReleaseDlg();
+        this->m_testPaperReleaseDlg->SetAcount(this->m_acount);
+        this->m_testPaperReleaseDlg->SetTestPaperName(testPaperName);
+        this->m_testPaperReleaseDlg->move((this->width() - this->m_testPaperReleaseDlg->width()) / 2 ,(this->height() - this->m_testPaperReleaseDlg->height()) / 2);
+        this->m_testPaperReleaseDlg->exec(); //线程会在此进行阻塞
+        if(this->m_testPaperReleaseDlg != nullptr)
+        {
+            delete this->m_testPaperReleaseDlg;
+            this->m_testPaperReleaseDlg = nullptr;
+        }
+    }
 }
 
 typedef struct deleteClickBtnArg
@@ -3440,6 +3454,25 @@ void  CMainMenueDlg::bindOperatorBtns()
                              if(clickedBtn == btn)
                              {
                                  this->updateStatusClickBtn(row);
+                                 break;
+                             }
+                         }
+                         row++;
+                     }
+                 });
+             }else if(btn->text() == "预览")
+             {
+                 //绑定的发布操作的槽函数
+                 QObject::connect(btn,&QPushButton::clicked,[=](){
+                     int row = 0;
+                     for(int i = 0 ; i < this->m_operators.size();i++)
+                     {
+                         QList<QPushButton*> buttons = this->m_operators.at(i)->findChildren<QPushButton*>();
+                         for(QPushButton* clickedBtn: buttons)
+                         {
+                             if(clickedBtn == btn)
+                             {
+                                // this->updateStatusClickBtn(row);
                                  break;
                              }
                          }
@@ -3810,10 +3843,15 @@ void CMainMenueDlg::initTestPaperTableContorl()
         QPushButton* release = new QPushButton("发布");
         release->setStyleSheet("QPushButton{border:none; border:1px solid #faa046; color:#faa046;border-radius:5;}QPushButton:hover{border:1px solid #50b8f7;color:#50b8f7;}");
         release->setParent(widget);
+        QPushButton* release2 = new QPushButton("预览");
+        release2->setStyleSheet("QPushButton{border:none; border:1px solid #faa046; color:#faa046;border-radius:5;}QPushButton:hover{border:1px solid #50b8f7;color:#50b8f7;}");
+        release2->setParent(widget);
         layout->addWidget(deleteBtn);
         layout->addWidget(release);
+        layout->addWidget(release2);
         deleteBtn->setVisible(false);
         release->setVisible(false);
+        release2->setVisible(false);
         this->ui->tableWidget->setCellWidget(i,6,widget);
         this->m_operators.push_back(widget);
     }

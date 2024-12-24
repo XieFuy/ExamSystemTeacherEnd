@@ -24,6 +24,7 @@ SOURCES += \
     registercontorller.cpp \
     registerdlg.cpp \
     registermodel.cpp \
+    testpaperreleasedlg.cpp \
     testpapersavedlg.cpp \
     threadpool.cpp \
     widget.cpp
@@ -43,6 +44,7 @@ HEADERS += \
     registercontorller.h \
     registerdlg.h \
     registermodel.h \
+    testpaperreleasedlg.h \
     testpapersavedlg.h \
     threadpool.h \
     widget.h
@@ -54,6 +56,7 @@ FORMS += \
     namechangedlg.ui \
     phonenumberchangedlg.ui \
     registerdlg.ui \
+    testpaperreleasedlg.ui \
     testpapersavedlg.ui \
     widget.ui
 
