@@ -11,6 +11,7 @@ CONFIG += c++11
 SOURCES += \
     classsavedlg.cpp \
     clientsocket.cpp \
+    datetimeselectdlg.cpp \
     dbhelper.cpp \
     exitlogindlg.cpp \
     logincontorller.cpp \
@@ -21,6 +22,7 @@ SOURCES += \
     mainmenuemodel.cpp \
     namechangedlg.cpp \
     phonenumberchangedlg.cpp \
+    previewtestpaperdlg.cpp \
     registercontorller.cpp \
     registerdlg.cpp \
     registermodel.cpp \
@@ -32,6 +34,7 @@ SOURCES += \
 HEADERS += \
     classsavedlg.h \
     clientsocket.h \
+    datetimeselectdlg.h \
     dbhelper.h \
     exitlogindlg.h \
     logincontorller.h \
@@ -41,6 +44,7 @@ HEADERS += \
     mainmenuemodel.h \
     namechangedlg.h \
     phonenumberchangedlg.h \
+    previewtestpaperdlg.h \
     registercontorller.h \
     registerdlg.h \
     registermodel.h \
@@ -51,10 +55,12 @@ HEADERS += \
 
 FORMS += \
     classsavedlg.ui \
+    datetimeselectdlg.ui \
     exitlogindlg.ui \
     mainmenuedlg.ui \
     namechangedlg.ui \
     phonenumberchangedlg.ui \
+    previewtestpaperdlg.ui \
     registerdlg.ui \
     testpaperreleasedlg.ui \
     testpapersavedlg.ui \

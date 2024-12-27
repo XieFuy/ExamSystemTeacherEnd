@@ -10,6 +10,50 @@ CMainMenueModel::~CMainMenueModel()
 
 }
 
+bool CMainMenueModel::updateTestPaperStatus(const char* acount,const char* testPaperName)
+{
+    if(acount == nullptr || testPaperName == nullptr)
+    {
+        return false;
+    }
+    std::shared_ptr<CDBHelper> dbHelper = std::make_shared<CDBHelper>();
+    char* sqlBuf = new char[1024000];
+    memset(sqlBuf,'\0',sizeof(char) * 1024000);
+    std::string sql;
+    sprintf(sqlBuf,"update `testPaperInfo` set `publishStatus` = '1' \
+where `teacherId` = '%s' and `testPaperName` = '%s';",acount,testPaperName);
+    sql = sqlBuf;
+    bool ret =  dbHelper->sqlExcute(sql,"ExamSystem");
+    delete[] sqlBuf;
+    return ret;
+}
+
+bool CMainMenueModel::initDataBaseTestPaperReleaseTable()
+{
+    std::shared_ptr<CDBHelper> dbHelper = std::make_shared<CDBHelper>();
+    char* sqlBuf = new char[1024000];
+    memset(sqlBuf,'\0',sizeof(char) * 1024000);
+    std::string sql;
+    sprintf(sqlBuf,"create table if not exists `testPaperRelease`(\n\
+`id` integer primary key auto_increment,\n\
+`teacherId` varchar(20)  not null,\n\
+foreign key(`teacherId`) references `Teacher`(`teacherId`),\n\
+`classId` integer unique,\n\
+foreign key(`classId`) references `class`(`id`),\n\
+`testPaperId` integer unique,\n\
+foreign key(`testPaperId`) references `testPaperInfo`(`testPaperId`),\n\
+`examStartTime` datetime not null ,\n\
+`examEndTime`  datetime not null,\n\
+`examLongTimeMinute` integer not null,\n\
+`limitSubmit` integer default 0,\n\
+`limitEntry` integer default 0\n\
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;");
+    sql = sqlBuf;
+    bool ret =  dbHelper->sqlExcute(sql,"ExamSystem");
+    delete[] sqlBuf;
+    return ret;
+}
+
 int CMainMenueModel::getStudentManegerTableCountByStudentName(const char* acount
                                              ,const char* className
                                              ,const char* studentName)
@@ -1219,7 +1263,7 @@ LIMIT 8 OFFSET %d;",acount,((curPageIndex -1) * 8)); //这里limite 9 的原因�
             ret.at(i).at(4) = tempArr.data();
         }else if(ret.at(i).at(4) == "1")
         {
-            QString strTemp = "以发布";
+            QString strTemp = "已发布";
             QByteArray tempArr = strTemp.toLocal8Bit();
             ret.at(i).at(4) = tempArr.data();
         }

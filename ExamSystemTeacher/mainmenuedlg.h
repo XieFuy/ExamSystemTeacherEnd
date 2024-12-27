@@ -262,6 +262,10 @@ private:
     //给所有的操作按钮进行信号槽的绑定
     void bindOperatorBtns();
 
+    //更新试卷状态信息
+    void updateTestPaperStatus(QString testPaperName);
+    static unsigned WINAPI threadUpdateTestPaperStatus(LPVOID arg);
+
     //将当前页的所有选项进行设置状态
     void changeCurPageCheckBoxStatus(bool status);
 
@@ -519,6 +523,9 @@ private:
     //显示学生管理表的姓名模糊查询结果集的上一页
     void  showStudentManegerTableLastPageByStudentName(QString studentName);
 
+    //初始化数据库试卷发布表
+    void initDataBaseTestPaperReleaseTable();
+    static unsigned WINAPI threadInitDataBaseTestPaperReleaseTable(LPVOID arg);
 
 private:
     Ui::CMainMenueDlg *ui;

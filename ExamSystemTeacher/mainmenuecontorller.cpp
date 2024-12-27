@@ -5,6 +5,21 @@ CMainMenueContorller::CMainMenueContorller()
  this->m_mainMenueModel = new CMainMenueModel();
 }
 
+bool CMainMenueContorller::initDataBaseTestPaperReleaseTable()
+{
+    return this->m_mainMenueModel->initDataBaseTestPaperReleaseTable();
+}
+
+bool CMainMenueContorller::updateTestPaperStatus(QString acount,QString testPaperName)
+{
+    QByteArray acountArr = acount.toLocal8Bit();
+    QByteArray testPaperNameArr = testPaperName.toLocal8Bit();
+
+    const char* pAcount  = acountArr.data();
+    const char* pTestPaperName = testPaperNameArr.data();
+    return this->m_mainMenueModel->updateTestPaperStatus(pAcount,pTestPaperName);
+}
+
 int CMainMenueContorller::getStudentManegerTableCountByStudentName(QString acount
                                                                    ,QString className
                                                                    ,QString studentName)

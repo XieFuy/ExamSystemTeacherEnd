@@ -668,6 +668,21 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
           this->getStudentManegerTableCountByStudentName(studentName);
         }
     });
+
+    this->initDataBaseTestPaperReleaseTable();
+}
+
+void CMainMenueDlg::initDataBaseTestPaperReleaseTable()
+{
+    _beginthreadex(nullptr,0,&CMainMenueDlg::threadInitDataBaseTestPaperReleaseTable,this,0,nullptr);
+}
+
+unsigned WINAPI CMainMenueDlg::threadInitDataBaseTestPaperReleaseTable(LPVOID arg)
+{
+    CMainMenueDlg* thiz = (CMainMenueDlg*)arg;
+    thiz->m_mainMenueContorller->initDataBaseTestPaperReleaseTable();
+    _endthreadex(0);
+    return 0;
 }
 
 void CMainMenueDlg::showStudentManegerTableLastPageByStudentName(QString studentName)
@@ -3372,7 +3387,38 @@ void CMainMenueDlg::updateStatusClickBtn(int row)
             delete this->m_testPaperReleaseDlg;
             this->m_testPaperReleaseDlg = nullptr;
         }
+
+        //执行更新发布的试卷信息的状态，并且重新回显全部数据
+        this->curPageIndex = 1;
+        this->updateTestPaperStatus(testPaperName);
     }
+}
+
+typedef struct updateTestPaperStatusArg{
+    CMainMenueDlg* thiz;
+    QString acount;
+    QString testPaperName;
+}UpdateTestPaperStatusArg;
+
+void CMainMenueDlg::updateTestPaperStatus(QString testPaperName)
+{
+    UpdateTestPaperStatusArg* arg = new UpdateTestPaperStatusArg();
+    arg->thiz = this;
+    arg->acount = this->m_acount;
+    arg->testPaperName = testPaperName;
+    _beginthreadex(nullptr,0,&CMainMenueDlg::threadUpdateTestPaperStatus,arg,0,nullptr);
+}
+
+unsigned WINAPI CMainMenueDlg::threadUpdateTestPaperStatus(LPVOID arg)
+{
+    UpdateTestPaperStatusArg* uInfo = (UpdateTestPaperStatusArg*)arg;
+    uInfo->thiz->m_mainMenueContorller->updateTestPaperStatus(uInfo->acount,uInfo->testPaperName);
+    //重新回显数据
+    uInfo->thiz->getCurPageIndexTableData();
+    uInfo->thiz->getTablePageCount();
+    delete uInfo;
+    _endthreadex(0);
+    return 0;
 }
 
 typedef struct deleteClickBtnArg

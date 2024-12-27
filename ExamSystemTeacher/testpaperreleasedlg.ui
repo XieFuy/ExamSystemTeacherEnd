@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1021</width>
-    <height>574</height>
+    <height>681</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -26,7 +26,7 @@ background-color:#F1F3F6;
      <x>10</x>
      <y>10</y>
      <width>991</width>
-     <height>551</height>
+     <height>661</height>
     </rect>
    </property>
    <property name="styleSheet">
@@ -114,7 +114,7 @@ background-color:#ec7f9e;
 }</string>
     </property>
     <property name="text">
-     <string>下一步</string>
+     <string>确定</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_2">
@@ -299,7 +299,7 @@ QComboBox QAbstractItemView{
       <x>50</x>
       <y>240</y>
       <width>921</width>
-      <height>291</height>
+      <height>401</height>
      </rect>
     </property>
     <property name="styleSheet">

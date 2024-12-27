@@ -99,6 +99,8 @@ public :
                                                                                    ,QString studentName
                                                                                    ,int curIndex);
    int getStudentManegerTableCountByStudentName(QString acount,QString className,QString studentName);
+   bool initDataBaseTestPaperReleaseTable();
+   bool updateTestPaperStatus(QString acount,QString testPaperName);
  private:
     CMainMenueModel* m_mainMenueModel = nullptr;
 };

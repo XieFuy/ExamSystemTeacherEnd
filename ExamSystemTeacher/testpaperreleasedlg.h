@@ -8,6 +8,8 @@
 #include <string>
 #include <vector>
 #include <QDebug>
+#include "datetimeselectdlg.h"
+
 namespace Ui {
 class CTestPaperReleaseDlg;
 }
@@ -25,13 +27,18 @@ signals:
 public:
     void SetTestPaperName(QString testPaperName);
     void SetAcount(QString acount);
+    void SetClassName(QString className);
 private:
     void getClassNameByAcount(); //根据职工账号查询所有加入人数大于0的课程名称
     static unsigned WINAPI threadGetClassNameByAcount(LPVOID arg);
     void showSubject(QVector<QVector<QString>>* ret);
+    void addTestPaperReleaseInfo();
+    static unsigned WINAPI threadAddTestPaperReleaseInfo(LPVOID arg);
 private:
     QString acount;
     QString testPaperName;
+    CDateTimeSelectDlg* m_dateTimeWid = nullptr;
+    QString className;
 private:
     Ui::CTestPaperReleaseDlg *ui;
 };
