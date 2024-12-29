@@ -10,6 +10,25 @@ CMainMenueModel::~CMainMenueModel()
 
 }
 
+bool CMainMenueModel::deleteTestPaperReleaseInfo(const char* acount,const char* testPaperName)
+{
+    if(acount == nullptr || testPaperName == nullptr)
+    {
+        return false;
+    }
+    std::shared_ptr<CDBHelper> dbHelper = std::make_shared<CDBHelper>();
+    char* sqlBuf = new char[1024000];
+    memset(sqlBuf,'\0',sizeof(char) * 1024000);
+    std::string sql;
+    sprintf(sqlBuf,"delete from `testPaperRelease` where `teacherId` = '%s' and `testPaperId` in (SELECT DISTINCT `testPaperId` \n\
+FROM `testPaperInfo` \n\
+WHERE `teacherId` = '%s' AND `testPaperName` = '%s');",acount,acount,testPaperName);
+    sql = sqlBuf;
+    bool ret =  dbHelper->sqlExcute(sql,"ExamSystem");
+    delete[] sqlBuf;
+    return ret;
+}
+
 bool CMainMenueModel::updateTestPaperStatus(const char* acount,const char* testPaperName)
 {
     if(acount == nullptr || testPaperName == nullptr)

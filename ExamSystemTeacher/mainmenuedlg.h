@@ -267,6 +267,10 @@ private:
     //给所有的操作按钮进行信号槽的绑定
     void bindOperatorBtns();
 
+    //删除指定的试卷的发布信息
+    void deleteTestPaperReleaseInfo(QString testPaperName);
+    static unsigned WINAPI threadDeleteTestPaperReleaseInfo(LPVOID arg);
+
     //更新试卷状态信息
     void updateTestPaperStatus(QString testPaperName);
     static unsigned WINAPI threadUpdateTestPaperStatus(LPVOID arg);

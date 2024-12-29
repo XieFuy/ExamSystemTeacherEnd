@@ -5,6 +5,17 @@ CMainMenueContorller::CMainMenueContorller()
  this->m_mainMenueModel = new CMainMenueModel();
 }
 
+bool CMainMenueContorller::deleteTestPaperReleaseInfo(QString acount,QString testPaperName)
+{
+    QByteArray acountArr = acount.toLocal8Bit();
+    QByteArray testPaperNameArr = testPaperName.toLocal8Bit();
+
+    const char* pAcount = acountArr.data();
+    const char* pTestPaperName = testPaperNameArr.data();
+
+    return this->m_mainMenueModel->deleteTestPaperReleaseInfo(pAcount,pTestPaperName);
+}
+
 bool CMainMenueContorller::initDataBaseTestPaperReleaseTable()
 {
     return this->m_mainMenueModel->initDataBaseTestPaperReleaseTable();

@@ -3421,6 +3421,31 @@ unsigned WINAPI CMainMenueDlg::threadUpdateTestPaperStatus(LPVOID arg)
     return 0;
 }
 
+typedef struct deleteTestPaperReleaseInfoArg{
+    CMainMenueDlg* thiz;
+    QString acount;
+    QString testPaperName;
+}DeleteTestPaperReleaseInfoArg;
+
+void CMainMenueDlg::deleteTestPaperReleaseInfo(QString testPaperName)
+{
+   DeleteTestPaperReleaseInfoArg* arg = new DeleteTestPaperReleaseInfoArg();
+   arg->thiz = this;
+   arg->acount = this->m_acount;
+   arg->testPaperName = testPaperName;
+   HANDLE thread = (HANDLE)_beginthreadex(nullptr,0,&CMainMenueDlg::threadDeleteTestPaperReleaseInfo,arg,0,nullptr);
+   WaitForSingleObject(thread,INFINITE);
+}
+
+unsigned WINAPI CMainMenueDlg::threadDeleteTestPaperReleaseInfo(LPVOID arg)
+{
+     DeleteTestPaperReleaseInfoArg* dInfo = ( DeleteTestPaperReleaseInfoArg*)arg;
+     dInfo->thiz->m_mainMenueContorller->deleteTestPaperReleaseInfo(dInfo->acount,dInfo->testPaperName);
+     delete dInfo;
+     _endthreadex(0);
+     return 0;
+}
+
 typedef struct deleteClickBtnArg
 {
     QString acount;
@@ -3434,10 +3459,17 @@ void CMainMenueDlg::deleteClickBtn(int row)
     QString createTime = this->m_createTime.at(row)->text().trimmed();
     qDebug()<<"createTime: "<<createTime; 
 
+    QString testPaperName = this->m_testPaperName.at(row)->text().trimmed();
+    qDebug()<<"testPaperName: "<<testPaperName;
+
+
     this->deleteFromSignalChoise(createTime);
     this->deleteFromMultiChoise(createTime);
     this->deleteFromJudge(createTime);
     this->deleteFromShortAnswer(createTime);
+
+    //删除与该试卷的发布信息记录
+    this->deleteTestPaperReleaseInfo(testPaperName); //这里要等记录先删除完毕再进行往下执行删除试卷信息
 
     DeleteClickBtnArg* arg = new DeleteClickBtnArg();
     arg->thiz = this;
