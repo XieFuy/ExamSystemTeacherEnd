@@ -22,6 +22,7 @@
 #include "threadpool.h"
 #include "classsavedlg.h"
 #include "testpaperreleasedlg.h"
+#include "previewtestpaperdlg.h"
 
 namespace Ui {
 class CMainMenueDlg;  //主菜单管理页面
@@ -157,6 +158,10 @@ private:
     int m_studentManegerClassIconIndex;
     std::string m_studentManegerHeadIconPath;
     QString m_studentManegerCount;
+
+
+    //试卷预览
+    CPreviewTestPaperDlg* m_previewTestPaper = nullptr;
 private:
     void showPageIndex();//显示分页查询的下标页
     void initTableWidgetHeader(); //初始化表头
@@ -265,6 +270,9 @@ private:
     //更新试卷状态信息
     void updateTestPaperStatus(QString testPaperName);
     static unsigned WINAPI threadUpdateTestPaperStatus(LPVOID arg);
+
+    //预览点击的试卷
+    void previewTestPaper(int row);
 
     //将当前页的所有选项进行设置状态
     void changeCurPageCheckBoxStatus(bool status);

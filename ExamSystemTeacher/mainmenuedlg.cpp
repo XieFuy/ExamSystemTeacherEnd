@@ -3518,7 +3518,7 @@ void  CMainMenueDlg::bindOperatorBtns()
                          {
                              if(clickedBtn == btn)
                              {
-                                // this->updateStatusClickBtn(row);
+                                 this->previewTestPaper(row);
                                  break;
                              }
                          }
@@ -3527,6 +3527,28 @@ void  CMainMenueDlg::bindOperatorBtns()
                  });
              }
          }
+    }
+}
+
+void CMainMenueDlg::previewTestPaper(int row)
+{
+    QString testPaperName = this->m_testPaperName.at(row)->text().trimmed();
+    if(this->m_previewTestPaper == nullptr)
+    {
+        this->m_previewTestPaper = new CPreviewTestPaperDlg();
+        this->m_previewTestPaper->SetAcount(this->m_acount);
+        this->m_previewTestPaper->SetTestPaperName(testPaperName);
+        this->m_previewTestPaper->move(this->x(),this->y());
+        this->m_previewTestPaper->show();
+        this->hide();
+        QObject::connect(this->m_previewTestPaper,&CPreviewTestPaperDlg::rejected,[=](){
+            if(this->m_previewTestPaper!= nullptr)
+            {
+                delete this->m_previewTestPaper;
+                this->m_previewTestPaper = nullptr;
+                this->show();
+            }
+        });
     }
 }
 

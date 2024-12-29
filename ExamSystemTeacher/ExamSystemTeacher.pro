@@ -22,7 +22,9 @@ SOURCES += \
     mainmenuemodel.cpp \
     namechangedlg.cpp \
     phonenumberchangedlg.cpp \
+    previewtestpapercontorller.cpp \
     previewtestpaperdlg.cpp \
+    previewtestpapermodel.cpp \
     registercontorller.cpp \
     registerdlg.cpp \
     registermodel.cpp \
@@ -44,7 +46,9 @@ HEADERS += \
     mainmenuemodel.h \
     namechangedlg.h \
     phonenumberchangedlg.h \
+    previewtestpapercontorller.h \
     previewtestpaperdlg.h \
+    previewtestpapermodel.h \
     registercontorller.h \
     registerdlg.h \
     registermodel.h \

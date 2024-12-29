@@ -2,6 +2,11 @@
 #define PREVIEWTESTPAPERDLG_H
 
 #include <QDialog>
+#include <QIcon>
+#include <QList>
+#include <QPushButton>
+#include <windows.h>
+#include "previewtestpapercontorller.h"
 
 namespace Ui {
 class CPreviewTestPaperDlg;
@@ -14,7 +19,26 @@ class CPreviewTestPaperDlg : public QDialog //试卷预览对话框
 public:
     explicit CPreviewTestPaperDlg(QWidget *parent = nullptr);
     ~CPreviewTestPaperDlg();
-
+    void SetAcount(QString acount);
+    void SetTestPaperName(QString testPaperName);
+signals:
+    void startShowMenueBtn(int Count);
+    void startShowSignalChoice(QVector<QVector<QString>>* ret); //进行
+private:
+    QList<QPushButton*> m_signalChoice; //单选题题号按钮
+    CPreviewTestPaperContorller* m_contorller = nullptr;
+    QString acount;
+    QString testPaperName;
+    int signalChoiceCurIndex; //当前单选题题号
+private:
+    //获取该份试卷的单选题的总数量  根据试卷名和职工号确定
+    void getSignalChoiceCount();
+    static unsigned WINAPI threadGetSignalChoiceCount(LPVOID arg);
+    void showMenueBtn(int Count);
+    void showSignalChoice(QVector<QVector<QString>>* ret);
+    //获取当前题号的单选题的内容
+    void getCurIndexSignalChoice();
+    static unsigned WINAPI  threadGetCurIndexSignalChoice(LPVOID arg);
 private:
     Ui::CPreviewTestPaperDlg *ui;
 };

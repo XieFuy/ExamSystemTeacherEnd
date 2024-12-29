@@ -16,5 +16,10 @@
         <file>icons/upLoad.png</file>
         <file>icons/setup.png</file>
         <file>icons/dateTime.png</file>
+        <file>icons/testPaperPreview.png</file>
+        <file>icons/judge.png</file>
+        <file>icons/signalChoice.png</file>
+        <file>icons/multiChoice.png</file>
+        <file>icons/shortAnswer.png</file>
     </qresource>
 </RCC>
