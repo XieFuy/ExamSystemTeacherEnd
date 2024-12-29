@@ -24,12 +24,14 @@
 
 CDBHelper::CDBHelper()
 {
-    std::cout << "数据库工具类单例对象已生成" << std::endl;
+//    std::cout << "数据库工具类单例对象已生成" << std::endl;
+    std::cout << "database instance create!" << std::endl;
 }
 
 CDBHelper::~CDBHelper()
 {
-    std::cout << "数据库工具类单例对象已释放" << std::endl;
+//    std::cout << "数据库工具类单例对象已释放" << std::endl;
+    std::cout << "dataBase instance release!" << std::endl;
 }
 
 CDBHelper::CDBHelper(CDBHelper& dbHelper){}

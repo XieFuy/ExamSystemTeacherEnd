@@ -30,6 +30,7 @@ private:
     QString acount;
     QString testPaperName;
     int signalChoiceCurIndex; //当前单选题题号
+    int signalChoiceCount;
 private:
     //获取该份试卷的单选题的总数量  根据试卷名和职工号确定
     void getSignalChoiceCount();
@@ -39,6 +40,13 @@ private:
     //获取当前题号的单选题的内容
     void getCurIndexSignalChoice();
     static unsigned WINAPI  threadGetCurIndexSignalChoice(LPVOID arg);
+
+    //点击下一题，进行显示下一题的单选题目
+    void getNextSignalChoive();
+
+    //点击上一题，进行显示上一题的单选题目
+    void getLastSignalChoice();
+
 private:
     Ui::CPreviewTestPaperDlg *ui;
 };

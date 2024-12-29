@@ -11,6 +11,7 @@ CPreviewTestPaperDlg::CPreviewTestPaperDlg(QWidget *parent) :
     this->m_contorller = new CPreviewTestPaperContorller();
 
     this->signalChoiceCurIndex = 1;
+    this->signalChoiceCount = 0;
 
     QObject::connect(this->ui->pushButton,&QPushButton::clicked,[=](){
         this->ui->stackedWidget->setCurrentIndex(0);
@@ -90,6 +91,26 @@ CPreviewTestPaperDlg::CPreviewTestPaperDlg(QWidget *parent) :
    emit this->ui->pushButton->clicked();
 
     QObject::connect(this,&CPreviewTestPaperDlg::startShowSignalChoice,this,&CPreviewTestPaperDlg::showSignalChoice);
+
+    QObject::connect(this->ui->pushButton_6,&QPushButton::clicked,this,&CPreviewTestPaperDlg::getNextSignalChoive);
+
+    QObject::connect(this->ui->pushButton_5,&QPushButton::clicked,this,&CPreviewTestPaperDlg::getLastSignalChoice);
+}
+
+void CPreviewTestPaperDlg::getLastSignalChoice()
+{
+    if(this->signalChoiceCurIndex > 1)
+    {
+        this->signalChoiceCurIndex -= 1;
+
+        //重新显示题目
+        this->getCurIndexSignalChoice();
+
+        //更改题号
+        this->ui->pushButton_85->setText(QString::number(this->signalChoiceCurIndex));
+        //重新显示题号高光
+        emit this->m_signalChoice.at(this->signalChoiceCurIndex - 1)->clicked();
+    }
 }
 
 void CPreviewTestPaperDlg::showSignalChoice(QVector<QVector<QString>>* ret)
@@ -178,11 +199,28 @@ unsigned WINAPI CPreviewTestPaperDlg::threadGetSignalChoiceCount(LPVOID arg)
 {
     GetSignalChoiceCountArg* gInfo = (GetSignalChoiceCountArg*)arg;
     int signalCount =  gInfo->thiz->m_contorller->getSignalChoiceCount(gInfo->acount,gInfo->testPaperName);
+    gInfo->thiz->signalChoiceCount = signalCount;
     //显示对应的按钮数量
     emit gInfo->thiz->startShowMenueBtn(signalCount);
     delete gInfo;
     _endthreadex(0);
     return 0;
+}
+
+void CPreviewTestPaperDlg::getNextSignalChoive()
+{
+    if(this->signalChoiceCurIndex < this->signalChoiceCount)
+    {
+        this->signalChoiceCurIndex += 1;
+
+        //重新显示题目
+        this->getCurIndexSignalChoice();
+
+        //更改题号
+        this->ui->pushButton_85->setText(QString::number(this->signalChoiceCurIndex));
+        //重新显示题号高光
+        emit this->m_signalChoice.at(this->signalChoiceCurIndex - 1)->clicked();
+    }
 }
 
 void CPreviewTestPaperDlg::showMenueBtn(int Count)
