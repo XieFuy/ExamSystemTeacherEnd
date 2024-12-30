@@ -5,6 +5,16 @@ CPreviewTestPaperContorller::CPreviewTestPaperContorller()
    this->m_model = new CPreviewTestPaperModel();
 }
 
+int CPreviewTestPaperContorller::getMultiChoiceCount(QString acount,QString testPaperName)
+{
+    QByteArray acountArr = acount.toLocal8Bit();
+    QByteArray testPaperNameArr = testPaperName.toLocal8Bit();
+
+    const char* pAcount = acountArr.data();
+    const char* pTestPaperName = testPaperNameArr.data();
+    return this->m_model->getMultiChoiceCount(pAcount,pTestPaperName);
+}
+
 CPreviewTestPaperContorller::~CPreviewTestPaperContorller()
 {
     if(this->m_model != nullptr)

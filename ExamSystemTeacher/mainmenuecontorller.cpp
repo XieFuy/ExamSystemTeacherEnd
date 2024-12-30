@@ -5,6 +5,8 @@ CMainMenueContorller::CMainMenueContorller()
  this->m_mainMenueModel = new CMainMenueModel();
 }
 
+
+
 bool CMainMenueContorller::deleteTestPaperReleaseInfo(QString acount,QString testPaperName)
 {
     QByteArray acountArr = acount.toLocal8Bit();

@@ -14,6 +14,7 @@ public:
     std::vector<std::vector<std::string>> getCurIndexSignalChoice(QString acount
                                                                   ,QString testPaperName
                                                                   ,int curIndex);
+    int getMultiChoiceCount(QString acount,QString testPaperName);
 private:
      CPreviewTestPaperModel* m_model = nullptr;
 };

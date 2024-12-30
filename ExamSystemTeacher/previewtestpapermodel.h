@@ -12,6 +12,7 @@ public:
     int getSignalChoiceCount(const char* acount,const char* testPaperName);
     std::vector<std::vector<std::string>> getCurIndexSignalChoice(const char* acount
                                                                   ,const char* testPaperName,int curIndex);
+    int getMultiChoiceCount(const char* acount,const char* testPaperName);
 };
 
 #endif // CPREVIEWTESTPAPERMODEL_H
