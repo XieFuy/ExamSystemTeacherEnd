@@ -11,6 +11,7 @@ CPreviewTestPaperDlg::CPreviewTestPaperDlg(QWidget *parent) :
     this->m_contorller = new CPreviewTestPaperContorller();
 
     this->signalChoiceCurIndex = 1;
+    this->multiChoiceCurIndex = 1;
     this->signalChoiceCount = 0;
     this->multiChoiceCount = 0;
     QObject::connect(this->ui->pushButton,&QPushButton::clicked,[=](){
@@ -29,6 +30,7 @@ CPreviewTestPaperDlg::CPreviewTestPaperDlg(QWidget *parent) :
         this->ui->pushButton_3->setStyleSheet("QPushButton{border:none;background-color:#0082EB;color:#FFFFFF;}QPushButton:hover{background-color:#2998F5;}");
         this->ui->pushButton_4->setStyleSheet("QPushButton{border:none;background-color:#0082EB;color:#FFFFFF;}QPushButton:hover{background-color:#2998F5;}");
         this->getMultiChoiceCount();
+        this->getCurIndexMultiChoice();
     });
 
     QObject::connect(this->ui->pushButton_3,&QPushButton::clicked,[=](){
@@ -140,6 +142,51 @@ CPreviewTestPaperDlg::CPreviewTestPaperDlg(QWidget *parent) :
     QObject::connect(this->ui->pushButton_5,&QPushButton::clicked,this,&CPreviewTestPaperDlg::getLastSignalChoice);
 
     QObject::connect(this,&CPreviewTestPaperDlg::startShowMultiMenueBtn,this,&CPreviewTestPaperDlg::showMultiMenueBtn);
+
+    QObject::connect(this,&CPreviewTestPaperDlg::startShowMultiChoice,this,&CPreviewTestPaperDlg::showMultiChoice);
+}
+
+typedef struct getCurIndexMultiChoiceArg{
+    CPreviewTestPaperDlg* thiz;
+    QString acount;
+    QString testPaperName;
+    int curIndex;
+}GetCurIndexMultiChoiceArg;
+
+void CPreviewTestPaperDlg::getCurIndexMultiChoice()
+{
+    GetCurIndexMultiChoiceArg* arg = new GetCurIndexMultiChoiceArg();
+    arg->acount = this->acount;
+    arg->testPaperName = this->testPaperName;
+    arg->curIndex = this->multiChoiceCurIndex;
+    arg->thiz = this;
+    _beginthreadex(nullptr,0,&CPreviewTestPaperDlg::threadGetCurIndexMultiChoice,arg,0,nullptr);
+}
+
+unsigned WINAPI CPreviewTestPaperDlg::threadGetCurIndexMultiChoice(LPVOID arg)
+{
+    GetCurIndexMultiChoiceArg* gInfo = (GetCurIndexMultiChoiceArg*)arg;
+    std::vector<std::vector<std::string>> ret =  gInfo->thiz->m_contorller->getCurIndexMultiChoice(gInfo->acount
+                                                                                                   ,gInfo->testPaperName
+                                                                                                   ,gInfo->curIndex);
+
+    QVector<QVector<QString>>* result = new QVector<QVector<QString>>();
+    for(int i = 0 ; i < ret.size();i++)
+    {
+        QVector<QString> temp;
+        for(int j = 0 ; j < ret.at(i).size();j++)
+        {
+            QString str = QString::fromLocal8Bit(ret.at(i).at(j).c_str());
+            temp.push_back(str);
+        }
+        result->push_back(temp);
+    }
+
+    emit gInfo->thiz->startShowMultiChoice(result);
+    delete gInfo;
+    _endthreadex(0);
+    return 0;
+
 }
 
 void CPreviewTestPaperDlg::showMultiMenueBtn(int Count)
@@ -193,6 +240,39 @@ void CPreviewTestPaperDlg::getLastSignalChoice()
         //重新显示题号高光
         emit this->m_signalChoice.at(this->signalChoiceCurIndex - 1)->clicked();
     }
+}
+
+void CPreviewTestPaperDlg::showMultiChoice(QVector<QVector<QString>>* ret)
+{
+    if(ret == nullptr)
+    {
+        return ;
+    }
+    //显示题干
+
+    this->ui->label_11->setText(ret->at(0).at(0));
+
+    //显示A选项
+    this->ui->checkBox->setText(ret->at(0).at(1));
+
+    //显示B选项
+    this->ui->checkBox_2->setText(ret->at(0).at(2));
+
+    //显示C选项
+    this->ui->checkBox_3->setText(ret->at(0).at(3));
+
+    //显示D选项
+    this->ui->checkBox_4->setText(ret->at(0).at(4));
+
+    //显示E选项
+    this->ui->checkBox_5->setText(ret->at(0).at(5));
+
+    //显示F选项
+    this->ui->checkBox_6->setText(ret->at(0).at(6));
+
+    //显示正确答案
+    this->ui->label_19->setText(ret->at(0).at(7));
+    delete ret;
 }
 
 void CPreviewTestPaperDlg::showSignalChoice(QVector<QVector<QString>>* ret)

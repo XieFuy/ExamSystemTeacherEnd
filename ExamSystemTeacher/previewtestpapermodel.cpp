@@ -10,6 +10,28 @@ CPreviewTestPaperModel::~CPreviewTestPaperModel()
 
 }
 
+std::vector<std::vector<std::string>> CPreviewTestPaperModel::getCurIndexMultiChoice(const char* acount
+                                                             ,const char* testPaperName
+                                                             ,int curIndex)
+{
+    if(acount == nullptr || testPaperName == nullptr)
+    {
+        return std::vector<std::vector<std::string>>();
+    }
+    std::shared_ptr<CDBHelper> dbHelper = std::make_shared<CDBHelper>();
+    char* sqlBuf = new char[1024000];
+    memset(sqlBuf,'\0',sizeof(char) * 1024000);
+    std::string sql;
+    sprintf(sqlBuf,"select `question`,`sessionA`,`sessionB`,`sessionC`,`sessionD`,`sessionE`,`sessionF`,`correctOptions` from `multiChoice`\n\
+where `testPaperId` in( SELECT DISTINCT `testPaperId` \n\
+FROM `testPaperInfo` \n\
+WHERE `teacherId` = '%s' AND `testPaperName` = '%s') order by `order` limit 1 offset %d;",acount,testPaperName,(curIndex - 1));
+    sql = sqlBuf;
+    std::vector<std::vector<std::string>> ret =  dbHelper->sqlQuery(sql,"ExamSystem");
+    delete[] sqlBuf;
+    return ret;
+}
+
 int CPreviewTestPaperModel::getMultiChoiceCount(const char* acount,const char* testPaperName)
 {
     if(acount == nullptr || testPaperName == nullptr)

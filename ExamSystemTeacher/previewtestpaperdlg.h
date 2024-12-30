@@ -26,7 +26,6 @@ signals:
     void startShowMultiMenueBtn(int Count);
     void startShowSignalChoice(QVector<QVector<QString>>* ret); //进行
     void startShowMultiChoice(QVector<QVector<QString>>* ret);
-
 private:
     QList<QPushButton*> m_signalChoice; //单选题题号按钮
     QList<QPushButton*> m_multiChoice; //多选题题号按钮
@@ -34,6 +33,7 @@ private:
     QString acount;
     QString testPaperName;
     int signalChoiceCurIndex; //当前单选题题号
+    int multiChoiceCurIndex; //当前多选题题号
     int signalChoiceCount;
     int multiChoiceCount;
 private:
@@ -55,6 +55,11 @@ private:
     //获取当前题号的单选题的内容
     void getCurIndexSignalChoice();
     static unsigned WINAPI  threadGetCurIndexSignalChoice(LPVOID arg);
+
+    //获取当前多选题的内容
+    void getCurIndexMultiChoice();
+    static unsigned WINAPI threadGetCurIndexMultiChoice(LPVOID arg);
+
 
     //点击下一题，进行显示下一题的单选题目
     void getNextSignalChoive();
