@@ -22,6 +22,10 @@ public:
     std::vector<std::vector<std::string>> getCurIndexJudegChoice(QString acount
                                                                  ,QString testPaperName
                                                                  ,int curIndex);
+    int getShortAnswerCount(QString acount,QString testPaperName);
+    std::vector<std::vector<std::string>> getCurIndexShortAnswerChoice(QString acount
+                                                                       ,QString testPaperName
+                                                                       ,int curIndex);
 private:
      CPreviewTestPaperModel* m_model = nullptr;
 };

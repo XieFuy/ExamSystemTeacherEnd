@@ -5,6 +5,29 @@ CPreviewTestPaperContorller::CPreviewTestPaperContorller()
    this->m_model = new CPreviewTestPaperModel();
 }
 
+std::vector<std::vector<std::string>> CPreviewTestPaperContorller::getCurIndexShortAnswerChoice(QString acount
+                                                                   ,QString testPaperName
+                                                                   ,int curIndex)
+{
+    QByteArray acountArr = acount.toLocal8Bit();
+    QByteArray testPaperNameArr = testPaperName.toLocal8Bit();
+
+    const char* pAcount = acountArr.data();
+    const char* pTestPaperName = testPaperNameArr.data();
+
+    return this->m_model->getCurIndexShortAnswerChoice(pAcount,pTestPaperName,curIndex);
+}
+
+int CPreviewTestPaperContorller::getShortAnswerCount(QString acount,QString testPaperName)
+{
+    QByteArray acountArr = acount.toLocal8Bit();
+    QByteArray testPaperNameArr = testPaperName.toLocal8Bit();
+
+    const char* pAcount = acountArr.data();
+    const char* pTestPaperName = testPaperNameArr.data();
+    return this->m_model->getShortAnswerCount(pAcount,pTestPaperName);
+}
+
 std::vector<std::vector<std::string>> CPreviewTestPaperContorller::getCurIndexJudegChoice(QString acount
                                                              ,QString testPaperName
                                                              ,int curIndex)

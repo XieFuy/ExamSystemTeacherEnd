@@ -10,6 +10,50 @@ CPreviewTestPaperModel::~CPreviewTestPaperModel()
 
 }
 
+std::vector<std::vector<std::string>> CPreviewTestPaperModel::getCurIndexShortAnswerChoice(const char* acount
+                                                                   ,const char* testPaperName
+                                                                   ,int curIndex)
+{
+    if(acount == nullptr || testPaperName == nullptr)
+    {
+        return std::vector<std::vector<std::string>>();
+    }
+    std::shared_ptr<CDBHelper> dbHelper = std::make_shared<CDBHelper>();
+    char* sqlBuf = new char[1024000];
+    memset(sqlBuf,'\0',sizeof(char) * 1024000);
+    std::string sql;
+    sprintf(sqlBuf,"select `question`,`referenceAnswer` from `shortAnswer`\n\
+where `testPaperId` in( SELECT DISTINCT `testPaperId` \n\
+FROM `testPaperInfo` \n\
+WHERE `teacherId` = '%s' AND `testPaperName` = '%s') order by `order` limit 1 offset %d;",acount,testPaperName,(curIndex - 1));
+    sql = sqlBuf;
+    std::vector<std::vector<std::string>> ret =  dbHelper->sqlQuery(sql,"ExamSystem");
+    delete[] sqlBuf;
+    return ret;
+}
+
+int CPreviewTestPaperModel::getShortAnswerCount(const char* acount,const char* testPaperName)
+{
+    if(acount == nullptr || testPaperName == nullptr)
+    {
+        return -1;
+    }
+    std::shared_ptr<CDBHelper> dbHelper = std::make_shared<CDBHelper>();
+    char* sqlBuf = new char[1024000];
+    memset(sqlBuf,'\0',sizeof(char) * 1024000);
+    std::string sql;
+    sprintf(sqlBuf,"SELECT COUNT(*) \n\
+FROM `shortAnswer` \n\
+WHERE `testPaperId` IN (\n\
+SELECT DISTINCT `testPaperId` \n\
+FROM `testPaperInfo` \n\
+WHERE `teacherId` = '%s' AND `testPaperName` = '%s');",acount,testPaperName);
+    sql = sqlBuf;
+    int ret =  dbHelper->sqlQueryCount(sql,"ExamSystem");
+    delete[] sqlBuf;
+    return ret;
+}
+
 std::vector<std::vector<std::string>> CPreviewTestPaperModel::getCurIndexJudegChoice(const char* acount
                                                              ,const char* testPaperName
                                                              ,int curIndex)

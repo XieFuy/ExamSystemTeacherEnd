@@ -20,6 +20,10 @@ public:
     std::vector<std::vector<std::string>> getCurIndexJudegChoice(const char* acount
                                                                  ,const char* testPaperName
                                                                  ,int curIndex);
+    int getShortAnswerCount(const char* acount,const char* testPaperName);
+    std::vector<std::vector<std::string>> getCurIndexShortAnswerChoice(const char* acount
+                                                                       ,const char* testPaperName
+                                                                       ,int curIndex);
 };
 
 #endif // CPREVIEWTESTPAPERMODEL_H
