@@ -18,6 +18,10 @@ public:
     std::vector<std::vector<std::string>> getCurIndexMultiChoice(QString acount
                                                                  ,QString testPaperName
                                                                  ,int curIndex);
+    int getJudgeChoiceCount(QString acount,QString testPaperName);
+    std::vector<std::vector<std::string>> getCurIndexJudegChoice(QString acount
+                                                                 ,QString testPaperName
+                                                                 ,int curIndex);
 private:
      CPreviewTestPaperModel* m_model = nullptr;
 };

@@ -12,8 +12,11 @@ CPreviewTestPaperDlg::CPreviewTestPaperDlg(QWidget *parent) :
 
     this->signalChoiceCurIndex = 1;
     this->multiChoiceCurIndex = 1;
+    this->judgeChoiceCurIndex = 1;
     this->signalChoiceCount = 0;
     this->multiChoiceCount = 0;
+    this->judegChoiceCount  = 0;
+
     QObject::connect(this->ui->pushButton,&QPushButton::clicked,[=](){
         this->ui->stackedWidget->setCurrentIndex(0);
         this->ui->pushButton->setStyleSheet("QPushButton{border:none;color:#FFFFFF;  background-color:#f7115b;}");
@@ -39,6 +42,8 @@ CPreviewTestPaperDlg::CPreviewTestPaperDlg(QWidget *parent) :
         this->ui->pushButton->setStyleSheet("QPushButton{border:none;background-color:#0082EB;color:#FFFFFF;}QPushButton:hover{background-color:#2998F5;}");
         this->ui->pushButton_2->setStyleSheet("QPushButton{border:none;background-color:#0082EB;color:#FFFFFF;}QPushButton:hover{background-color:#2998F5;}");
         this->ui->pushButton_4->setStyleSheet("QPushButton{border:none;background-color:#0082EB;color:#FFFFFF;}QPushButton:hover{background-color:#2998F5;}");
+        this->getJudgeChoiceCount();
+        this->getCurIndexJudegChoice();
     });
 
     QObject::connect(this->ui->pushButton_4,&QPushButton::clicked,[=](){
@@ -67,6 +72,17 @@ CPreviewTestPaperDlg::CPreviewTestPaperDlg(QWidget *parent) :
        this->m_multiChoice.push_back(btn);  //这些按钮 不需要我们去释放，UI文件自动管理
     }
 
+    //将UI中的判断题题号按钮都加入到容器中
+    for(int i = 170;i <= 247 ; i++)
+    {
+        QString strName = "pushButton_";
+        strName += QString::number(i);
+        QPushButton* btn =  this->findChild<QPushButton*>(strName);
+        this->m_judgeChoice.push_back(btn);  //这些按钮 不需要我们去释放，UI文件自动管理
+    }
+
+
+
     int i = 1;
     //给每一个按钮进行设置样式
     for(QPushButton* btn: this->m_signalChoice)
@@ -79,6 +95,15 @@ CPreviewTestPaperDlg::CPreviewTestPaperDlg(QWidget *parent) :
     //给多选题的每一个按钮进行设置样式
     i = 1;
     for(QPushButton* btn: this->m_multiChoice)
+    {
+        btn->setText(QString::number(i++));
+        btn->setFont(QFont("黑体",12));
+        btn->setStyleSheet("QPushButton{border:none;border:2px solid black;border-radius:25;}");
+    }
+
+    //给判断题的每一个按钮进行设置样式
+    i = 1;
+    for(QPushButton* btn: this->m_judgeChoice)
     {
         btn->setText(QString::number(i++));
         btn->setFont(QFont("黑体",12));
@@ -118,6 +143,22 @@ CPreviewTestPaperDlg::CPreviewTestPaperDlg(QWidget *parent) :
         });
     }
 
+    //判断题题号进行信号槽绑定，实现单击只有一个题号是绿色
+    for(QPushButton* btn : this->m_judgeChoice)
+    {
+        QObject::connect(btn,&QPushButton::clicked,[=](){
+            //被点击的按钮设置为绿色，其他的所有按钮恢复原来的状态
+            btn->setStyleSheet("QPushButton{border:none;border:2px solid black;border-radius:25;background-color:green;}");
+            for(QPushButton* btn2 : this->m_judgeChoice)
+            {
+                if(btn2 != btn)
+                {
+                    btn2->setStyleSheet("QPushButton{border:none;border:2px solid black;border-radius:25;}");
+                }
+            }
+        });
+    }
+
 
     //一开始将全部的按钮进行隐藏
     for(QPushButton* btn : this->m_signalChoice)
@@ -127,6 +168,12 @@ CPreviewTestPaperDlg::CPreviewTestPaperDlg(QWidget *parent) :
 
     //将多选题号按钮进行隐藏
     for(QPushButton* btn : this->m_multiChoice)
+    {
+       btn->setVisible(false);
+    }
+
+    //将判断题号按钮进行隐藏
+    for(QPushButton* btn : this->m_judgeChoice)
     {
        btn->setVisible(false);
     }
@@ -144,6 +191,188 @@ CPreviewTestPaperDlg::CPreviewTestPaperDlg(QWidget *parent) :
     QObject::connect(this,&CPreviewTestPaperDlg::startShowMultiMenueBtn,this,&CPreviewTestPaperDlg::showMultiMenueBtn);
 
     QObject::connect(this,&CPreviewTestPaperDlg::startShowMultiChoice,this,&CPreviewTestPaperDlg::showMultiChoice);
+
+    QObject::connect(this->ui->pushButton_88,&QPushButton::clicked,this,&CPreviewTestPaperDlg::getNextMultiChoic);
+
+    QObject::connect(this->ui->pushButton_87,&QPushButton::clicked,this,&CPreviewTestPaperDlg::getLastMultiChoic);
+
+    QObject::connect(this,&CPreviewTestPaperDlg::startShowJudegMenueBtn,this,&CPreviewTestPaperDlg::showJudegMenueBtn);
+
+    QObject::connect(this,&CPreviewTestPaperDlg::startShowJudgeChoice,this,&CPreviewTestPaperDlg::showJudgeChoice);
+
+    QObject::connect(this->ui->pushButton_169,&QPushButton::clicked,this,&CPreviewTestPaperDlg::getNextJudgeChoice);
+
+    QObject::connect(this->ui->pushButton_168,&QPushButton::clicked,this,&CPreviewTestPaperDlg::getLastJudgeChoice);
+}
+
+void CPreviewTestPaperDlg::getLastJudgeChoice()
+{
+    if(this->judgeChoiceCurIndex > 1)
+    {
+        this->judgeChoiceCurIndex -= 1;
+
+        //重新显示题目
+        this->getCurIndexJudegChoice();
+
+        //更改题号
+        this->ui->pushButton_167->setText(QString::number(this->judgeChoiceCurIndex));
+        //重新显示题号高光
+        emit this->m_judgeChoice.at(this->judgeChoiceCurIndex - 1)->clicked();
+    }
+}
+
+void CPreviewTestPaperDlg::getNextJudgeChoice()
+{
+    if(this->judgeChoiceCurIndex < this->judegChoiceCount)
+    {
+        this->judgeChoiceCurIndex += 1;
+
+        //重新显示题目
+        this->getCurIndexJudegChoice();
+
+        //更改题号
+        this->ui->pushButton_167->setText(QString::number(this->judgeChoiceCurIndex));
+        //重新显示题号高光
+        emit this->m_judgeChoice.at(this->judgeChoiceCurIndex - 1)->clicked();
+    }
+}
+
+void CPreviewTestPaperDlg::showJudgeChoice(QVector<QVector<QString>>* ret)
+{
+    if(ret == nullptr)
+    {
+        return ;
+    }
+    //显示题干
+
+    this->ui->label_20->setText(ret->at(0).at(0));
+
+    //显示A选项
+    this->ui->radioButton_5->setText(ret->at(0).at(1));
+
+    //显示B选项
+    this->ui->radioButton_6->setText(ret->at(0).at(2));
+
+    //显示正确答案
+    this->ui->label_22->setText(ret->at(0).at(3));
+    delete ret;
+}
+
+typedef struct getCurIndexJudegChoiceArg{
+    CPreviewTestPaperDlg* thiz;
+    QString acount;
+    QString testPaperName;
+    int curIndex;
+}GetCurIndexJudegChoiceArg;
+
+void CPreviewTestPaperDlg::getCurIndexJudegChoice()
+{
+    GetCurIndexJudegChoiceArg* arg = new GetCurIndexJudegChoiceArg();
+    arg->acount = this->acount;
+    arg->testPaperName = this->testPaperName;
+    arg->curIndex = this->judgeChoiceCurIndex;
+    arg->thiz = this;
+    _beginthreadex(nullptr,0,&CPreviewTestPaperDlg::threadGetCurIndexJudegChoice,arg,0,nullptr);
+}
+
+unsigned WINAPI CPreviewTestPaperDlg::threadGetCurIndexJudegChoice(LPVOID arg)
+{
+    GetCurIndexJudegChoiceArg* gInfo = (GetCurIndexJudegChoiceArg*)arg;
+    std::vector<std::vector<std::string>> ret =  gInfo->thiz->m_contorller->getCurIndexJudegChoice(gInfo->acount
+                                                                                                   ,gInfo->testPaperName
+                                                                                                   ,gInfo->curIndex);
+
+    QVector<QVector<QString>>* result = new QVector<QVector<QString>>();
+    for(int i = 0 ; i < ret.size();i++)
+    {
+        QVector<QString> temp;
+        for(int j = 0 ; j < ret.at(i).size();j++)
+        {
+            QString str = QString::fromLocal8Bit(ret.at(i).at(j).c_str());
+            if(str == "1")
+            {
+                str = "对";
+            }else if(str == "0")
+            {
+                str = "错";
+            }
+            temp.push_back(str);
+        }
+        result->push_back(temp);
+    }
+
+    emit gInfo->thiz->startShowJudgeChoice(result);
+    delete gInfo;
+    _endthreadex(0);
+    return 0;
+}
+
+void CPreviewTestPaperDlg::showJudegMenueBtn(int Count)
+{
+    for(int i = 0 ; i < Count;i++)
+    {
+        this->m_judgeChoice.at(i)->setVisible(true);
+    }
+}
+
+typedef struct getJudgeChoiceCountArg{
+    QString acount;
+    QString testPaperName;
+    CPreviewTestPaperDlg* thiz;
+}GetJudgeChoiceCountArg;
+
+void CPreviewTestPaperDlg::getJudgeChoiceCount()
+{
+    //确保对象的属性已经赋值
+    GetJudgeChoiceCountArg* arg = new GetJudgeChoiceCountArg();
+    arg->acount = this->acount;
+    arg->testPaperName = this->testPaperName;
+    arg->thiz = this;
+    _beginthreadex(nullptr,0,&CPreviewTestPaperDlg::threadGetJudgeChoiceCount,arg,0,nullptr);
+}
+
+unsigned WINAPI CPreviewTestPaperDlg::threadGetJudgeChoiceCount(LPVOID arg)
+{
+    GetJudgeChoiceCountArg* gInfo = (GetJudgeChoiceCountArg*)arg;
+    int judgeCount =  gInfo->thiz->m_contorller->getJudgeChoiceCount(gInfo->acount,gInfo->testPaperName);
+    gInfo->thiz->judegChoiceCount = judgeCount;
+    //显示对应的按钮数量
+    emit gInfo->thiz->startShowJudegMenueBtn(judgeCount);
+    delete gInfo;
+    _endthreadex(0);
+    return 0;
+}
+
+void CPreviewTestPaperDlg::getLastMultiChoic()
+{
+    if(this->multiChoiceCurIndex > 1)
+    {
+        this->multiChoiceCurIndex -= 1;
+
+        //重新显示题目
+        this->getCurIndexMultiChoice();
+
+        //更改题号
+        this->ui->pushButton_86->setText(QString::number(this->multiChoiceCurIndex));
+        //重新显示题号高光
+        emit this->m_multiChoice.at(this->multiChoiceCurIndex - 1)->clicked();
+    }
+}
+
+void CPreviewTestPaperDlg::getNextMultiChoic()
+{
+    if(this->multiChoiceCurIndex < this->multiChoiceCount)
+    {
+        this->multiChoiceCurIndex += 1;
+
+        //重新显示题目
+        this->getCurIndexMultiChoice();
+
+        //更改题号
+        this->ui->pushButton_86->setText(QString::number(this->multiChoiceCurIndex));
+        //重新显示题号高光
+        emit this->m_multiChoice.at(this->multiChoiceCurIndex - 1)->clicked();
+    }
 }
 
 typedef struct getCurIndexMultiChoiceArg{
@@ -186,7 +415,6 @@ unsigned WINAPI CPreviewTestPaperDlg::threadGetCurIndexMultiChoice(LPVOID arg)
     delete gInfo;
     _endthreadex(0);
     return 0;
-
 }
 
 void CPreviewTestPaperDlg::showMultiMenueBtn(int Count)
@@ -216,7 +444,6 @@ void CPreviewTestPaperDlg::getMultiChoiceCount()
 unsigned WINAPI CPreviewTestPaperDlg::threadGetMultiChoiceCount(LPVOID arg)
 {
     GetMultiChoiceCountArg* gInfo = ( GetMultiChoiceCountArg*)arg;
-    gInfo->thiz->m_contorller->getMultiChoiceCount(gInfo->acount,gInfo->testPaperName);
     int multiCount =  gInfo->thiz->m_contorller->getMultiChoiceCount(gInfo->acount,gInfo->testPaperName);
     gInfo->thiz->multiChoiceCount = multiCount;
     //    //显示对应的按钮数量
