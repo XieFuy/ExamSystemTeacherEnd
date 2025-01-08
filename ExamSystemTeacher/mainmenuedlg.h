@@ -539,6 +539,7 @@ private:
     void initDataBaseTestPaperReleaseTable();
     static unsigned WINAPI threadInitDataBaseTestPaperReleaseTable(LPVOID arg);
 
+
 private:
     Ui::CMainMenueDlg *ui;
 };

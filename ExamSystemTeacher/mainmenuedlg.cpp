@@ -672,6 +672,7 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
     this->initDataBaseTestPaperReleaseTable();
 }
 
+
 void CMainMenueDlg::initDataBaseTestPaperReleaseTable()
 {
     _beginthreadex(nullptr,0,&CMainMenueDlg::threadInitDataBaseTestPaperReleaseTable,this,0,nullptr);
@@ -3381,16 +3382,20 @@ void CMainMenueDlg::updateStatusClickBtn(int row)
         this->m_testPaperReleaseDlg->SetAcount(this->m_acount);
         this->m_testPaperReleaseDlg->SetTestPaperName(testPaperName);
         this->m_testPaperReleaseDlg->move((this->width() - this->m_testPaperReleaseDlg->width()) / 2 ,(this->height() - this->m_testPaperReleaseDlg->height()) / 2);
-        this->m_testPaperReleaseDlg->exec(); //线程会在此进行阻塞
+        int ret =  this->m_testPaperReleaseDlg->exec(); //线程会在此进行阻塞
         if(this->m_testPaperReleaseDlg != nullptr)
         {
             delete this->m_testPaperReleaseDlg;
             this->m_testPaperReleaseDlg = nullptr;
         }
 
-        //执行更新发布的试卷信息的状态，并且重新回显全部数据
-        this->curPageIndex = 1;
-        this->updateTestPaperStatus(testPaperName);
+        //点击的是确认的时候才进行更新
+        if(ret == QDialog::Accepted)
+        {
+            //执行更新发布的试卷信息的状态，并且重新回显全部数据
+            this->curPageIndex = 1;
+            this->updateTestPaperStatus(testPaperName);
+        }
     }
 }
 

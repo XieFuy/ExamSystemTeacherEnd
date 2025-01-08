@@ -77,7 +77,7 @@ typedef struct addTestPaperReleaseInfoArg{
     CTestPaperReleaseDlg* thiz;
 }AddTestPaperReleaseInfoArg;
 
-void CTestPaperReleaseDlg::addTestPaperReleaseInfo()
+void CTestPaperReleaseDlg::addTestPaperReleaseInfo()  //发布执行accept
 {
     AddTestPaperReleaseInfoArg* arg = new AddTestPaperReleaseInfoArg();
     arg->thiz = this;
@@ -91,7 +91,8 @@ void CTestPaperReleaseDlg::addTestPaperReleaseInfo()
     arg->acount = this->acount;
     HANDLE thread = (HANDLE)_beginthreadex(nullptr,0,&CTestPaperReleaseDlg::threadAddTestPaperReleaseInfo,arg,0,nullptr);
     WaitForSingleObject(thread,INFINITE);
-    this->reject();
+//    this->reject();
+    this->accept();
 }
 
 unsigned WINAPI CTestPaperReleaseDlg::threadAddTestPaperReleaseInfo(LPVOID arg)
