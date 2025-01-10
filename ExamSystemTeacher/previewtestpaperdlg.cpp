@@ -420,7 +420,7 @@ void CPreviewTestPaperDlg::showJudgeChoice(QVector<QVector<QString>>* ret)
     }
     //显示题干
 
-    this->ui->label_20->setText(ret->at(0).at(0));
+    this->ui->textEdit_5->setText(ret->at(0).at(0));
 
     //显示A选项
     this->ui->radioButton_5->setText(ret->at(0).at(1));
@@ -652,7 +652,7 @@ void CPreviewTestPaperDlg::showMultiChoice(QVector<QVector<QString>>* ret)
     }
     //显示题干
 
-    this->ui->label_11->setText(ret->at(0).at(0));
+    this->ui->textEdit_4->setText(ret->at(0).at(0));
 
     //显示A选项
     this->ui->checkBox->setText(ret->at(0).at(1));
@@ -683,9 +683,11 @@ void CPreviewTestPaperDlg::showSignalChoice(QVector<QVector<QString>>* ret)
     {
         return ;
     }
+    //设置题干自适应
+//    this->showTestPaperSingalEnable();
     //显示题干
 
-    this->ui->label->setText(ret->at(0).at(0));
+    this->ui->textEdit_3->setText(ret->at(0).at(0));
 
     //显示A选项
     this->ui->radioButton->setText(ret->at(0).at(1));

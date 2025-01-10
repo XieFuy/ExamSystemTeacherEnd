@@ -57,7 +57,7 @@ bool CMainMenueModel::initDataBaseTestPaperReleaseTable()
 `id` integer primary key auto_increment,\n\
 `teacherId` varchar(20)  not null,\n\
 foreign key(`teacherId`) references `Teacher`(`teacherId`),\n\
-`classId` integer unique,\n\
+`classId` integer not null,\n\
 foreign key(`classId`) references `class`(`id`),\n\
 `testPaperId` integer unique,\n\
 foreign key(`testPaperId`) references `testPaperInfo`(`testPaperId`),\n\

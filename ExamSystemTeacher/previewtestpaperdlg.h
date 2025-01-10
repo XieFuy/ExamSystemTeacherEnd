@@ -7,6 +7,7 @@
 #include <QPushButton>
 #include <windows.h>
 #include "previewtestpapercontorller.h"
+#include <QDebug>
 
 namespace Ui {
 class CPreviewTestPaperDlg;
