@@ -419,8 +419,9 @@ void CPreviewTestPaperDlg::showJudgeChoice(QVector<QVector<QString>>* ret)
         return ;
     }
     //显示题干
-
-    this->ui->textEdit_5->setText(ret->at(0).at(0));
+    this->ui->label_3->setText(ret->at(0).at(0));
+    this->ui->verticalLayoutWidget_3->adjustSize();
+    this->DynemicShowJudgeChoice();
 
     //显示A选项
     this->ui->radioButton_5->setText(ret->at(0).at(1));
@@ -652,8 +653,9 @@ void CPreviewTestPaperDlg::showMultiChoice(QVector<QVector<QString>>* ret)
     }
     //显示题干
 
-    this->ui->textEdit_4->setText(ret->at(0).at(0));
-
+    this->ui->label_2->setText(ret->at(0).at(0));
+    this->ui->verticalLayoutWidget_2->adjustSize();
+    this->DynemicShowMultiChoice();
     //显示A选项
     this->ui->checkBox->setText(ret->at(0).at(1));
 
@@ -677,18 +679,58 @@ void CPreviewTestPaperDlg::showMultiChoice(QVector<QVector<QString>>* ret)
     delete ret;
 }
 
+void  CPreviewTestPaperDlg::DynemicShowSignalChoice()
+{
+    //进行设置第一个选项的位置
+    this->ui->radioButton->move(this->ui->verticalLayoutWidget->x(),this->ui->verticalLayoutWidget->height() + this->ui->verticalLayoutWidget->y() + 10);
+    this->ui->label_7->move(this->ui->radioButton->x() - 50,this->ui->radioButton->y());
+    this->ui->radioButton_2->move(this->ui->radioButton->x(),this->ui->radioButton->y() + this->ui->radioButton->height() + 10);
+    this->ui->label_8->move(this->ui->radioButton_2->x() - 50,this->ui->radioButton_2->y());
+    this->ui->radioButton_3->move(this->ui->radioButton_2->x(),this->ui->radioButton_2->y() + this->ui->radioButton_2->height() + 10);
+    this->ui->label_9->move(this->ui->radioButton_3->x() - 50,this->ui->radioButton_3->y());
+    this->ui->radioButton_4->move(this->ui->radioButton_3->x(),this->ui->radioButton_3->y() + this->ui->radioButton_3->height() + 10);
+    this->ui->label_10->move(this->ui->radioButton_4->x() - 50,this->ui->radioButton_4->y());
+}
+
+void CPreviewTestPaperDlg::DynemicShowMultiChoice()
+{
+    //进行设置第一个选项的位置
+    this->ui->checkBox->move(this->ui->verticalLayoutWidget_2->x(),this->ui->verticalLayoutWidget_2->height() + this->ui->verticalLayoutWidget_2->y() + 10);
+    this->ui->label_12->move(this->ui->checkBox->x() - 50,this->ui->checkBox->y());
+    this->ui->checkBox_2->move(this->ui->checkBox->x(),this->ui->checkBox->y() + this->ui->checkBox->height() + 1);
+    this->ui->label_13->move(this->ui->checkBox_2->x() - 50,this->ui->checkBox_2->y());
+    this->ui->checkBox_3->move(this->ui->checkBox_2->x(),this->ui->checkBox_2->y() + this->ui->checkBox_2->height() + 1);
+    this->ui->label_14->move(this->ui->checkBox_3->x() - 50,this->ui->checkBox_3->y());
+    this->ui->checkBox_4->move(this->ui->checkBox_3->x(),this->ui->checkBox_3->y() + this->ui->checkBox_3->height() + 1);
+    this->ui->label_15->move(this->ui->checkBox_4->x() - 50,this->ui->checkBox_4->y());
+
+    this->ui->checkBox_5->move(this->ui->checkBox_4->x(),this->ui->checkBox_4->y() + this->ui->checkBox_4->height() + 1);
+    this->ui->label_16->move(this->ui->checkBox_5->x() - 50,this->ui->checkBox_5->y());
+
+    this->ui->checkBox_6->move(this->ui->checkBox_5->x(),this->ui->checkBox_5->y() + this->ui->checkBox_5->height() + 1);
+    this->ui->label_17->move(this->ui->checkBox_6->x() - 50,this->ui->checkBox_6->y());
+
+}
+
+void CPreviewTestPaperDlg::DynemicShowJudgeChoice()
+{
+    this->ui->radioButton_5->move(this->ui->verticalLayoutWidget_3->x(),this->ui->verticalLayoutWidget_3->height() + this->ui->verticalLayoutWidget_3->y() + 10);
+    this->ui->radioButton_6->move(this->ui->radioButton_5->x(),this->ui->radioButton_5->y() + this->ui->radioButton_5->height() + 10);
+}
+
 void CPreviewTestPaperDlg::showSignalChoice(QVector<QVector<QString>>* ret)
 {
     if(ret == nullptr)
     {
         return ;
     }
-    //设置题干自适应
-//    this->showTestPaperSingalEnable();
     //显示题干
+    qDebug()<<"["<<ret->at(0).at(0)<<"]";
+    this->ui->label->setText(ret->at(0).at(0));
+    this->ui->verticalLayoutWidget->adjustSize();
 
-    this->ui->textEdit_3->setText(ret->at(0).at(0));
-
+    //设置题干自适应
+    this->DynemicShowSignalChoice();
     //显示A选项
     this->ui->radioButton->setText(ret->at(0).at(1));
 

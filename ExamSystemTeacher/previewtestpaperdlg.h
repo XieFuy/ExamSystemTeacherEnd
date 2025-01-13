@@ -116,6 +116,14 @@ private:
     //点击上一题，进行显示上一题的简答题
     void getLastShortAnswerChoice();
 
+    //进行动态调整，并且调整选项的位置
+    void DynemicShowSignalChoice();
+
+    //进行动态调整，并且调整多选的位置
+    void DynemicShowMultiChoice();
+
+    //进行动态调整，并且调整多选的位置
+    void DynemicShowJudgeChoice();
 private:
     Ui::CPreviewTestPaperDlg *ui;
 };
