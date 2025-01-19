@@ -131,7 +131,6 @@ CPreviewTestPaperDlg::CPreviewTestPaperDlg(QWidget *parent) :
         btn->setStyleSheet("QPushButton{border:none;border:2px solid black;border-radius:25;}");
     }
 
-
     //进行绑定信号槽，实现单击只有一个题号是绿色
     for(QPushButton* btn : this->m_signalChoice)
     {

@@ -49,6 +49,7 @@ private:
     int multiChoiceCount;
     int judegChoiceCount;
     int shortAnswerCount;
+
 private:
     //获取该份试卷的单选题的总数量  根据试卷名和职工号确定
     void getSignalChoiceCount();
@@ -122,7 +123,7 @@ private:
     //进行动态调整，并且调整多选的位置
     void DynemicShowMultiChoice();
 
-    //进行动态调整，并且调整多选的位置
+    //进行动态调整，并且调整判断的位置
     void DynemicShowJudgeChoice();
 private:
     Ui::CPreviewTestPaperDlg *ui;
