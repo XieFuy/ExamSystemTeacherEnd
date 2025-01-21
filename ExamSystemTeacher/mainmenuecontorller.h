@@ -102,6 +102,10 @@ public :
    bool initDataBaseTestPaperReleaseTable();
    bool updateTestPaperStatus(QString acount,QString testPaperName);
    bool deleteTestPaperReleaseInfo(QString acount,QString testPaperName);
+   bool initStudentAnswerSingaleTable();
+   bool initStudentAnswerMultiTable();
+   bool initStudentAnswerJudgeTable();
+   bool initStudentAnswerShortAnswerTable();
  private:
     CMainMenueModel* m_mainMenueModel = nullptr;
 };

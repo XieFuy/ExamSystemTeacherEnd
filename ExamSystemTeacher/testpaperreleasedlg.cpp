@@ -65,6 +65,133 @@ CTestPaperReleaseDlg::CTestPaperReleaseDlg(QWidget *parent) :
     QObject::connect(this->ui->pushButton_2,&QPushButton::clicked,this,&CTestPaperReleaseDlg::addTestPaperReleaseInfo);
 }
 
+typedef struct  addStudentAnswerSignalInfo{
+    QString teacherId;
+    QString classId;
+    QString testPaperId;
+    QString StudentId;
+}AddStudentAnswerSignalInfo;
+
+unsigned WINAPI CTestPaperReleaseDlg::threadAddStudentAnswerShortAnswerInfo(LPVOID arg)
+{
+    std::shared_ptr<AddStudentAnswerSignalInfo>* p = (std::shared_ptr<AddStudentAnswerSignalInfo>*)arg;
+    std::shared_ptr<AddStudentAnswerSignalInfo> aInfo = *p;
+
+    QByteArray teacherIdArr= aInfo->teacherId.toLocal8Bit();
+    QByteArray classIdArr = aInfo->classId.toLocal8Bit();
+    QByteArray testPaperIdArr = aInfo->testPaperId.toLocal8Bit();
+    QByteArray StudentIdArr = aInfo->StudentId.toLocal8Bit();
+
+    const char* pTeacherId = teacherIdArr.data();
+    const char* pClassId = classIdArr.data();
+    const char* pTestPaperId = testPaperIdArr.data();
+    const char* pStudentId = StudentIdArr.data();
+
+    qDebug()<<pTeacherId<<pClassId<<pTestPaperId<<pStudentId;
+    //进行数据库操作
+    std::shared_ptr<CDBHelper> dbHelper = std::make_shared<CDBHelper>();
+    std::unique_ptr<char[]> sqlBuf(new char[1024000]);
+    std::string sql;
+    memset(sqlBuf.get(),'\0',sizeof(char) * 1024000);
+    sprintf(sqlBuf.get(),"insert into `studentAnswerShortAnswer`(`teacherId`,`classId`,`testPaperId`,`studentId`) \
+values('%s','%s','%s','%s');",pTeacherId,pClassId,pTestPaperId,pStudentId);
+     sql = sqlBuf.get();
+    bool ret =  dbHelper->sqlExcute(sql,"ExamSystem");
+    delete p;
+    _endthreadex(0);
+    return 0;
+}
+
+unsigned WINAPI CTestPaperReleaseDlg::threadAddStudentAnswerJudgeInfo(LPVOID arg)
+{
+    std::shared_ptr<AddStudentAnswerSignalInfo>* p = (std::shared_ptr<AddStudentAnswerSignalInfo>*)arg;
+    std::shared_ptr<AddStudentAnswerSignalInfo> aInfo = *p;
+
+    QByteArray teacherIdArr= aInfo->teacherId.toLocal8Bit();
+    QByteArray classIdArr = aInfo->classId.toLocal8Bit();
+    QByteArray testPaperIdArr = aInfo->testPaperId.toLocal8Bit();
+    QByteArray StudentIdArr = aInfo->StudentId.toLocal8Bit();
+
+    const char* pTeacherId = teacherIdArr.data();
+    const char* pClassId = classIdArr.data();
+    const char* pTestPaperId = testPaperIdArr.data();
+    const char* pStudentId = StudentIdArr.data();
+
+    qDebug()<<pTeacherId<<pClassId<<pTestPaperId<<pStudentId;
+    //进行数据库操作
+    std::shared_ptr<CDBHelper> dbHelper = std::make_shared<CDBHelper>();
+    std::unique_ptr<char[]> sqlBuf(new char[1024000]);
+    std::string sql;
+    memset(sqlBuf.get(),'\0',sizeof(char) * 1024000);
+    sprintf(sqlBuf.get(),"insert into `studentAnswerJudge`(`teacherId`,`classId`,`testPaperId`,`studentId`) \
+values('%s','%s','%s','%s');",pTeacherId,pClassId,pTestPaperId,pStudentId);
+     sql = sqlBuf.get();
+    bool ret =  dbHelper->sqlExcute(sql,"ExamSystem");
+    delete p;
+    _endthreadex(0);
+    return 0;
+}
+
+unsigned WINAPI CTestPaperReleaseDlg::threadAddStudentAnswerMultiInfo(LPVOID arg)
+{
+    std::shared_ptr<AddStudentAnswerSignalInfo>* p = (std::shared_ptr<AddStudentAnswerSignalInfo>*)arg;
+    std::shared_ptr<AddStudentAnswerSignalInfo> aInfo = *p;
+
+    QByteArray teacherIdArr= aInfo->teacherId.toLocal8Bit();
+    QByteArray classIdArr = aInfo->classId.toLocal8Bit();
+    QByteArray testPaperIdArr = aInfo->testPaperId.toLocal8Bit();
+    QByteArray StudentIdArr = aInfo->StudentId.toLocal8Bit();
+
+    const char* pTeacherId = teacherIdArr.data();
+    const char* pClassId = classIdArr.data();
+    const char* pTestPaperId = testPaperIdArr.data();
+    const char* pStudentId = StudentIdArr.data();
+
+    qDebug()<<pTeacherId<<pClassId<<pTestPaperId<<pStudentId;
+    //进行数据库操作
+    std::shared_ptr<CDBHelper> dbHelper = std::make_shared<CDBHelper>();
+    std::unique_ptr<char[]> sqlBuf(new char[1024000]);
+    std::string sql;
+    memset(sqlBuf.get(),'\0',sizeof(char) * 1024000);
+    sprintf(sqlBuf.get(),"insert into `studentAnswerMulti`(`teacherId`,`classId`,`testPaperId`,`studentId`) \
+values('%s','%s','%s','%s');",pTeacherId,pClassId,pTestPaperId,pStudentId);
+     sql = sqlBuf.get();
+    bool ret =  dbHelper->sqlExcute(sql,"ExamSystem");
+    delete p;
+    _endthreadex(0);
+    return 0;
+}
+
+unsigned WINAPI CTestPaperReleaseDlg::threadAddStudentAnswerSignalInfo(LPVOID arg)
+{
+    std::shared_ptr<AddStudentAnswerSignalInfo>* p = (std::shared_ptr<AddStudentAnswerSignalInfo>*)arg;
+    std::shared_ptr<AddStudentAnswerSignalInfo> aInfo = *p;
+
+    QByteArray teacherIdArr= aInfo->teacherId.toLocal8Bit();
+    QByteArray classIdArr = aInfo->classId.toLocal8Bit();
+    QByteArray testPaperIdArr = aInfo->testPaperId.toLocal8Bit();
+    QByteArray StudentIdArr = aInfo->StudentId.toLocal8Bit();
+
+    const char* pTeacherId = teacherIdArr.data();
+    const char* pClassId = classIdArr.data();
+    const char* pTestPaperId = testPaperIdArr.data();
+    const char* pStudentId = StudentIdArr.data();
+
+    qDebug()<<pTeacherId<<pClassId<<pTestPaperId<<pStudentId;
+    //进行数据库操作
+    std::shared_ptr<CDBHelper> dbHelper = std::make_shared<CDBHelper>();
+    std::unique_ptr<char[]> sqlBuf(new char[1024000]);
+    std::string sql;
+    memset(sqlBuf.get(),'\0',sizeof(char) * 1024000);
+    sprintf(sqlBuf.get(),"insert into `studentAnswerSingal`(`teacherId`,`classId`,`testPaperId`,`studentId`) \
+values('%s','%s','%s','%s');",pTeacherId,pClassId,pTestPaperId,pStudentId);
+     sql = sqlBuf.get();
+    bool ret =  dbHelper->sqlExcute(sql,"ExamSystem");
+    delete p;
+    _endthreadex(0);
+    return 0;
+}
+
 typedef struct addTestPaperReleaseInfoArg{
     QString startTime;
     QString endTime;
@@ -112,6 +239,7 @@ unsigned WINAPI CTestPaperReleaseDlg::threadAddTestPaperReleaseInfo(LPVOID arg)
     const char* pClassName = classNameArr.data();
     const char* pAcount = acountArr.data();
 
+
     //进行数据库操作
     std::shared_ptr<CDBHelper> dbHelper = std::make_shared<CDBHelper>();
     char* sqlBuf = new char[1024000];
@@ -134,6 +262,76 @@ unsigned WINAPI CTestPaperReleaseDlg::threadAddTestPaperReleaseInfo(LPVOID arg)
     ret = dbHelper->sqlQuery(sql,"ExamSystem");
     QString strTestPaperId =  QString::fromLocal8Bit(ret.at(0).at(0).c_str());
     int testPaperId = strTestPaperId.toInt();
+
+    //再拿到属于这个课程的所有的学生id
+    memset(sqlBuf,'\0',sizeof(char) * 1024000);
+    //先拿到课程id
+    sprintf(sqlBuf,"select `studentId` from `joinClassStudentManeage` where `className` = '%s' and `teacherId` = '%s';",pClassName,pAcount);
+    sql = sqlBuf;
+    std::vector<std::vector<std::string>> ret2 =  dbHelper->sqlQuery(sql,"ExamSystem");\
+
+    //进行插入单选题答题记录
+    for(int i = 0 ; i < ret2.size();i++)
+    {
+        std::shared_ptr<AddStudentAnswerSignalInfo> arg = std::make_shared<AddStudentAnswerSignalInfo>();
+        arg->teacherId =QString::fromLocal8Bit(pAcount);
+        arg->classId = QString::number(classId);
+        arg->testPaperId = QString::number(testPaperId);
+        arg->StudentId  = QString::fromLocal8Bit(ret2.at(i).at(0).c_str());
+
+        std::shared_ptr<AddStudentAnswerSignalInfo>* p = new std::shared_ptr<AddStudentAnswerSignalInfo>(arg);
+        //执行插入学生答案记录
+       _beginthreadex(nullptr,0,&CTestPaperReleaseDlg::threadAddStudentAnswerSignalInfo,p,0,nullptr);
+    }
+
+    //进行插入多选题答题记录
+    for(int i = 0 ; i < ret2.size();i++)
+    {
+        std::shared_ptr<AddStudentAnswerSignalInfo> arg = std::make_shared<AddStudentAnswerSignalInfo>();
+        arg->teacherId =QString::fromLocal8Bit(pAcount);
+        arg->classId = QString::number(classId);
+        arg->testPaperId = QString::number(testPaperId);
+        arg->StudentId  = QString::fromLocal8Bit(ret2.at(i).at(0).c_str());
+
+        std::shared_ptr<AddStudentAnswerSignalInfo>* p = new std::shared_ptr<AddStudentAnswerSignalInfo>(arg);
+        //执行插入学生答案记录
+       _beginthreadex(nullptr,0,&CTestPaperReleaseDlg::threadAddStudentAnswerMultiInfo,p,0,nullptr);
+    }
+
+    //进行插入判断题答题记录
+    for(int i = 0 ; i < ret2.size();i++)
+    {
+        std::shared_ptr<AddStudentAnswerSignalInfo> arg = std::make_shared<AddStudentAnswerSignalInfo>();
+        arg->teacherId =QString::fromLocal8Bit(pAcount);
+        arg->classId = QString::number(classId);
+        arg->testPaperId = QString::number(testPaperId);
+        arg->StudentId  = QString::fromLocal8Bit(ret2.at(i).at(0).c_str());
+
+        std::shared_ptr<AddStudentAnswerSignalInfo>* p = new std::shared_ptr<AddStudentAnswerSignalInfo>(arg);
+        //执行插入学生答案记录
+       _beginthreadex(nullptr,0,&CTestPaperReleaseDlg::threadAddStudentAnswerJudgeInfo,p,0,nullptr);
+    }
+
+    //进行插入简答题答题记录
+    for(int i = 0 ; i < ret2.size();i++)
+    {
+        std::shared_ptr<AddStudentAnswerSignalInfo> arg = std::make_shared<AddStudentAnswerSignalInfo>();
+        arg->teacherId =QString::fromLocal8Bit(pAcount);
+        arg->classId = QString::number(classId);
+        arg->testPaperId = QString::number(testPaperId);
+        arg->StudentId  = QString::fromLocal8Bit(ret2.at(i).at(0).c_str());
+
+        std::shared_ptr<AddStudentAnswerSignalInfo>* p = new std::shared_ptr<AddStudentAnswerSignalInfo>(arg);
+        //执行插入学生答案记录
+       _beginthreadex(nullptr,0,&CTestPaperReleaseDlg::threadAddStudentAnswerShortAnswerInfo,p,0,nullptr);
+    }
+
+    //清除ret2所有的元素
+    for(int i = 0 ; i < ret2.size();i++)
+    {
+        ret2.at(i).clear();
+    }
+    ret2.clear();
 
     //进行记录插入
     memset(sqlBuf,'\0',sizeof(char) * 1024000);

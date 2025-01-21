@@ -10,6 +10,94 @@ CMainMenueModel::~CMainMenueModel()
 
 }
 
+bool CMainMenueModel::initStudentAnswerShortAnswerTable()
+{
+    std::shared_ptr<CDBHelper> dbHelper = std::make_shared<CDBHelper>();
+    std::unique_ptr<char[]> sqlBuf(new char[1024000]);
+    memset(sqlBuf.get(),'\0',sizeof(char) * 1024000);
+    std::string sql;
+    sprintf(sqlBuf.get(),"create table if not exists `studentAnswerShortAnswer`(\n\
+`id` integer primary key auto_increment,\n\
+`teacherId` varchar(20)  not null,\n\
+foreign key(`teacherId`) references `Teacher`(`teacherId`),\n\
+`classId` integer not null ,  \n\
+foreign key(`classId`) references `class`(`id`),\n\
+`testPaperId` integer not null,\n\
+foreign key(`testPaperId`) references `testPaperInfo`(`testPaperId`),\n\
+`studentId` varchar(20) not null,\n\
+foreign key(`studentId`) references `Student`(`studentId`),\n\
+`AnswerGiven` varchar(20) not null default 'NULL'\n\
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;");
+    sql = sqlBuf.get();
+    return dbHelper->sqlExcute(sql,"ExamSystem");
+}
+
+bool CMainMenueModel::initStudentAnswerJudgeTable()
+{
+    std::shared_ptr<CDBHelper> dbHelper = std::make_shared<CDBHelper>();
+    std::unique_ptr<char[]> sqlBuf(new char[1024000]);
+    memset(sqlBuf.get(),'\0',sizeof(char) * 1024000);
+    std::string sql;
+    sprintf(sqlBuf.get(),"create table if not exists `studentAnswerJudge`(\n\
+`id` integer primary key auto_increment,\n\
+`teacherId` varchar(20)  not null,\n\
+foreign key(`teacherId`) references `Teacher`(`teacherId`),\n\
+`classId` integer not null ,  \n\
+foreign key(`classId`) references `class`(`id`),\n\
+`testPaperId` integer not null,\n\
+foreign key(`testPaperId`) references `testPaperInfo`(`testPaperId`),\n\
+`studentId` varchar(20) not null,\n\
+foreign key(`studentId`) references `Student`(`studentId`),\n\
+`AnswerGiven` varchar(20) not null default 'NULL' \n\
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;");
+    sql = sqlBuf.get();
+    return dbHelper->sqlExcute(sql,"ExamSystem");
+}
+
+bool CMainMenueModel::initStudentAnswerMultiTable()
+{
+    std::shared_ptr<CDBHelper> dbHelper = std::make_shared<CDBHelper>();
+    std::unique_ptr<char[]> sqlBuf(new char[1024000]);
+    memset(sqlBuf.get(),'\0',sizeof(char) * 1024000);
+    std::string sql;
+    sprintf(sqlBuf.get(),"create table if not exists `studentAnswerMulti`(\n\
+`id` integer primary key auto_increment,\n\
+`teacherId` varchar(20)  not null,\n\
+foreign key(`teacherId`) references `Teacher`(`teacherId`),\n\
+`classId` integer not null ,  \n\
+foreign key(`classId`) references `class`(`id`),\n\
+`testPaperId` integer not null,\n\
+foreign key(`testPaperId`) references `testPaperInfo`(`testPaperId`),\n\
+`studentId` varchar(20) not null,\n\
+foreign key(`studentId`) references `Student`(`studentId`),\n\
+`AnswerGiven` varchar(20) not null default 'NULL' \n\
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;");
+    sql = sqlBuf.get();
+    return dbHelper->sqlExcute(sql,"ExamSystem");
+}
+
+bool CMainMenueModel::initStudentAnswerSingaleTable()
+{
+    std::shared_ptr<CDBHelper> dbHelper = std::make_shared<CDBHelper>();
+    std::unique_ptr<char[]> sqlBuf(new char[1024000]);
+    memset(sqlBuf.get(),'\0',sizeof(char) * 1024000);
+    std::string sql;
+    sprintf(sqlBuf.get(),"create table if not exists `studentAnswerSingal`(\n\
+`id` integer primary key auto_increment,\n\
+`teacherId` varchar(20)  not null,\n\
+foreign key(`teacherId`) references `Teacher`(`teacherId`),\n\
+`classId` integer not null,\n\
+foreign key(`classId`) references `class`(`id`),\n\
+`testPaperId` integer not null,\n\
+foreign key(`testPaperId`) references `testPaperInfo`(`testPaperId`),\n\
+`studentId` varchar(20) not null,\n\
+foreign key(`studentId`) references `Student`(`studentId`),\n\
+`AnswerGiven` varchar(20) not null default 'NULL' \n\
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;");
+    sql = sqlBuf.get();
+    return dbHelper->sqlExcute(sql,"ExamSystem");
+}
+
 bool CMainMenueModel::deleteTestPaperReleaseInfo(const char* acount,const char* testPaperName)
 {
     if(acount == nullptr || testPaperName == nullptr)
@@ -1258,7 +1346,9 @@ COALESCE((SELECT COUNT(*) FROM shortAnswer sa WHERE sa.testPaperId = tp.testPape
 ) AS totalQuestionCount,\n\
 tp.saveTime,\n\
 t.name AS teacherName,\n\
-tp.publishStatus\n\
+tp.publishStatus,\n\
+tp.teacherId,\n\
+tp.testPaperId\n\
 FROM \n\
 testPaperInfo tp\n\
 JOIN \n\

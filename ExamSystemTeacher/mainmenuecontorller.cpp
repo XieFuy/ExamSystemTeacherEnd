@@ -5,7 +5,10 @@ CMainMenueContorller::CMainMenueContorller()
  this->m_mainMenueModel = new CMainMenueModel();
 }
 
-
+bool CMainMenueContorller::initStudentAnswerSingaleTable()
+{
+    return this->m_mainMenueModel->initStudentAnswerSingaleTable();
+}
 
 bool CMainMenueContorller::deleteTestPaperReleaseInfo(QString acount,QString testPaperName)
 {
@@ -841,4 +844,19 @@ bool CMainMenueContorller::addShortAnswerInfo(QString grade,QString question,QSt
       QByteArray acountArr = acount.toUtf8();
       const char* pAcount = acountArr.data();
       return this->m_mainMenueModel->showCurPageIndexTable(curPageIndex,const_cast<char*>(pAcount));
+ }
+
+ bool CMainMenueContorller::initStudentAnswerMultiTable()
+ {
+     return this->m_mainMenueModel->initStudentAnswerMultiTable();
+ }
+
+ bool CMainMenueContorller::initStudentAnswerJudgeTable()
+ {
+     return this->m_mainMenueModel->initStudentAnswerJudgeTable();
+ }
+
+ bool CMainMenueContorller::initStudentAnswerShortAnswerTable()
+ {
+     return this->m_mainMenueModel->initStudentAnswerShortAnswerTable();
  }

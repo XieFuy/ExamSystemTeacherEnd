@@ -34,6 +34,11 @@ private:
     void showSubject(QVector<QVector<QString>>* ret);
     void addTestPaperReleaseInfo();
     static unsigned WINAPI threadAddTestPaperReleaseInfo(LPVOID arg);
+
+    static unsigned WINAPI threadAddStudentAnswerSignalInfo(LPVOID arg); //进行添加一条学生的单选答题记录
+    static unsigned WINAPI threadAddStudentAnswerMultiInfo(LPVOID arg);
+    static unsigned WINAPI threadAddStudentAnswerJudgeInfo(LPVOID arg);
+    static unsigned WINAPI threadAddStudentAnswerShortAnswerInfo(LPVOID arg);
 private:
     QString acount;
     QString testPaperName;

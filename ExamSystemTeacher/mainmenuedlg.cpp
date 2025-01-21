@@ -670,8 +670,24 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
     });
 
     this->initDataBaseTestPaperReleaseTable();
+    this->initStudentAnswerSingaleTable();
+    this->initStudentAnswerMultiTable();
+    this->initStudentAnswerJudgeTable();
+    this->initStudentAnswerShortAnswerTable();
 }
 
+void CMainMenueDlg::initStudentAnswerSingaleTable()
+{
+    _beginthreadex(nullptr,0,&CMainMenueDlg::threadInitStudentAnswerSingaleTableEntry,this,0,nullptr);
+}
+
+unsigned WINAPI CMainMenueDlg::threadInitStudentAnswerSingaleTableEntry(LPVOID arg)
+{
+    CMainMenueDlg* thiz = (CMainMenueDlg*)arg;
+    thiz->m_mainMenueContorller->initStudentAnswerSingaleTable();
+    _endthreadex(0);
+    return 0;
+}
 
 void CMainMenueDlg::initDataBaseTestPaperReleaseTable()
 {
@@ -3372,7 +3388,7 @@ void CMainMenueDlg::changeCurPageCheckBoxStatus(bool status)
 }
 
 
-void CMainMenueDlg::updateStatusClickBtn(int row)
+void CMainMenueDlg::updateStatusClickBtn(int row)  //这里是点击发布的处理函数
 {
     QString testPaperName =  this->m_testPaperName.at(row)->text().trimmed();
     //进行试卷发布操作
@@ -4112,6 +4128,45 @@ unsigned WINAPI CMainMenueDlg::threadGetCurPageIndexTableDataNotPubulishedEntry(
    return 0;
 }
 
+void CMainMenueDlg::initStudentAnswerShortAnswerTable()
+{
+    _beginthreadex(nullptr,0,&CMainMenueDlg::threadInitStudentAnswerShortAnswerTableEntry,this,0,nullptr);
+}
+
+unsigned WINAPI CMainMenueDlg::threadInitStudentAnswerShortAnswerTableEntry(LPVOID arg)
+{
+    CMainMenueDlg* thiz = (CMainMenueDlg*)arg;
+    thiz->m_mainMenueContorller->initStudentAnswerShortAnswerTable();
+    _endthreadex(0);
+    return 0;
+}
+
+void CMainMenueDlg::initStudentAnswerJudgeTable()
+{
+    _beginthreadex(nullptr,0,&CMainMenueDlg::threadInitStudentAnswerJudgeTableEntry,this,0,nullptr);
+}
+
+unsigned WINAPI CMainMenueDlg::threadInitStudentAnswerJudgeTableEntry(LPVOID arg)
+{
+    CMainMenueDlg* thiz = (CMainMenueDlg*)arg;
+    thiz->m_mainMenueContorller->initStudentAnswerJudgeTable();
+    _endthreadex(0);
+    return 0;
+}
+
+void CMainMenueDlg::initStudentAnswerMultiTable()
+{
+    _beginthreadex(nullptr,0,&CMainMenueDlg::threadInitStudentAnswerMultiTableEntry,this,0,nullptr);
+}
+
+unsigned WINAPI CMainMenueDlg::threadInitStudentAnswerMultiTableEntry(LPVOID arg)
+{
+    CMainMenueDlg* thiz = (CMainMenueDlg*)arg;
+    thiz->m_mainMenueContorller->initStudentAnswerMultiTable();
+    _endthreadex(0);
+    return 0;
+}
+
 void CMainMenueDlg::getCurPageIndexTableData()
 {
     _beginthreadex(nullptr,0,&CMainMenueDlg::threadGetCurPageIndexTableData,this,0,nullptr);
@@ -4147,6 +4202,14 @@ void CMainMenueDlg::showCurPageIndexTable(QVector<QVector<QString>>* ret)
        //发布状态
        str = ret->at(i).at(4);
        this->m_status.at(i)->setText(str);
+
+       //进行存储教师的Id
+       str = ret->at(i).at(5);
+       this->m_teacherIdVec.push_back(str);
+
+       //进行存储试卷的Id
+       str = ret->at(i).at(6);
+       this->m_testPaperIdVec.push_back(str);
 
        //显示操作按钮
        QList<QPushButton*> optButton = this->m_operators.at(i)->findChildren<QPushButton*>();

@@ -159,9 +159,11 @@ private:
     std::string m_studentManegerHeadIconPath;
     QString m_studentManegerCount;
 
-
     //试卷预览
     CPreviewTestPaperDlg* m_previewTestPaper = nullptr;
+
+    QVector<QString> m_teacherIdVec; //用于存储获取试卷信息时查询到的教师Id
+    QVector<QString> m_testPaperIdVec;//用于存储获取试卷信息时查询到的试卷iD
 private:
     void showPageIndex();//显示分页查询的下标页
     void initTableWidgetHeader(); //初始化表头
@@ -169,6 +171,22 @@ private:
     void clearTreeItemMulti();
     void clearTreeItemJudge();
     void clearTreeItemShortAnswer();
+
+    //初始化学生单选题答题记录表
+    void initStudentAnswerSingaleTable();
+    static unsigned WINAPI threadInitStudentAnswerSingaleTableEntry(LPVOID arg);
+
+    //初始化学生多选题答题记录表
+    void initStudentAnswerMultiTable();
+    static unsigned WINAPI threadInitStudentAnswerMultiTableEntry(LPVOID arg);
+
+    //初始化学生判断题答题记录表
+    void initStudentAnswerJudgeTable();
+    static unsigned WINAPI threadInitStudentAnswerJudgeTableEntry(LPVOID arg);
+
+    //初始化学生简答题答题记录表
+    void initStudentAnswerShortAnswerTable();
+    static unsigned WINAPI threadInitStudentAnswerShortAnswerTableEntry(LPVOID arg);
 
     void initSingleChoiceTable();//初始化单选表
     static unsigned WINAPI threadInitSingleChoiceTableEntry(LPVOID arg);
