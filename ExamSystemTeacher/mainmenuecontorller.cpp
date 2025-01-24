@@ -478,7 +478,7 @@ typedef struct deleteFromSignalChoiseArg
 }DeleteFromSignalChoiseArg;
 
 
-bool CMainMenueContorller::deleteMultiClickBtn(QString acount,QList<QString> createTimeLst)
+bool CMainMenueContorller::deleteMultiClickBtn(QString acount,QList<QString> createTimeLst,QList<QString>& testPaperIdLst)
 {
     bool ret = false;
     QByteArray acountArr = acount.toUtf8();
@@ -518,15 +518,33 @@ bool CMainMenueContorller::deleteMultiClickBtn(QString acount,QList<QString> cre
 //        ret = this->m_mainMenueModel->deleteFromMultiChoise(pAcount,pCreateTime);
 //        ret = this->m_mainMenueModel->deleteFromJudge(pAcount,pCreateTime);
 //        ret = this->m_mainMenueModel->deleteFromShortAnswer(pAcount,pCreateTime);
+
+        //开启线程进行删除该试卷的发布信息
+        DeleteFromSignalChoiseArg* arg5 = new DeleteFromSignalChoiseArg();
+        arg5->thiz = this;
+        arg5->acount = acount;
+        arg5->createTime = testPaperIdLst.at(i);  //这里要传的是试卷名称不是试卷id ，懒得该变量名 包括函数参数也是
+        HANDLE thread5 = (HANDLE)_beginthreadex(nullptr,0,&CMainMenueContorller::threadDeleteTestPaperRelease,arg5,0,nullptr);
+
         //再进行删除题库中的试卷信息
         //等待四个线程结束时进行执行
         WaitForSingleObject(thread1,INFINITE);
         WaitForSingleObject(thread2,INFINITE);
         WaitForSingleObject(thread3,INFINITE);
         WaitForSingleObject(thread4,INFINITE);
+        WaitForSingleObject(thread5,INFINITE);
         ret = this->m_mainMenueModel->deleteClickBtn(pAcount,pCreateTime);
     }
     return ret;
+}
+
+unsigned WINAPI CMainMenueContorller::threadDeleteTestPaperRelease(LPVOID arg)
+{
+    DeleteFromSignalChoiseArg* dInfo = (DeleteFromSignalChoiseArg*)arg;
+    dInfo->thiz->deleteTestPaperReleaseInfo(dInfo->acount,dInfo->createTime);
+    delete dInfo;
+    _endthreadex(0);
+    return 0;
 }
 
 unsigned WINAPI CMainMenueContorller::threadDeleteFromShortAnswer(LPVOID arg)

@@ -26,7 +26,8 @@ foreign key(`classId`) references `class`(`id`),\n\
 foreign key(`testPaperId`) references `testPaperInfo`(`testPaperId`),\n\
 `studentId` varchar(20) not null,\n\
 foreign key(`studentId`) references `Student`(`studentId`),\n\
-`AnswerGiven` varchar(20) not null default 'NULL'\n\
+`AnswerGiven` varchar(20) not null default 'NULL',\n\
+`order` integer not null\n\
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;");
     sql = sqlBuf.get();
     return dbHelper->sqlExcute(sql,"ExamSystem");
@@ -48,7 +49,8 @@ foreign key(`classId`) references `class`(`id`),\n\
 foreign key(`testPaperId`) references `testPaperInfo`(`testPaperId`),\n\
 `studentId` varchar(20) not null,\n\
 foreign key(`studentId`) references `Student`(`studentId`),\n\
-`AnswerGiven` varchar(20) not null default 'NULL' \n\
+`AnswerGiven` varchar(20) not null default 'NULL',\n\
+`order` integer not null \n\
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;");
     sql = sqlBuf.get();
     return dbHelper->sqlExcute(sql,"ExamSystem");
@@ -70,7 +72,8 @@ foreign key(`classId`) references `class`(`id`),\n\
 foreign key(`testPaperId`) references `testPaperInfo`(`testPaperId`),\n\
 `studentId` varchar(20) not null,\n\
 foreign key(`studentId`) references `Student`(`studentId`),\n\
-`AnswerGiven` varchar(20) not null default 'NULL' \n\
+`AnswerGiven` varchar(20) not null default 'NULL',\n\
+`order` integer not null \n\
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;");
     sql = sqlBuf.get();
     return dbHelper->sqlExcute(sql,"ExamSystem");
@@ -92,7 +95,8 @@ foreign key(`classId`) references `class`(`id`),\n\
 foreign key(`testPaperId`) references `testPaperInfo`(`testPaperId`),\n\
 `studentId` varchar(20) not null,\n\
 foreign key(`studentId`) references `Student`(`studentId`),\n\
-`AnswerGiven` varchar(20) not null default 'NULL' \n\
+`AnswerGiven` varchar(20) not null default 'NULL',\n\
+`order` integer not null \n\
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;");
     sql = sqlBuf.get();
     return dbHelper->sqlExcute(sql,"ExamSystem");
@@ -107,12 +111,44 @@ bool CMainMenueModel::deleteTestPaperReleaseInfo(const char* acount,const char* 
     std::shared_ptr<CDBHelper> dbHelper = std::make_shared<CDBHelper>();
     char* sqlBuf = new char[1024000];
     memset(sqlBuf,'\0',sizeof(char) * 1024000);
-    std::string sql;
+    std::string sql;  
+    //进行删除单选题学生答案记录
+   sprintf(sqlBuf,"delete from `studentAnswerSingal` where `teacherId` = '%s' and `testPaperId` in (SELECT DISTINCT `testPaperId` \n\
+FROM `testPaperInfo` \n\
+WHERE `teacherId` = '%s' AND `testPaperName` = '%s');",acount,acount,testPaperName);
+   sql = sqlBuf;
+   bool ret =  dbHelper->sqlExcute(sql,"ExamSystem");
+
+    //进行删除多选题的学生答案记录
+    memset(sqlBuf,'\0',sizeof(char) * 1024000);
+    sprintf(sqlBuf,"delete from `studentAnswerMulti` where `teacherId` = '%s' and `testPaperId` in (SELECT DISTINCT `testPaperId` \n\
+FROM `testPaperInfo` \n\
+WHERE `teacherId` = '%s' AND `testPaperName` = '%s');",acount,acount,testPaperName);
+    sql = sqlBuf;
+    ret =  dbHelper->sqlExcute(sql,"ExamSystem");
+
+    //进行删除判断题的学生答案记录
+    memset(sqlBuf,'\0',sizeof(char) * 1024000);
+    sprintf(sqlBuf,"delete from `studentAnswerJudge` where `teacherId` = '%s' and `testPaperId` in (SELECT DISTINCT `testPaperId` \n\
+FROM `testPaperInfo` \n\
+WHERE `teacherId` = '%s' AND `testPaperName` = '%s');",acount,acount,testPaperName);
+    sql = sqlBuf;
+    ret =  dbHelper->sqlExcute(sql,"ExamSystem");
+
+    //进行删除简答题的学生答案记录
+    memset(sqlBuf,'\0',sizeof(char) * 1024000);
+    sprintf(sqlBuf,"delete from `studentAnswerShortAnswer` where `teacherId` = '%s' and `testPaperId` in (SELECT DISTINCT `testPaperId` \n\
+FROM `testPaperInfo` \n\
+WHERE `teacherId` = '%s' AND `testPaperName` = '%s');",acount,acount,testPaperName);
+    sql = sqlBuf;
+    ret =  dbHelper->sqlExcute(sql,"ExamSystem");
+
+    memset(sqlBuf,'\0',sizeof(char) * 1024000);
     sprintf(sqlBuf,"delete from `testPaperRelease` where `teacherId` = '%s' and `testPaperId` in (SELECT DISTINCT `testPaperId` \n\
 FROM `testPaperInfo` \n\
 WHERE `teacherId` = '%s' AND `testPaperName` = '%s');",acount,acount,testPaperName);
     sql = sqlBuf;
-    bool ret =  dbHelper->sqlExcute(sql,"ExamSystem");
+    ret =  dbHelper->sqlExcute(sql,"ExamSystem");
     delete[] sqlBuf;
     return ret;
 }
@@ -1003,7 +1039,9 @@ COALESCE((SELECT COUNT(*) FROM shortAnswer sa WHERE sa.testPaperId = tp.testPape
 ) AS totalQuestionCount,\n\
 tp.saveTime,\n\
 t.name AS teacherName,\n\
-tp.publishStatus\n\
+tp.publishStatus,\n\
+tp.teacherId,\n\
+tp.testPaperId\n\
 FROM \n\
 testPaperInfo tp\n\
 JOIN \n\
@@ -1183,7 +1221,9 @@ COALESCE((SELECT COUNT(*) FROM shortAnswer sa WHERE sa.testPaperId = tp.testPape
 ) AS totalQuestionCount,\n\
 tp.saveTime,\n\
 t.name AS teacherName,\n\
-tp.publishStatus\n\
+tp.publishStatus,\n\
+tp.teacherId,\n\
+tp.testPaperId\n\
 FROM \n\
 testPaperInfo tp\n\
 JOIN \n\

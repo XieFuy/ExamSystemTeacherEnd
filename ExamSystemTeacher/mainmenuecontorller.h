@@ -54,7 +54,8 @@ public :
     static unsigned WINAPI threadDeleteFromJudge(LPVOID arg);
     bool deleteFromShortAnswer(QString acount,QString createTime);
     static unsigned WINAPI threadDeleteFromShortAnswer(LPVOID arg);
-    bool deleteMultiClickBtn(QString acount,QList<QString> createTimeLst);
+    static unsigned WINAPI threadDeleteTestPaperRelease(LPVOID arg);
+    bool deleteMultiClickBtn(QString acount,QList<QString> createTimeLst,QList<QString>& testPaperIdLst);
     bool initClassTableDatabase();
     std::vector<std::vector<std::string>> getClassTableData(QString acount,int curPageIndex);
     int getClassTableCount(QString acount);

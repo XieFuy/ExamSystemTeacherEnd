@@ -3223,6 +3223,7 @@ typedef struct deleteMultiClickBtnArg
 {
     QString acount;
     QList<QString>* createTimeLst;
+    QList<QString>* testPaperIdLst;
     CMainMenueDlg* thiz;
 }DeleteMultiClickBtnArg;
 
@@ -3233,6 +3234,7 @@ void CMainMenueDlg::deleteMultiClickBtn()
     arg->acount = this->m_acount;
 
     QList<QString>* createTimeLst = new QList<QString>();
+    QList<QString>* testPaperNameLst = new QList<QString>(); //用于存储被选中的试卷的试卷Id
     for(int i = 0 ; i < this->m_checkVec.size();i++)
     {
         QList<QCheckBox*> ret =  m_checkVec.at(i)->findChildren<QCheckBox*>();
@@ -3241,14 +3243,17 @@ void CMainMenueDlg::deleteMultiClickBtn()
             if(check->isChecked())
             {
                 QString createTime = this->m_createTime.at(i)->text().trimmed();
+                QString testPaperName = this->m_testPaperName.at(i)->text().trimmed();
                 if(createTime != "")
                 {
                     createTimeLst->push_back(createTime);
+                    testPaperNameLst->push_back(testPaperName);
                 }
             }
         }
     }
     arg->createTimeLst = createTimeLst;
+    arg->testPaperIdLst = testPaperNameLst;
     this->curPageIndex = 1;
     _beginthreadex(nullptr,0,&CMainMenueDlg::threadDeleteMultiClickBtnEntry,arg,0,nullptr);
     //将复选框进行设置为未选中
@@ -3266,8 +3271,9 @@ void CMainMenueDlg::deleteMultiClickBtn()
 unsigned WINAPI CMainMenueDlg::threadDeleteMultiClickBtnEntry(LPVOID arg)
 {
       DeleteMultiClickBtnArg* dInfo = (DeleteMultiClickBtnArg*)arg;
-      dInfo->thiz->m_mainMenueContorller->deleteMultiClickBtn(dInfo->acount,*dInfo->createTimeLst);
+      dInfo->thiz->m_mainMenueContorller->deleteMultiClickBtn(dInfo->acount,*dInfo->createTimeLst,*dInfo->testPaperIdLst);
       delete dInfo->createTimeLst;
+      delete dInfo->testPaperIdLst;
       delete dInfo;
       dInfo->thiz->getCurPageIndexTableData();
       dInfo->thiz->getTablePageCount();
@@ -3474,7 +3480,7 @@ typedef struct deleteClickBtnArg
     CMainMenueDlg* thiz;
 }DeleteClickBtnArg;
 
-void CMainMenueDlg::deleteClickBtn(int row)
+void CMainMenueDlg::deleteClickBtn(int row)  //点击单次调用的函数
 {
     //获取到同一行的创建时间
     QString createTime = this->m_createTime.at(row)->text().trimmed();
@@ -4175,6 +4181,7 @@ void CMainMenueDlg::getCurPageIndexTableData()
 void CMainMenueDlg::showCurPageIndexTable(QVector<QVector<QString>>* ret)
 {
     this->clearTestPaperTableContorl();
+    qDebug()<<"获取已发布的数量："<<ret->size();
    //将数据进行插入到表格中
    for(int i = 0 ; i < ret->size(); i++)
    {

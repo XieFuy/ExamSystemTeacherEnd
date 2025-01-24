@@ -39,6 +39,16 @@ private:
     static unsigned WINAPI threadAddStudentAnswerMultiInfo(LPVOID arg);
     static unsigned WINAPI threadAddStudentAnswerJudgeInfo(LPVOID arg);
     static unsigned WINAPI threadAddStudentAnswerShortAnswerInfo(LPVOID arg);
+
+    static unsigned WINAPI threadGetClassIdEntry(LPVOID arg);
+    static unsigned WINAPI threadGetTestPaperIdEntry(LPVOID arg);
+    static unsigned WINAPI threadGetStudentIdVectorEntry(LPVOID arg); //获取学生id集合
+
+    static unsigned WINAPI threadGetTestPaperSignalOrderEntry(LPVOID arg);//进行获取某一份试卷的单选题的题号
+    static unsigned WINAPI threadGetTestPaperMultiOrderEntry(LPVOID arg);
+    static unsigned WINAPI threadGetTestPaperJudgeOrderEntry(LPVOID arg);
+    static unsigned WINAPI threadGetTestPaperShortAnswerEntry(LPVOID arg);
+
 private:
     QString acount;
     QString testPaperName;
