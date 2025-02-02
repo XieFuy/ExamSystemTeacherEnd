@@ -465,7 +465,7 @@ color:#50b8f7;
     </rect>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>3</number>
    </property>
    <widget class="QWidget" name="page">
     <widget class="QWidget" name="widget_3" native="true">
@@ -740,7 +740,7 @@ color:#50b8f7;
         </rect>
        </property>
        <property name="currentIndex">
-        <number>3</number>
+        <number>0</number>
        </property>
        <widget class="QWidget" name="page_6">
         <widget class="QLineEdit" name="lineEdit">
@@ -2507,7 +2507,7 @@ background-color: #F8FAF7;
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>91</width>
+         <width>137</width>
          <height>80</height>
         </rect>
        </property>
@@ -2516,6 +2516,13 @@ background-color: #F8FAF7;
          <family>黑体</family>
          <pointsize>14</pointsize>
         </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">#label_44{
+border:none;
+background-color:#EFEFEF;
+border:1px solid #646465;
+}</string>
        </property>
        <property name="text">
         <string>序号</string>
@@ -2527,9 +2534,9 @@ background-color: #F8FAF7;
       <widget class="QLabel" name="label_45">
        <property name="geometry">
         <rect>
-         <x>110</x>
+         <x>135</x>
          <y>0</y>
-         <width>241</width>
+         <width>207</width>
          <height>80</height>
         </rect>
        </property>
@@ -2538,6 +2545,13 @@ background-color: #F8FAF7;
          <family>黑体</family>
          <pointsize>14</pointsize>
         </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">#label_45{
+border:none;
+background-color:#EFEFEF;
+border:1px solid #646465;
+}</string>
        </property>
        <property name="text">
         <string>试卷名称</string>
@@ -2549,9 +2563,9 @@ background-color: #F8FAF7;
       <widget class="QLabel" name="label_46">
        <property name="geometry">
         <rect>
-         <x>340</x>
+         <x>342</x>
          <y>0</y>
-         <width>111</width>
+         <width>137</width>
          <height>80</height>
         </rect>
        </property>
@@ -2560,6 +2574,13 @@ background-color: #F8FAF7;
          <family>黑体</family>
          <pointsize>14</pointsize>
         </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">#label_46{
+border:none;
+background-color:#EFEFEF;
+border:1px solid #646465;
+}</string>
        </property>
        <property name="text">
         <string>题量</string>
@@ -2571,10 +2592,10 @@ background-color: #F8FAF7;
       <widget class="QLabel" name="label_47">
        <property name="geometry">
         <rect>
-         <x>460</x>
-         <y>10</y>
-         <width>141</width>
-         <height>61</height>
+         <x>476</x>
+         <y>0</y>
+         <width>155</width>
+         <height>80</height>
         </rect>
        </property>
        <property name="font">
@@ -2582,6 +2603,13 @@ background-color: #F8FAF7;
          <family>黑体</family>
          <pointsize>14</pointsize>
         </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">#label_47{
+border:none;
+background-color:#EFEFEF;
+border:1px solid #646465;
+}</string>
        </property>
        <property name="text">
         <string>创建时间</string>
@@ -2593,10 +2621,10 @@ background-color: #F8FAF7;
       <widget class="QLabel" name="label_48">
        <property name="geometry">
         <rect>
-         <x>610</x>
-         <y>10</y>
-         <width>151</width>
-         <height>61</height>
+         <x>629</x>
+         <y>0</y>
+         <width>137</width>
+         <height>80</height>
         </rect>
        </property>
        <property name="font">
@@ -2604,6 +2632,13 @@ background-color: #F8FAF7;
          <family>黑体</family>
          <pointsize>14</pointsize>
         </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">#label_48{
+border:none;
+background-color:#EFEFEF;
+border:1px solid #646465;
+}</string>
        </property>
        <property name="text">
         <string>出卷人</string>
@@ -2615,9 +2650,9 @@ background-color: #F8FAF7;
       <widget class="QLabel" name="label_49">
        <property name="geometry">
         <rect>
-         <x>760</x>
+         <x>764</x>
          <y>0</y>
-         <width>151</width>
+         <width>177</width>
          <height>80</height>
         </rect>
        </property>
@@ -2626,6 +2661,13 @@ background-color: #F8FAF7;
          <family>黑体</family>
          <pointsize>14</pointsize>
         </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">#label_49{
+border:none;
+background-color:#EFEFEF;
+border:1px solid #646465;
+}</string>
        </property>
        <property name="text">
         <string>发布状态</string>
@@ -2637,9 +2679,9 @@ background-color: #F8FAF7;
       <widget class="QLabel" name="label_50">
        <property name="geometry">
         <rect>
-         <x>940</x>
+         <x>939</x>
          <y>0</y>
-         <width>441</width>
+         <width>447</width>
          <height>80</height>
         </rect>
        </property>
@@ -2648,6 +2690,13 @@ background-color: #F8FAF7;
          <family>黑体</family>
          <pointsize>14</pointsize>
         </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">#label_50{
+border:none;
+background-color:#EFEFEF;
+border:1px solid #646465;
+}</string>
        </property>
        <property name="text">
         <string>操作</string>
@@ -3042,14 +3091,14 @@ color:#50b8fd;
      <widget class="QLabel" name="label_8">
       <property name="geometry">
        <rect>
-        <x>270</x>
-        <y>240</y>
-        <width>151</width>
+        <x>0</x>
+        <y>10</y>
+        <width>361</width>
         <height>81</height>
        </rect>
       </property>
       <property name="text">
-       <string>学生试卷批改</string>
+       <string>  显示已经完成考试的科目信息</string>
       </property>
      </widget>
     </widget>

@@ -53,8 +53,10 @@ void ScreenInfo::getScreenSize(int& width,int& height)
 
 int main(int argc, char *argv[])
 {
+    QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+    QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
     QApplication a(argc, argv);
-    std::shared_ptr<ScreenInfo> sInfo = std::make_shared<ScreenInfo>();
+//    std::shared_ptr<ScreenInfo> sInfo = std::make_shared<ScreenInfo>();
     Widget w;
     w.show();
     return a.exec();

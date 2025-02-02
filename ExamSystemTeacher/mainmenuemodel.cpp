@@ -26,10 +26,11 @@ foreign key(`classId`) references `class`(`id`),\n\
 foreign key(`testPaperId`) references `testPaperInfo`(`testPaperId`),\n\
 `studentId` varchar(20) not null,\n\
 foreign key(`studentId`) references `Student`(`studentId`),\n\
-`AnswerGiven` varchar(20) not null default 'NULL',\n\
+`AnswerGiven`  varchar(16383) not null default 'NULL',\n\
 `order` integer not null\n\
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;");
     sql = sqlBuf.get();
+    qDebug()<<sql.c_str();
     return dbHelper->sqlExcute(sql,"ExamSystem");
 }
 
