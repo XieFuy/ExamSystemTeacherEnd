@@ -465,7 +465,7 @@ color:#50b8f7;
     </rect>
    </property>
    <property name="currentIndex">
-    <number>3</number>
+    <number>6</number>
    </property>
    <widget class="QWidget" name="page">
     <widget class="QWidget" name="widget_3" native="true">
@@ -2813,7 +2813,7 @@ color:#50b8f7;
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>60</y>
+        <y>70</y>
         <width>1391</width>
         <height>80</height>
        </rect>
@@ -2829,7 +2829,7 @@ background-color: #F8FAF7;
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>71</width>
+         <width>93</width>
          <height>80</height>
         </rect>
        </property>
@@ -2838,6 +2838,13 @@ background-color: #F8FAF7;
          <family>黑体</family>
          <pointsize>14</pointsize>
         </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">#label_51{
+border:none;
+background-color:#EFEFEF;
+border:1px solid #646465;
+}</string>
        </property>
        <property name="text">
         <string>序号</string>
@@ -2849,9 +2856,9 @@ background-color: #F8FAF7;
       <widget class="QLabel" name="label_52">
        <property name="geometry">
         <rect>
-         <x>90</x>
+         <x>92</x>
          <y>0</y>
-         <width>131</width>
+         <width>139</width>
          <height>80</height>
         </rect>
        </property>
@@ -2860,6 +2867,13 @@ background-color: #F8FAF7;
          <family>黑体</family>
          <pointsize>14</pointsize>
         </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">#label_52{
+border:none;
+background-color:#EFEFEF;
+border:1px solid #646465;
+}</string>
        </property>
        <property name="text">
         <string>课程图标</string>
@@ -2871,9 +2885,9 @@ background-color: #F8FAF7;
       <widget class="QLabel" name="label_53">
        <property name="geometry">
         <rect>
-         <x>230</x>
+         <x>231</x>
          <y>0</y>
-         <width>241</width>
+         <width>278</width>
          <height>80</height>
         </rect>
        </property>
@@ -2882,6 +2896,13 @@ background-color: #F8FAF7;
          <family>黑体</family>
          <pointsize>14</pointsize>
         </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">#label_53{
+border:none;
+background-color:#EFEFEF;
+border:1px solid #646465;
+}</string>
        </property>
        <property name="text">
         <string>课程名称</string>
@@ -2893,10 +2914,10 @@ background-color: #F8FAF7;
       <widget class="QLabel" name="label_54">
        <property name="geometry">
         <rect>
-         <x>520</x>
-         <y>10</y>
-         <width>211</width>
-         <height>61</height>
+         <x>509</x>
+         <y>0</y>
+         <width>278</width>
+         <height>80</height>
         </rect>
        </property>
        <property name="font">
@@ -2904,6 +2925,13 @@ background-color: #F8FAF7;
          <family>黑体</family>
          <pointsize>14</pointsize>
         </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">#label_54{
+border:none;
+background-color:#EFEFEF;
+border:1px solid #646465;
+}</string>
        </property>
        <property name="text">
         <string>创建时间</string>
@@ -2915,10 +2943,10 @@ background-color: #F8FAF7;
       <widget class="QLabel" name="label_55">
        <property name="geometry">
         <rect>
-         <x>780</x>
-         <y>10</y>
-         <width>191</width>
-         <height>61</height>
+         <x>787</x>
+         <y>0</y>
+         <width>231</width>
+         <height>80</height>
         </rect>
        </property>
        <property name="font">
@@ -2926,6 +2954,13 @@ background-color: #F8FAF7;
          <family>黑体</family>
          <pointsize>14</pointsize>
         </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">#label_55{
+border:none;
+background-color:#EFEFEF;
+border:1px solid #646465;
+}</string>
        </property>
        <property name="text">
         <string>创建人</string>
@@ -2937,9 +2972,9 @@ background-color: #F8FAF7;
       <widget class="QLabel" name="label_57">
        <property name="geometry">
         <rect>
-         <x>980</x>
+         <x>1018</x>
          <y>0</y>
-         <width>401</width>
+         <width>371</width>
          <height>80</height>
         </rect>
        </property>
@@ -2948,6 +2983,13 @@ background-color: #F8FAF7;
          <family>黑体</family>
          <pointsize>14</pointsize>
         </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">#label_57{
+border:none;
+background-color:#EFEFEF;
+border:1px solid #646465;
+}</string>
        </property>
        <property name="text">
         <string>操作</string>
@@ -3388,7 +3430,7 @@ border:none;
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>1391</width>
+       <width>1390</width>
        <height>861</height>
       </rect>
      </property>
@@ -3507,7 +3549,7 @@ background-color: #F8FAF7;
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>71</width>
+          <width>92</width>
           <height>80</height>
          </rect>
         </property>
@@ -3516,6 +3558,13 @@ background-color: #F8FAF7;
           <family>黑体</family>
           <pointsize>14</pointsize>
          </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">#label_61{
+border:none;
+background-color:#EFEFEF;
+border:1px solid #646465;
+}</string>
         </property>
         <property name="text">
          <string>序号</string>
@@ -3527,9 +3576,9 @@ background-color: #F8FAF7;
        <widget class="QLabel" name="label_62">
         <property name="geometry">
          <rect>
-          <x>130</x>
+          <x>92</x>
           <y>0</y>
-          <width>221</width>
+          <width>310</width>
           <height>80</height>
          </rect>
         </property>
@@ -3538,6 +3587,13 @@ background-color: #F8FAF7;
           <family>黑体</family>
           <pointsize>14</pointsize>
          </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">#label_62{
+border:none;
+background-color:#EFEFEF;
+border:1px solid #646465;
+}</string>
         </property>
         <property name="text">
          <string> 学生姓名</string>
@@ -3549,9 +3605,9 @@ background-color: #F8FAF7;
        <widget class="QLabel" name="label_63">
         <property name="geometry">
          <rect>
-          <x>410</x>
+          <x>402</x>
           <y>0</y>
-          <width>241</width>
+          <width>310</width>
           <height>80</height>
          </rect>
         </property>
@@ -3560,6 +3616,13 @@ background-color: #F8FAF7;
           <family>黑体</family>
           <pointsize>14</pointsize>
          </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">#label_63{
+border:none;
+background-color:#EFEFEF;
+border:1px solid #646465;
+}</string>
         </property>
         <property name="text">
          <string>  学生学号</string>
@@ -3571,10 +3634,10 @@ background-color: #F8FAF7;
        <widget class="QLabel" name="label_64">
         <property name="geometry">
          <rect>
-          <x>750</x>
-          <y>10</y>
-          <width>211</width>
-          <height>61</height>
+          <x>712</x>
+          <y>0</y>
+          <width>308</width>
+          <height>80</height>
          </rect>
         </property>
         <property name="font">
@@ -3582,6 +3645,13 @@ background-color: #F8FAF7;
           <family>黑体</family>
           <pointsize>14</pointsize>
          </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">#label_64{
+border:none;
+background-color:#EFEFEF;
+border:1px solid #646465;
+}</string>
         </property>
         <property name="text">
          <string> 申请时间</string>
@@ -3593,9 +3663,9 @@ background-color: #F8FAF7;
        <widget class="QLabel" name="label_66">
         <property name="geometry">
          <rect>
-          <x>980</x>
+          <x>1020</x>
           <y>0</y>
-          <width>401</width>
+          <width>370</width>
           <height>80</height>
          </rect>
         </property>
@@ -3604,6 +3674,13 @@ background-color: #F8FAF7;
           <family>黑体</family>
           <pointsize>14</pointsize>
          </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">#label_66{
+border:none;
+background-color:#EFEFEF;
+border:1px solid #646465;
+}</string>
         </property>
         <property name="text">
          <string>操作</string>
@@ -4000,7 +4077,7 @@ background-color: #F8FAF7;
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>71</width>
+          <width>77</width>
           <height>80</height>
          </rect>
         </property>
@@ -4009,6 +4086,13 @@ background-color: #F8FAF7;
           <family>黑体</family>
           <pointsize>14</pointsize>
          </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">#label_69{
+border:none;
+background-color:#EFEFEF;
+border:1px solid #646465;
+}</string>
         </property>
         <property name="text">
          <string>序号</string>
@@ -4020,9 +4104,9 @@ background-color: #F8FAF7;
        <widget class="QLabel" name="label_70">
         <property name="geometry">
          <rect>
-          <x>200</x>
+          <x>216</x>
           <y>0</y>
-          <width>211</width>
+          <width>196</width>
           <height>80</height>
          </rect>
         </property>
@@ -4031,6 +4115,13 @@ background-color: #F8FAF7;
           <family>黑体</family>
           <pointsize>14</pointsize>
          </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">#label_70{
+border:none;
+background-color:#EFEFEF;
+border:1px solid #646465;
+}</string>
         </property>
         <property name="text">
          <string> 学生姓名</string>
@@ -4042,9 +4133,9 @@ background-color: #F8FAF7;
        <widget class="QLabel" name="label_71">
         <property name="geometry">
          <rect>
-          <x>400</x>
+          <x>412</x>
           <y>0</y>
-          <width>241</width>
+          <width>250</width>
           <height>80</height>
          </rect>
         </property>
@@ -4053,6 +4144,13 @@ background-color: #F8FAF7;
           <family>黑体</family>
           <pointsize>14</pointsize>
          </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">#label_71{
+border:none;
+background-color:#EFEFEF;
+border:1px solid #646465;
+}</string>
         </property>
         <property name="text">
          <string>  学生学号</string>
@@ -4064,10 +4162,10 @@ background-color: #F8FAF7;
        <widget class="QLabel" name="label_72">
         <property name="geometry">
          <rect>
-          <x>930</x>
-          <y>10</y>
-          <width>211</width>
-          <height>61</height>
+          <x>913</x>
+          <y>0</y>
+          <width>305</width>
+          <height>80</height>
          </rect>
         </property>
         <property name="font">
@@ -4075,6 +4173,13 @@ background-color: #F8FAF7;
           <family>黑体</family>
           <pointsize>14</pointsize>
          </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">#label_72{
+border:none;
+background-color:#EFEFEF;
+border:1px solid #646465;
+}</string>
         </property>
         <property name="text">
          <string>  加入时间</string>
@@ -4086,9 +4191,9 @@ background-color: #F8FAF7;
        <widget class="QLabel" name="label_73">
         <property name="geometry">
          <rect>
-          <x>1200</x>
+          <x>1218</x>
           <y>0</y>
-          <width>171</width>
+          <width>161</width>
           <height>80</height>
          </rect>
         </property>
@@ -4097,6 +4202,13 @@ background-color: #F8FAF7;
           <family>黑体</family>
           <pointsize>14</pointsize>
          </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">#label_73{
+border:none;
+background-color:#EFEFEF;
+border:1px solid #646465;
+}</string>
         </property>
         <property name="text">
          <string>操作</string>
@@ -4108,9 +4220,9 @@ background-color: #F8FAF7;
        <widget class="QLabel" name="label_75">
         <property name="geometry">
          <rect>
-          <x>70</x>
+          <x>77</x>
           <y>0</y>
-          <width>141</width>
+          <width>139</width>
           <height>80</height>
          </rect>
         </property>
@@ -4119,6 +4231,13 @@ background-color: #F8FAF7;
           <family>黑体</family>
           <pointsize>14</pointsize>
          </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">#label_75{
+border:none;
+background-color:#EFEFEF;
+border:1px solid #646465;
+}</string>
         </property>
         <property name="text">
          <string> 学生头像</string>
@@ -4130,9 +4249,9 @@ background-color: #F8FAF7;
        <widget class="QLabel" name="label_76">
         <property name="geometry">
          <rect>
-          <x>670</x>
+          <x>662</x>
           <y>0</y>
-          <width>211</width>
+          <width>251</width>
           <height>80</height>
          </rect>
         </property>
@@ -4141,6 +4260,13 @@ background-color: #F8FAF7;
           <family>黑体</family>
           <pointsize>14</pointsize>
          </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">#label_76{
+border:none;
+background-color:#EFEFEF;
+border:1px solid #646465;
+}</string>
         </property>
         <property name="text">
          <string> 学生电话</string>
