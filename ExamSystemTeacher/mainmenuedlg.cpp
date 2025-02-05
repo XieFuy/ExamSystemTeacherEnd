@@ -24,6 +24,12 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
     this->m_testPaperStatusChoise = 0;
     this->m_sortNumStudentManeger = 0;
 
+    this->strSignalLabelStyleSheet = "QLabel{border:none;background-color:#E1EFD8;border-bottom:1px solid #646465;}";
+    this->strSignalWidgetStyleSheet = "QWidget{border:none;background-color:#E1EFD8;border-bottom:1px solid #646465;}";
+
+    this->strDoubleLabelStyleSheet = "QLabel{border:none;background-color:#FFFFFF;border-bottom:1px solid #646465;}";
+    this->strDoubleWidgetStyleSheet = "QWidget{border:none;background-color:#FFFFFF;border-bottom:1px solid #646465;}";
+
     this->m_studentRequestCount = "";
     this->m_judgeAnswer = "";
     this->ui->comboBox->addItem("全部",0);
@@ -674,6 +680,102 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
     this->initStudentAnswerMultiTable();
     this->initStudentAnswerJudgeTable();
     this->initStudentAnswerShortAnswerTable();
+    this->initCorrectTestPaperTableUI();
+    this->initCorrectTestPaperTableContorl();
+}
+
+void CMainMenueDlg::initCorrectTestPaperTableContorl()
+{
+    // 试卷名称
+    for(int i = 0 ; i < 8 ; i++)
+    {
+        QLabel* testName = new QLabel();
+        testName->setText("测试试卷2025.02.25");
+        testName->setFont(QFont("黑体",12));
+        this->ui->tableWidget_5->setCellWidget(i,0,testName);
+        testName->setAlignment(Qt::AlignCenter);
+        this->m_correctTestPaperName.push_back(testName);
+    }
+
+    // 已批人数
+    for(int i = 0 ; i < 8 ; i++)
+    {
+        QLabel* testName = new QLabel();
+        testName->setText("52人");
+        testName->setFont(QFont("黑体",12));
+        this->ui->tableWidget_5->setCellWidget(i,1,testName);
+        testName->setAlignment(Qt::AlignCenter);
+        this->m_corrected.push_back(testName);
+    }
+
+    //待批人数
+    for(int i = 0 ; i < 8;i++)
+    {
+        QLabel* testName = new QLabel();
+        testName->setText("0人");
+        testName->setFont(QFont("黑体",12));
+        this->ui->tableWidget_5->setCellWidget(i,2,testName);
+        testName->setAlignment(Qt::AlignCenter);
+        this->m_notCorrected.push_back(testName);
+    }
+
+    //操作
+    for(int i = 0 ; i < 8 ; i++)
+    {
+        QWidget* widget = new QWidget();
+        QPushButton* deleteBtn = new QPushButton("进入批改");
+        deleteBtn->setStyleSheet("QPushButton{border:none; border:1px solid #faa046; color:#faa046;border-radius:5;}QPushButton:hover{border:1px solid #50b8f7;color:#50b8f7;}");
+        deleteBtn->setParent(widget);
+        deleteBtn->setGeometry(120,20,100,30);
+        deleteBtn->setFont(QFont("黑体",12));
+//        deleteBtn->setVisible(false);
+        this->ui->tableWidget_5->setCellWidget(i,3,widget);
+        this->m_correctOprator.push_back(widget);
+    }
+
+    //进行设置表格样式
+    for(int i = 0 ; i < 8 ; i++)
+    {
+        //同一行的所有控件都进行设置同样的背景颜色
+        if(i % 2 == 0)//
+        {
+            this->m_correctTestPaperName.at(i)->setStyleSheet("QLabel{border:none;background-color:#E1EFD8;border-bottom:1px solid #646465;}");
+            this->m_corrected.at(i)->setStyleSheet("QLabel{border:none;background-color:#E1EFD8;border-bottom:1px solid #646465;}");
+            this->m_notCorrected.at(i)->setStyleSheet("QLabel{border:none;background-color:#E1EFD8;border-bottom:1px solid #646465;}");
+            this->m_correctOprator.at(i)->setStyleSheet("QWidget{border:none;background-color:#E1EFD8;border-bottom:1px solid #646465;}");
+        }else
+        {
+            this->m_correctTestPaperName.at(i)->setStyleSheet("QLabel{border:none;background-color:#FFFFFF;border-bottom:1px solid #646465;}");
+            this->m_corrected.at(i)->setStyleSheet("QLabel{border:none;background-color:#FFFFFF;border-bottom:1px solid #646465;}");
+            this->m_notCorrected.at(i)->setStyleSheet("QLabel{border:none;background-color:#FFFFFF;border-bottom:1px solid #646465;}");
+            this->m_correctOprator.at(i)->setStyleSheet("QWidget{border:none;background-color:#FFFFFF;border-bottom:1px solid #646465;}");
+        }
+    }
+}
+
+void CMainMenueDlg::initCorrectTestPaperTableUI()
+{
+    this->ui->tableWidget_5->setRowCount(8);
+    this->ui->tableWidget_5->setColumnCount(4);
+    this->ui->tableWidget_5->horizontalHeader()->hide();
+    this->ui->tableWidget_5->verticalHeader()->hide();
+
+    //设置列宽
+    int width = this->ui->tableWidget_5->width();
+    int heigth = this->ui->tableWidget_5->height();
+    this->ui->tableWidget_5->setColumnWidth(0,width / 4);
+    this->ui->tableWidget_5->setColumnWidth(1,width / 4);
+    this->ui->tableWidget_5->setColumnWidth(2,width / 4);
+    this->ui->tableWidget_5->setColumnWidth(3,width / 4);
+
+    this->ui->tableWidget_5->setRowHeight(0,heigth/ 8);
+    this->ui->tableWidget_5->setRowHeight(1,heigth/ 8);
+    this->ui->tableWidget_5->setRowHeight(2,heigth/ 8);
+    this->ui->tableWidget_5->setRowHeight(3,heigth/ 8);
+    this->ui->tableWidget_5->setRowHeight(4,heigth/ 8);
+    this->ui->tableWidget_5->setRowHeight(5,heigth/ 8);
+    this->ui->tableWidget_5->setRowHeight(6,heigth/ 8);
+    this->ui->tableWidget_5->setRowHeight(7,heigth/ 8);
 }
 
 void CMainMenueDlg::initStudentAnswerSingaleTable()
@@ -1281,7 +1383,7 @@ void CMainMenueDlg::initStudentManegerTableContorl()
         QCheckBox* checkBox = new QCheckBox();
         checkBox->setText(QString::number(++this->m_sortNumStudentManeger));
         checkBox->setFont(QFont("黑体"));
-        checkBox->setStyleSheet("QCheckBox{margin-left:20px;}");
+        checkBox->setStyleSheet("QCheckBox{border:none;margin-left:20px;}");
         checkBox->setVisible(false);
         layout->addWidget(checkBox);
         checkBox->setParent(widget);
@@ -1294,7 +1396,8 @@ void CMainMenueDlg::initStudentManegerTableContorl()
     {
         QWidget* widget = new QWidget();
         QLabel* testName = new QLabel(widget);
-        testName->setGeometry(0,0,140,140);
+        testName->setStyleSheet("QLabel{border:none;}");
+        testName->setGeometry(0,0,136,136);
 //        testName->setPixmap(QPixmap(":/icons/acount.png"));
         testName->setScaledContents(true);
         this->ui->tableWidget_4->setCellWidget(i,1,widget);
@@ -1357,6 +1460,30 @@ void CMainMenueDlg::initStudentManegerTableContorl()
         deleteBtn->setVisible(false);
         this->ui->tableWidget_4->setCellWidget(i,6,widget);
         this->m_studentManegerOperators.push_back(widget);
+    }
+
+    //进行设置表格样式
+    for(int i = 0 ; i < 8 ; i++)
+    {
+        if(i % 2 == 0)
+        {
+            this->m_studentManegerCheckVec.at(i)->setStyleSheet(strSignalWidgetStyleSheet);
+            this->m_studentManegerHeadIconVec.at(i)->setStyleSheet(strSignalWidgetStyleSheet);
+            this->m_studentManagerStudentNameVec.at(i)->setStyleSheet(strSignalLabelStyleSheet);
+            this->m_studentManagerStudentIdVec.at(i)->setStyleSheet(strSignalLabelStyleSheet);
+            this->m_studentManegerPhoneNumberVec.at(i)->setStyleSheet(strSignalLabelStyleSheet);
+            this->m_studentManegerJoinTimeVec.at(i)->setStyleSheet(strSignalLabelStyleSheet);
+            this->m_studentManegerOperators.at(i)->setStyleSheet(strSignalWidgetStyleSheet);
+        }else
+        {
+            this->m_studentManegerCheckVec.at(i)->setStyleSheet(strDoubleWidgetStyleSheet);
+            this->m_studentManegerHeadIconVec.at(i)->setStyleSheet(strDoubleWidgetStyleSheet);
+            this->m_studentManagerStudentNameVec.at(i)->setStyleSheet(strDoubleLabelStyleSheet);
+            this->m_studentManagerStudentIdVec.at(i)->setStyleSheet(strDoubleLabelStyleSheet);
+            this->m_studentManegerPhoneNumberVec.at(i)->setStyleSheet(strDoubleLabelStyleSheet);
+            this->m_studentManegerJoinTimeVec.at(i)->setStyleSheet(strDoubleLabelStyleSheet);
+            this->m_studentManegerOperators.at(i)->setStyleSheet(strDoubleWidgetStyleSheet);
+        }
     }
 }
 
@@ -2527,7 +2654,7 @@ void CMainMenueDlg::initStudentRequestTableControl()
         QCheckBox* checkBox = new QCheckBox();
         checkBox->setText(QString::number(++this->m_sortNumStudentRequest));
         checkBox->setFont(QFont("黑体"));
-        checkBox->setStyleSheet("QCheckBox{margin-left:25px;}");
+        checkBox->setStyleSheet("QCheckBox{border:none;margin-left:25px;}");
         checkBox->setVisible(false);
         layout->addWidget(checkBox);
         checkBox->setParent(widget);
@@ -2587,6 +2714,26 @@ void CMainMenueDlg::initStudentRequestTableControl()
         release->setVisible(false);
         this->ui->tableWidget_3->setCellWidget(i,4,widget);
         this->m_studentRequestOpetators.push_back(widget);
+    }
+
+    //进行修改样式
+    for(int i = 0 ; i < 8;i++)
+    {
+        if(i % 2 == 0)
+        {
+            this->m_studentRequestCheckVec.at(i)->setStyleSheet(strSignalWidgetStyleSheet);
+            this->m_studentRequestNameVec.at(i)->setStyleSheet(strSignalLabelStyleSheet);
+            this->m_studentRequestStudentIdVec.at(i)->setStyleSheet(strSignalLabelStyleSheet);
+            this->m_studentRequestTimeVec.at(i)->setStyleSheet(strSignalLabelStyleSheet);
+            this->m_studentRequestOpetators.at(i)->setStyleSheet(strSignalWidgetStyleSheet);
+        }else
+        {
+            this->m_studentRequestCheckVec.at(i)->setStyleSheet(strDoubleWidgetStyleSheet);
+            this->m_studentRequestNameVec.at(i)->setStyleSheet(strDoubleLabelStyleSheet);
+            this->m_studentRequestStudentIdVec.at(i)->setStyleSheet(strDoubleLabelStyleSheet);
+            this->m_studentRequestTimeVec.at(i)->setStyleSheet(strDoubleLabelStyleSheet);
+            this->m_studentRequestOpetators.at(i)->setStyleSheet(strDoubleWidgetStyleSheet);
+        }
     }
 }
 
@@ -3113,7 +3260,7 @@ void CMainMenueDlg::initClassTableControl()
         QCheckBox* checkBox = new QCheckBox();
         checkBox->setText(QString::number(++this->sortNumberClass));
         checkBox->setFont(QFont("黑体"));
-        checkBox->setStyleSheet("QCheckBox{margin-left:25px;}");
+        checkBox->setStyleSheet("QCheckBox{border:none;margin-left:25px;}");
         checkBox->setVisible(false);
         layout->addWidget(checkBox);
         checkBox->setParent(widget);
@@ -3185,6 +3332,28 @@ void CMainMenueDlg::initClassTableControl()
         release->setVisible(false);
         this->ui->tableWidget_2->setCellWidget(i,5,widget);
         this->m_classOperationsVec.push_back(widget);
+    }
+
+    //进行修改表格的样式
+    for(int i = 0 ; i < 8; i++)
+    {
+        if(i % 2 == 0)
+        {
+            this->m_classCheckVec.at(i)->setStyleSheet(strSignalWidgetStyleSheet);
+            this->m_classIconVec.at(i)->setStyleSheet(strSignalLabelStyleSheet);
+            this->m_classNameVec.at(i)->setStyleSheet(strSignalLabelStyleSheet);
+            this->m_classCreateTimeVec.at(i)->setStyleSheet(strSignalLabelStyleSheet);
+            this->m_classCreatorVec.at(i)->setStyleSheet(strSignalLabelStyleSheet);
+            this->m_classOperationsVec.at(i)->setStyleSheet(strSignalWidgetStyleSheet);
+        }else
+        {
+            this->m_classCheckVec.at(i)->setStyleSheet(strDoubleWidgetStyleSheet);
+            this->m_classIconVec.at(i)->setStyleSheet(strDoubleLabelStyleSheet);
+            this->m_classNameVec.at(i)->setStyleSheet(strDoubleLabelStyleSheet);
+            this->m_classCreateTimeVec.at(i)->setStyleSheet(strDoubleLabelStyleSheet);
+            this->m_classCreatorVec.at(i)->setStyleSheet(strDoubleLabelStyleSheet);
+            this->m_classOperationsVec.at(i)->setStyleSheet(strDoubleWidgetStyleSheet);
+        }
     }
 
     this->bindClassOperators();
@@ -3895,7 +4064,7 @@ void CMainMenueDlg::initTestPaperTableContorl()
         QCheckBox* checkBox = new QCheckBox();
         checkBox->setText(QString::number(++this->sortNUmber));
         checkBox->setFont(QFont("黑体"));
-        checkBox->setStyleSheet("QCheckBox{margin-left:45px;}");
+        checkBox->setStyleSheet("QCheckBox{border:none;margin-left:45px;}");
         checkBox->setVisible(false);
         layout->addWidget(checkBox);
         checkBox->setParent(widget);
@@ -3981,6 +4150,30 @@ void CMainMenueDlg::initTestPaperTableContorl()
         release2->setVisible(false);
         this->ui->tableWidget->setCellWidget(i,6,widget);
         this->m_operators.push_back(widget);
+    }
+
+    //初始化表格样式
+    for(int i = 0 ; i < 8 ; i++)
+    {
+        if(i % 2 == 0)
+        {
+            this->m_checkVec.at(i)->setStyleSheet(strSignalWidgetStyleSheet);
+            this->m_testPaperName.at(i)->setStyleSheet(strSignalLabelStyleSheet);
+            this->m_testPaperCount.at(i)->setStyleSheet(strSignalLabelStyleSheet);
+            this->m_createTime.at(i)->setStyleSheet(strSignalLabelStyleSheet);
+            this->m_creater.at(i)->setStyleSheet(strSignalLabelStyleSheet);
+            this->m_status.at(i)->setStyleSheet(strSignalLabelStyleSheet);
+            this->m_operators.at(i)->setStyleSheet(strSignalWidgetStyleSheet);
+        }else
+        {
+            this->m_checkVec.at(i)->setStyleSheet(strDoubleWidgetStyleSheet);
+            this->m_testPaperName.at(i)->setStyleSheet(strDoubleLabelStyleSheet);
+            this->m_testPaperCount.at(i)->setStyleSheet(strDoubleLabelStyleSheet);
+            this->m_createTime.at(i)->setStyleSheet(strDoubleLabelStyleSheet);
+            this->m_creater.at(i)->setStyleSheet(strDoubleLabelStyleSheet);
+            this->m_status.at(i)->setStyleSheet(strDoubleLabelStyleSheet);
+            this->m_operators.at(i)->setStyleSheet(strDoubleWidgetStyleSheet);
+        }
     }
 
     //给操作按钮绑定信号槽函数
@@ -5145,6 +5338,43 @@ CMainMenueDlg::~CMainMenueDlg()
         }
     }
     this->m_studentManegerOperators.clear();
+
+    for(QLabel* lab : this->m_correctTestPaperName)
+    {
+        if(lab != nullptr)
+        {
+            delete  lab;
+        }
+    }
+    this->m_correctTestPaperName.clear();
+
+    for(QLabel* lab : this->m_corrected)
+    {
+        if(lab != nullptr)
+        {
+            delete lab;
+        }
+    }
+    this->m_corrected.clear();
+
+
+    for(QLabel* lab : this->m_notCorrected)
+    {
+        if(lab != nullptr)
+        {
+            delete lab;
+        }
+    }
+    this->m_notCorrected.clear();
+
+    for(QWidget* widget : this->m_correctOprator)
+    {
+        if(widget != nullptr)
+        {
+            delete widget;
+        }
+    }
+    this->m_correctOprator.clear();
 
     //如果关闭界面，接收头像信息的线程还在执行的话就等待接收后结束线程
     WaitForSingleObject(this->m_recvHeadThead,INFINITE); //找到退出崩溃的原因，因为关闭界面的时候，接收头像线程还在执行，但是UI已经释放导致异常

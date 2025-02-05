@@ -164,6 +164,18 @@ private:
 
     QVector<QString> m_teacherIdVec; //用于存储获取试卷信息时查询到的教师Id
     QVector<QString> m_testPaperIdVec;//用于存储获取试卷信息时查询到的试卷iD
+
+    //待批改模块
+    QVector<QLabel*> m_correctTestPaperName;
+    QVector<QLabel*> m_corrected;
+    QVector<QLabel*> m_notCorrected;
+    QVector<QWidget*> m_correctOprator;
+
+    QString strSignalLabelStyleSheet; //单数行的label表格样式字符串
+    QString strSignalWidgetStyleSheet; //单数行的widget表格样式字符串
+
+    QString strDoubleLabelStyleSheet; //双数行的表格样式字符串
+    QString strDoubleWidgetStyleSheet; //双数行的widget表格样式字符串
 private:
     void showPageIndex();//显示分页查询的下标页
     void initTableWidgetHeader(); //初始化表头
@@ -557,6 +569,11 @@ private:
     void initDataBaseTestPaperReleaseTable();
     static unsigned WINAPI threadInitDataBaseTestPaperReleaseTable(LPVOID arg);
 
+    //初始化待改试卷表格UI
+    void initCorrectTestPaperTableUI();
+
+    //初始化待批改试卷表格控件
+    void initCorrectTestPaperTableContorl();
 
 private:
     Ui::CMainMenueDlg *ui;
