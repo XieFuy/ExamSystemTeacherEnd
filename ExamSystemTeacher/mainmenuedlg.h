@@ -575,6 +575,11 @@ private:
     //初始化待批改试卷表格控件
     void initCorrectTestPaperTableContorl();
 
+    //初始化数据库提交表
+    void initCommitTestPaperTable();
+    static unsigned WINAPI threadInitCommitTestPaperTable(LPVOID arg);
+
+
 private:
     Ui::CMainMenueDlg *ui;
 };

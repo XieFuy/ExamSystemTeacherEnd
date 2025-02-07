@@ -13,6 +13,7 @@ SOURCES += \
     clientsocket.cpp \
     datetimeselectdlg.cpp \
     dbhelper.cpp \
+    dpihelper.cpp \
     exitlogindlg.cpp \
     logincontorller.cpp \
     loginmodel.cpp \
@@ -38,6 +39,7 @@ HEADERS += \
     clientsocket.h \
     datetimeselectdlg.h \
     dbhelper.h \
+    dpihelper.h \
     exitlogindlg.h \
     logincontorller.h \
     loginmodel.h \

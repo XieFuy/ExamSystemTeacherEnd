@@ -682,6 +682,20 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
     this->initStudentAnswerShortAnswerTable();
     this->initCorrectTestPaperTableUI();
     this->initCorrectTestPaperTableContorl();
+    this->initCommitTestPaperTable();
+}
+
+void CMainMenueDlg::initCommitTestPaperTable()
+{
+     _beginthreadex(nullptr,0,&CMainMenueDlg::threadInitCommitTestPaperTable,this,0,nullptr);
+}
+
+unsigned WINAPI CMainMenueDlg::threadInitCommitTestPaperTable(LPVOID arg)
+{
+    CMainMenueDlg* thiz = (CMainMenueDlg*)arg;
+    thiz->m_mainMenueContorller->initCommitTestPaperTable();
+    _endthreadex(0);
+    return 0;
 }
 
 void CMainMenueDlg::initCorrectTestPaperTableContorl()
@@ -690,7 +704,7 @@ void CMainMenueDlg::initCorrectTestPaperTableContorl()
     for(int i = 0 ; i < 8 ; i++)
     {
         QLabel* testName = new QLabel();
-        testName->setText("测试试卷2025.02.25");
+        testName->setText("");
         testName->setFont(QFont("黑体",12));
         this->ui->tableWidget_5->setCellWidget(i,0,testName);
         testName->setAlignment(Qt::AlignCenter);
@@ -701,7 +715,7 @@ void CMainMenueDlg::initCorrectTestPaperTableContorl()
     for(int i = 0 ; i < 8 ; i++)
     {
         QLabel* testName = new QLabel();
-        testName->setText("52人");
+        testName->setText("");
         testName->setFont(QFont("黑体",12));
         this->ui->tableWidget_5->setCellWidget(i,1,testName);
         testName->setAlignment(Qt::AlignCenter);
@@ -712,7 +726,7 @@ void CMainMenueDlg::initCorrectTestPaperTableContorl()
     for(int i = 0 ; i < 8;i++)
     {
         QLabel* testName = new QLabel();
-        testName->setText("0人");
+        testName->setText("");
         testName->setFont(QFont("黑体",12));
         this->ui->tableWidget_5->setCellWidget(i,2,testName);
         testName->setAlignment(Qt::AlignCenter);
@@ -728,7 +742,7 @@ void CMainMenueDlg::initCorrectTestPaperTableContorl()
         deleteBtn->setParent(widget);
         deleteBtn->setGeometry(120,20,100,30);
         deleteBtn->setFont(QFont("黑体",12));
-//        deleteBtn->setVisible(false);
+        deleteBtn->setVisible(false);
         this->ui->tableWidget_5->setCellWidget(i,3,widget);
         this->m_correctOprator.push_back(widget);
     }

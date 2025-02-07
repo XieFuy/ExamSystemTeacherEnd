@@ -10,6 +10,30 @@ CMainMenueModel::~CMainMenueModel()
 
 }
 
+bool CMainMenueModel::initCommitTestPaperTable()
+{
+    std::shared_ptr<CDBHelper> dbHelper = std::make_shared<CDBHelper>();
+    std::unique_ptr<char[]> sqlBuf(new char[1024000]);
+    memset(sqlBuf.get(),'\0',sizeof(char) * 1024000);
+    std::string sql;
+    sprintf(sqlBuf.get(),"create table if not exists `commitTestPaper`(\n\
+`id` integer primary key auto_increment,\n\
+`teacherId` varchar(20)  not null,\n\
+foreign key(`teacherId`) references `Teacher`(`teacherId`),\n\
+`classId` integer not null ,  \n\
+foreign key(`classId`) references `class`(`id`),\n\
+`testPaperId` integer not null,\n\
+foreign key(`testPaperId`) references `testPaperInfo`(`testPaperId`),\n\
+`studentId` varchar(20) not null,\n\
+foreign key(`studentId`) references `Student`(`studentId`),\n\
+`testPaperName` varchar(100) not null,\n\
+`correctStatus` varchar(5) not null default '0'\n\
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;");
+    sql = sqlBuf.get();
+    qDebug()<<sql.c_str();
+    return dbHelper->sqlExcute(sql,"ExamSystem");
+}
+
 bool CMainMenueModel::initStudentAnswerShortAnswerTable()
 {
     std::shared_ptr<CDBHelper> dbHelper = std::make_shared<CDBHelper>();

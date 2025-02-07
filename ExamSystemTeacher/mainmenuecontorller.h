@@ -107,6 +107,7 @@ public :
    bool initStudentAnswerMultiTable();
    bool initStudentAnswerJudgeTable();
    bool initStudentAnswerShortAnswerTable();
+   bool initCommitTestPaperTable();
  private:
     CMainMenueModel* m_mainMenueModel = nullptr;
 };

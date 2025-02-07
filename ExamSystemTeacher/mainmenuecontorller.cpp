@@ -10,6 +10,11 @@ bool CMainMenueContorller::initStudentAnswerSingaleTable()
     return this->m_mainMenueModel->initStudentAnswerSingaleTable();
 }
 
+bool CMainMenueContorller::initCommitTestPaperTable()
+{
+    return this->m_mainMenueModel->initCommitTestPaperTable();
+}
+
 bool CMainMenueContorller::deleteTestPaperReleaseInfo(QString acount,QString testPaperName)
 {
     QByteArray acountArr = acount.toLocal8Bit();
