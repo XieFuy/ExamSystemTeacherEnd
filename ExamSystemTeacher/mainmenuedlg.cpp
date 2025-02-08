@@ -23,6 +23,7 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
     this->m_multiCorrectOptions = "";
     this->m_testPaperStatusChoise = 0;
     this->m_sortNumStudentManeger = 0;
+    this->curPageIndexCorrect = 1;
 
     this->strSignalLabelStyleSheet = "QLabel{border:none;background-color:#E1EFD8;border-bottom:1px solid #646465;}";
     this->strSignalWidgetStyleSheet = "QWidget{border:none;background-color:#E1EFD8;border-bottom:1px solid #646465;}";
@@ -137,6 +138,7 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
         this->ui->pushButton_5->setStyleSheet("QPushButton{border:none;border:1px solid #faa046;color:#faa046;border-radius:20;}QPushButton:hover{border:1px solid #50b8f7;color:#50b8f7;}");
         this->ui->pushButton_6->setStyleSheet("QPushButton{border:none;border:1px solid #faa046;color:#faa046;border-radius:20;}QPushButton:hover{border:1px solid #50b8f7;color:#50b8f7;}");
         this->ui->pushButton_4->setStyleSheet("QPushButton{border:none;border:1px solid #faa046;color:#faa046;border-radius:20;}QPushButton:hover{border:1px solid #50b8f7;color:#50b8f7;}");
+        this->getCurPageIndexCorrect();
     });
 
     this->m_signalOperator = new QTreeWidgetItem(QStringList()<<"1、单选题");
@@ -675,6 +677,9 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
         }
     });
 
+    QObject::connect(this,&CMainMenueDlg::startShowCorrectTestPaper,this,&CMainMenueDlg::showCorrectTestPaperUI);
+
+
     this->initDataBaseTestPaperReleaseTable();
     this->initStudentAnswerSingaleTable();
     this->initStudentAnswerMultiTable();
@@ -682,7 +687,7 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
     this->initStudentAnswerShortAnswerTable();
     this->initCorrectTestPaperTableUI();
     this->initCorrectTestPaperTableContorl();
-    this->initCommitTestPaperTable();
+    this->initCommitTestPaperTable();   
 }
 
 void CMainMenueDlg::initCommitTestPaperTable()
@@ -711,7 +716,7 @@ void CMainMenueDlg::initCorrectTestPaperTableContorl()
         this->m_correctTestPaperName.push_back(testName);
     }
 
-    // 已批人数
+    //待批人数
     for(int i = 0 ; i < 8 ; i++)
     {
         QLabel* testName = new QLabel();
@@ -719,10 +724,11 @@ void CMainMenueDlg::initCorrectTestPaperTableContorl()
         testName->setFont(QFont("黑体",12));
         this->ui->tableWidget_5->setCellWidget(i,1,testName);
         testName->setAlignment(Qt::AlignCenter);
-        this->m_corrected.push_back(testName);
+        this->m_notCorrected.push_back(testName);
+
     }
 
-    //待批人数
+    //已批人数
     for(int i = 0 ; i < 8;i++)
     {
         QLabel* testName = new QLabel();
@@ -730,7 +736,7 @@ void CMainMenueDlg::initCorrectTestPaperTableContorl()
         testName->setFont(QFont("黑体",12));
         this->ui->tableWidget_5->setCellWidget(i,2,testName);
         testName->setAlignment(Qt::AlignCenter);
-        this->m_notCorrected.push_back(testName);
+        this->m_corrected.push_back(testName);
     }
 
     //操作
@@ -790,6 +796,122 @@ void CMainMenueDlg::initCorrectTestPaperTableUI()
     this->ui->tableWidget_5->setRowHeight(5,heigth/ 8);
     this->ui->tableWidget_5->setRowHeight(6,heigth/ 8);
     this->ui->tableWidget_5->setRowHeight(7,heigth/ 8);
+}
+
+void CMainMenueDlg::clearCorrectTestPaperTable()
+{
+    //清除试卷名称
+    for(QLabel* lab : this->m_correctTestPaperName)
+    {
+        if(lab != nullptr)
+        {
+            lab->setText("");
+        }
+    }
+
+    //清除待批人数
+    for(QLabel* lab : this->m_corrected)
+    {
+        if(lab != nullptr)
+        {
+            lab->setText("");
+        }
+    }
+
+    //清除已批人数
+    for(QLabel* lab : this->m_notCorrected)
+    {
+        if(lab != nullptr)
+        {
+            lab->setText("");
+        }
+    }
+
+    //清除操作按钮
+    for(int i = 0 ; i < 8 ; i++)
+    {
+        QList<QPushButton*> optButton = this->m_correctOprator.at(i)->findChildren<QPushButton*>();
+        for (QPushButton *button : optButton) {
+            button->setVisible(false);
+        }
+    }
+}
+
+void CMainMenueDlg::showCorrectTestPaperUI(QVector<QVector<QString>>* ret)
+{
+    if(ret == nullptr)
+    {
+        return ;
+    }
+    //进行UI显示
+   this->clearCorrectTestPaperTable();
+   //将数据进行插入到表格中
+   for(int i = 0 ; i < ret->size(); i++)
+   {
+       //显示试卷名称
+       QString str = ret->at(i).at(0);
+       this->m_correctTestPaperName.at(i)->setText(str);
+
+       //显示待批人数
+       str = ret->at(i).at(1);
+       this->m_notCorrected.at(i)->setText(str);
+
+       //显示已批人数
+       str = ret->at(i).at(2);
+       this->m_corrected.at(i)->setText(str);
+
+       //显示操作按钮
+       QList<QPushButton*> optButton = this->m_correctOprator.at(i)->findChildren<QPushButton*>();
+       for (QPushButton *button : optButton) {
+           button->setVisible(true);
+       }
+   }
+   if(ret != nullptr)
+   {
+       delete ret;
+   }
+}
+
+typedef struct getCurPageIndexCorrectArg{
+    QString teacherId;
+    CMainMenueDlg* thiz;
+    int curIndex;
+}GetCurPageIndexCorrectArg;
+
+//TODO:明天接着这里写
+void CMainMenueDlg::getCurPageIndexCorrect()
+{
+  std::shared_ptr<GetCurPageIndexCorrectArg> arg = std::make_shared<GetCurPageIndexCorrectArg>();
+  arg->teacherId = this->m_acount; //m_acount就是职工号
+  arg->thiz = this;
+  arg->curIndex = this->curPageIndexCorrect;
+  std::shared_ptr<GetCurPageIndexCorrectArg>* p = new std::shared_ptr<GetCurPageIndexCorrectArg>(arg);
+  _beginthreadex(nullptr,0,&CMainMenueDlg::threadGetCurPageIndexCorrect,p,0,nullptr);
+}
+
+unsigned WINAPI CMainMenueDlg::threadGetCurPageIndexCorrect(LPVOID arg)
+{
+    std::shared_ptr<GetCurPageIndexCorrectArg>* p = (std::shared_ptr<GetCurPageIndexCorrectArg>*)arg;
+    std::shared_ptr<GetCurPageIndexCorrectArg> gInfo = *p;
+    std::vector<std::vector<std::string>> ret =  gInfo->thiz->m_mainMenueContorller->getCurPageIndexCorrect(gInfo->teacherId,gInfo->curIndex);
+    delete  p;
+    //进行处理结果集
+    QVector<QVector<QString>>* result = new QVector<QVector<QString>>();
+    for(int i = 0 ; i < ret.size();i++)
+    {
+        QVector<QString> temp;
+        for(int j = 0 ; j < ret.at(i).size();j++)
+        {
+            QString str = QString::fromLocal8Bit(ret.at(i).at(j).c_str());
+            temp.push_back(str);
+        }
+        result->push_back(temp);
+    }
+
+    //发送回显信号
+    emit gInfo->thiz->startShowCorrectTestPaper(result);
+    _endthreadex(0);
+    return 0;
 }
 
 void CMainMenueDlg::initStudentAnswerSingaleTable()

@@ -108,6 +108,7 @@ public :
    bool initStudentAnswerJudgeTable();
    bool initStudentAnswerShortAnswerTable();
    bool initCommitTestPaperTable();
+   std::vector<std::vector<std::string>> getCurPageIndexCorrect(QString teacherId,int curIndex);
  private:
     CMainMenueModel* m_mainMenueModel = nullptr;
 };

@@ -392,6 +392,9 @@ border-bottom-left-radius:25;
          <property name="text">
           <string>欢迎登录</string>
          </property>
+         <property name="scaledContents">
+          <bool>true</bool>
+         </property>
         </widget>
        </item>
        <item>

@@ -10,6 +10,33 @@ CMainMenueModel::~CMainMenueModel()
 
 }
 
+std::vector<std::vector<std::string>> CMainMenueModel::getCurPageIndexCorrect(const char* teacherId
+                                                             ,int curIndex)
+{
+    if(teacherId == nullptr || curIndex <= 0)
+    {
+        return std::vector<std::vector<std::string>>();
+    }
+    std::shared_ptr<CDBHelper> dbHelper = std::make_shared<CDBHelper>();
+    std::unique_ptr<char[]> sqlBuf(new char[1024000]);
+    std::string sql;
+    memset(sqlBuf.get(),'\0',sizeof(char) * 1024000);
+    sprintf(sqlBuf.get(),"SELECT \n\
+testPaperName,\n\
+SUM(CASE WHEN correctStatus = '0' THEN 1 ELSE 0 END) AS pendingCount,\n\
+SUM(CASE WHEN correctStatus != '0' THEN 1 ELSE 0 END) AS correctedCount\n\
+FROM \n\
+commitTestPaper\n\
+WHERE\n\
+teacherId = '%s'\n\
+GROUP BY \n\
+testPaperName  \n\
+limit 8 offset %d;",teacherId,(curIndex -1)*8);
+    sql = sqlBuf.get();
+    qDebug()<<sql.c_str();
+    return dbHelper->sqlQuery(sql,"ExamSystem");
+}
+
 bool CMainMenueModel::initCommitTestPaperTable()
 {
     std::shared_ptr<CDBHelper> dbHelper = std::make_shared<CDBHelper>();

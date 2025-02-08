@@ -69,6 +69,7 @@ signals:
     void startShowStudentHeadIconUI(QImage* image);
     void startShowStudentManegerCurPagaUI(QVector<QVector<QString>>* ret);
     void startShowStudentManegerTableIndex();
+    void startShowCorrectTestPaper(QVector<QVector<QString>>* ret);
 private:
     CTestPaperReleaseDlg* m_testPaperReleaseDlg = nullptr;
     CExitLoginDlg* m_exitLoginDlg = nullptr;
@@ -170,12 +171,15 @@ private:
     QVector<QLabel*> m_corrected;
     QVector<QLabel*> m_notCorrected;
     QVector<QWidget*> m_correctOprator;
+    int curPageIndexCorrect;
 
     QString strSignalLabelStyleSheet; //单数行的label表格样式字符串
     QString strSignalWidgetStyleSheet; //单数行的widget表格样式字符串
 
     QString strDoubleLabelStyleSheet; //双数行的表格样式字符串
     QString strDoubleWidgetStyleSheet; //双数行的widget表格样式字符串
+
+
 private:
     void showPageIndex();//显示分页查询的下标页
     void initTableWidgetHeader(); //初始化表头
@@ -579,6 +583,14 @@ private:
     void initCommitTestPaperTable();
     static unsigned WINAPI threadInitCommitTestPaperTable(LPVOID arg);
 
+    //获取提交表的当前页的记录
+    void getCurPageIndexCorrect(); //获取待批改的表的当前页记录
+    static unsigned WINAPI threadGetCurPageIndexCorrect(LPVOID arg);
+
+    //显示批改试卷信息
+    void showCorrectTestPaperUI(QVector<QVector<QString>>* ret);
+
+    void clearCorrectTestPaperTable();//清除批改表UI
 
 private:
     Ui::CMainMenueDlg *ui;

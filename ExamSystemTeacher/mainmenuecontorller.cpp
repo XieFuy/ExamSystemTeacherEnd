@@ -5,6 +5,13 @@ CMainMenueContorller::CMainMenueContorller()
  this->m_mainMenueModel = new CMainMenueModel();
 }
 
+std::vector<std::vector<std::string>> CMainMenueContorller::getCurPageIndexCorrect(QString teacherId,int curIndex)
+{
+    QByteArray teacherIdArr = teacherId.toLocal8Bit();
+    const char* pTeacherId = teacherIdArr.data();
+    return this->m_mainMenueModel->getCurPageIndexCorrect(pTeacherId,curIndex);
+}
+
 bool CMainMenueContorller::initStudentAnswerSingaleTable()
 {
     return this->m_mainMenueModel->initStudentAnswerSingaleTable();
