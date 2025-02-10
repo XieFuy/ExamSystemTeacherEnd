@@ -10,6 +10,39 @@ CMainMenueModel::~CMainMenueModel()
 
 }
 
+int CMainMenueModel::getCorrectTestPaperCount(const char* teacherId)
+{
+    if(teacherId == nullptr)
+    {
+        return -1;
+    }
+
+    std::shared_ptr<CDBHelper> dbHelper = std::make_shared<CDBHelper>();
+    std::unique_ptr<char[]> sqlBuf (new char[1024000]);
+    memset(sqlBuf.get(),'\0',sizeof(char) * 1024000);
+    std::string sql;
+    sprintf(sqlBuf.get(),"SELECT COUNT(DISTINCT testPaperId) AS uniqueTestPaperCount\n\
+FROM commitTestPaper\n\
+WHERE teacherId = '%s';",teacherId);
+    sql = sqlBuf.get();
+    int tableCount =  dbHelper->sqlQueryCount(sql,"ExamSystem"); //获取的是表的记录条数
+    tableCount -= 1; //减去最上面的一条记录
+    int result = (tableCount / 8) ;
+
+    if(result < 0) //表示总的记录条数小于8
+    {
+        result += 1;
+    }else
+    {
+        int yuShu = tableCount - (result * 8);
+        if(yuShu >= 0)
+        {
+            result += 1;
+        }
+    }
+    return result;
+}
+
 std::vector<std::vector<std::string>> CMainMenueModel::getCurPageIndexCorrect(const char* teacherId
                                                              ,int curIndex)
 {

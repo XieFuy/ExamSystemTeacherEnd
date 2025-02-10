@@ -24,6 +24,7 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
     this->m_testPaperStatusChoise = 0;
     this->m_sortNumStudentManeger = 0;
     this->curPageIndexCorrect = 1;
+    this->m_correctTestPaperCount = "0";
 
     this->strSignalLabelStyleSheet = "QLabel{border:none;background-color:#E1EFD8;border-bottom:1px solid #646465;}";
     this->strSignalWidgetStyleSheet = "QWidget{border:none;background-color:#E1EFD8;border-bottom:1px solid #646465;}";
@@ -139,6 +140,7 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
         this->ui->pushButton_6->setStyleSheet("QPushButton{border:none;border:1px solid #faa046;color:#faa046;border-radius:20;}QPushButton:hover{border:1px solid #50b8f7;color:#50b8f7;}");
         this->ui->pushButton_4->setStyleSheet("QPushButton{border:none;border:1px solid #faa046;color:#faa046;border-radius:20;}QPushButton:hover{border:1px solid #50b8f7;color:#50b8f7;}");
         this->getCurPageIndexCorrect();
+        this->getCorrectTestPaperCount();
     });
 
     this->m_signalOperator = new QTreeWidgetItem(QStringList()<<"1、单选题");
@@ -678,7 +680,7 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
     });
 
     QObject::connect(this,&CMainMenueDlg::startShowCorrectTestPaper,this,&CMainMenueDlg::showCorrectTestPaperUI);
-
+    QObject::connect(this,&CMainMenueDlg::startShowCorrectTestPaperIndex,this,&CMainMenueDlg::showCorrectTestPaperIndex);
 
     this->initDataBaseTestPaperReleaseTable();
     this->initStudentAnswerSingaleTable();
@@ -688,6 +690,41 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
     this->initCorrectTestPaperTableUI();
     this->initCorrectTestPaperTableContorl();
     this->initCommitTestPaperTable();   
+}
+
+void CMainMenueDlg::showCorrectTestPaperIndex()
+{
+    QString first = QString::number(this->curPageIndexCorrect);
+    first += "/";
+    first += this->m_correctTestPaperCount;
+    this->ui->label_80->setText(first);
+}
+
+typedef struct  getCorrectTestPaperCountArg{
+    QString teacherId;
+    CMainMenueDlg* thiz;
+}GetCorrectTestPaperCountArg;
+
+void CMainMenueDlg::getCorrectTestPaperCount()
+{
+    std::shared_ptr<GetCorrectTestPaperCountArg> arg = std::make_shared<GetCorrectTestPaperCountArg>();
+    arg->teacherId = this->m_acount;
+    arg->thiz = this;
+    std::shared_ptr<GetCorrectTestPaperCountArg>* p = new std::shared_ptr<GetCorrectTestPaperCountArg>(arg);
+    _beginthreadex(nullptr,0,&CMainMenueDlg::threadGetCorrectTestPaperCount,p,0,nullptr);
+}
+
+unsigned WINAPI CMainMenueDlg::threadGetCorrectTestPaperCount(LPVOID arg)
+{
+    std::shared_ptr<GetCorrectTestPaperCountArg>* p = (std::shared_ptr<GetCorrectTestPaperCountArg>*)arg;
+    std::shared_ptr<GetCorrectTestPaperCountArg> gInfo = *p;
+    int ret =  gInfo->thiz->m_mainMenueContorller->getCorrectTestPaperCount(gInfo->teacherId);
+    gInfo->thiz->m_correctTestPaperCount = QString::number(ret);
+    //进行发送信号，进行显示总页数
+    emit gInfo->thiz->startShowCorrectTestPaperIndex();
+    delete p;
+    _endthreadex(0);
+    return 0;
 }
 
 void CMainMenueDlg::initCommitTestPaperTable()

@@ -5,6 +5,13 @@ CMainMenueContorller::CMainMenueContorller()
  this->m_mainMenueModel = new CMainMenueModel();
 }
 
+int CMainMenueContorller::getCorrectTestPaperCount(QString teacherId)
+{
+    QByteArray teacherIdArr = teacherId.toLocal8Bit();
+    const char* pTeacherId = teacherIdArr.data();
+    return this->m_mainMenueModel->getCorrectTestPaperCount(pTeacherId);
+}
+
 std::vector<std::vector<std::string>> CMainMenueContorller::getCurPageIndexCorrect(QString teacherId,int curIndex)
 {
     QByteArray teacherIdArr = teacherId.toLocal8Bit();

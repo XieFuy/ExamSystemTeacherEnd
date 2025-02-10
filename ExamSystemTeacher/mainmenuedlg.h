@@ -70,6 +70,7 @@ signals:
     void startShowStudentManegerCurPagaUI(QVector<QVector<QString>>* ret);
     void startShowStudentManegerTableIndex();
     void startShowCorrectTestPaper(QVector<QVector<QString>>* ret);
+    void startShowCorrectTestPaperIndex();
 private:
     CTestPaperReleaseDlg* m_testPaperReleaseDlg = nullptr;
     CExitLoginDlg* m_exitLoginDlg = nullptr;
@@ -179,7 +180,7 @@ private:
     QString strDoubleLabelStyleSheet; //双数行的表格样式字符串
     QString strDoubleWidgetStyleSheet; //双数行的widget表格样式字符串
 
-
+    QString m_correctTestPaperCount;
 private:
     void showPageIndex();//显示分页查询的下标页
     void initTableWidgetHeader(); //初始化表头
@@ -592,6 +593,11 @@ private:
 
     void clearCorrectTestPaperTable();//清除批改表UI
 
+    //进行获取待批表的总页数
+    void getCorrectTestPaperCount();
+    static unsigned WINAPI threadGetCorrectTestPaperCount(LPVOID arg);
+
+    void showCorrectTestPaperIndex();
 private:
     Ui::CMainMenueDlg *ui;
 };
