@@ -1,153 +1,108 @@
 #include "dpihelper.h"
-//#include <memory>
-//#include <cassert>
 
-//bool DpiHelper::GetPathsAndModes(std::vector<DISPLAYCONFIG_PATH_INFO>& pathsV, std::vector<DISPLAYCONFIG_MODE_INFO>& modesV, int flags)
-//{
-//    UINT32 numPaths = 0, numModes = 0;
-//    auto status = ::GetDisplayConfigBufferSizes(flags, &numPaths, &numModes);
-//    if (ERROR_SUCCESS != status)
-//    {
-//        return false;
-//    }
+DpiHelper::DpiHelper()
+{
 
-//    std::unique_ptr<DISPLAYCONFIG_PATH_INFO[]> paths(new DISPLAYCONFIG_PATH_INFO[numPaths]);
-//    std::unique_ptr<DISPLAYCONFIG_MODE_INFO[]> modes(new DISPLAYCONFIG_MODE_INFO[numModes]);
-//    status = QueryDisplayConfig(flags, &numPaths, paths.get(), &numModes, modes.get(), nullptr);
-//    if (ERROR_SUCCESS != status)
-//    {
-//        return false;
-//    }
+}
 
-//    for (unsigned int i = 0; i < numPaths; i++)
-//    {
-//        pathsV.push_back(paths[i]);
-//    }
+DpiHelper::~DpiHelper()
+{
+    //进行设置回原来的dpi
+    this->SetScalingPercentage(this->localScaling);
+}
 
-//    for (unsigned int i = 0; i < numModes; i++)
-//    {
-//        modesV.push_back(modes[i]);
-//    }
+//targetDpi=baseDpi× （缩放比例 /100）
+bool DpiHelper::isRunningAsAdmin() {
+    BOOL isAdmin = FALSE;
+    SID_IDENTIFIER_AUTHORITY NtAuthority = SECURITY_NT_AUTHORITY;
+    PSID AdministratorsGroup;
+    if (AllocateAndInitializeSid(&NtAuthority, 2, SECURITY_BUILTIN_DOMAIN_RID, DOMAIN_ALIAS_RID_ADMINS, 0, 0, 0, 0, 0, 0, &AdministratorsGroup)) {
+        if (!CheckTokenMembership(NULL, AdministratorsGroup, &isAdmin)) {
+            isAdmin = FALSE;
+        }
+        FreeSid(AdministratorsGroup);
+    }
+    return isAdmin;
+}
 
-//    return true;
-//}
+bool DpiHelper::requestAdminRights() {
+    wchar_t szPath[MAX_PATH];
+    if (GetModuleFileName(NULL, szPath, ARRAYSIZE(szPath))) {
+        SHELLEXECUTEINFO sei = { sizeof(sei) };
+        sei.lpVerb = L"runas"; // 请求提升权限
+        sei.lpFile = szPath;
+        sei.hwnd = NULL;
+        sei.nShow = SW_NORMAL;
 
+        if (!ShellExecuteEx(&sei)) {
+            DWORD dwError = GetLastError();
+            if (dwError == ERROR_CANCELLED) {
+                QMessageBox::critical(nullptr, "错误", "管理员权限被拒绝，程序将退出。");
+            }
+            return false;
+        }
+        return true;
+    }
+    return false;
+}
 
-//DpiHelper::DpiHelper()
-//{
-//}
+// 获取当前显示缩放比例
+int DpiHelper::GetCurrentScalingPercentage() {
+    HDC hdc = GetDC(NULL);
+    int dpi = GetDeviceCaps(hdc, LOGPIXELSX);
+    ReleaseDC(NULL, hdc);
 
+    // 计算缩放比例
+    int scalingPercentage = static_cast<int>((static_cast<float>(dpi) / 96.0f) * 100);
+    return scalingPercentage;
+}
 
-//DpiHelper::~DpiHelper()
-//{
-//}
+// 设置显示缩放比例
+bool DpiHelper::SetScalingPercentage(int scalingPercentage) {
+    HKEY hKey;
+    LONG result;
 
+    // 打开注册表键
+    result = RegOpenKeyEx(HKEY_CURRENT_USER, TEXT("Control Panel\\Desktop"), 0, KEY_WRITE, &hKey);
+    if (result != ERROR_SUCCESS) {
+        qDebug()<< "Failed to open registry key.";
+        return false;
+    }
 
-//DpiHelper::DPIScalingInfo DpiHelper::GetDPIScalingInfo(LUID adapterID, UINT32 sourceID)
-//{
-//    DPIScalingInfo dpiInfo = {};
+    // 计算目标 DPI 值
+    int targetDpi = (96 * scalingPercentage) / 100;
 
-//    DpiHelper::DISPLAYCONFIG_SOURCE_DPI_SCALE_GET requestPacket = {};
-//    requestPacket.header.type = (DISPLAYCONFIG_DEVICE_INFO_TYPE)DpiHelper::DISPLAYCONFIG_DEVICE_INFO_TYPE_CUSTOM::DISPLAYCONFIG_DEVICE_INFO_GET_DPI_SCALE;
-//    requestPacket.header.size = sizeof(requestPacket);
-//    assert(0x20 == sizeof(requestPacket));//if this fails => OS has changed somthing, and our reverse enginnering knowledge about the API is outdated
-//    requestPacket.header.adapterId = adapterID;
-//    requestPacket.header.id = sourceID;
+    // 设置 LogPixels 值
+    DWORD logPixels = static_cast<DWORD>(targetDpi);
+    result = RegSetValueEx(hKey, TEXT("LogPixels"), 0, REG_DWORD, reinterpret_cast<BYTE*>(&logPixels), sizeof(logPixels));
+    if (result != ERROR_SUCCESS) {
+        qDebug()<< "Failed to set LogPixels value." ;
+        RegCloseKey(hKey);
+        return false;
+    }
 
-//    auto res = ::DisplayConfigGetDeviceInfo(&requestPacket.header);
-//    if (ERROR_SUCCESS == res)
-//    {//success
-//        if (requestPacket.curScaleRel < requestPacket.minScaleRel)
-//        {
-//            requestPacket.curScaleRel = requestPacket.minScaleRel;
-//        }
-//        else if (requestPacket.curScaleRel > requestPacket.maxScaleRel)
-//        {
-//            requestPacket.curScaleRel = requestPacket.maxScaleRel;
-//        }
+    // 设置 Win8DpiScaling 值
+    DWORD win8DpiScaling = 1;
+    result = RegSetValueEx(hKey, TEXT("Win8DpiScaling"), 0, REG_DWORD, reinterpret_cast<BYTE*>(&win8DpiScaling), sizeof(win8DpiScaling));
+    if (result != ERROR_SUCCESS) {
+        qDebug()<< "Failed to set Win8DpiScaling value." ;
+        RegCloseKey(hKey);
+        return false;
+    }
 
-//        std::int32_t minAbs = abs((int)requestPacket.minScaleRel);
-//        if (DpiHelper::CountOf(DpiVals) >= (size_t)(minAbs + requestPacket.maxScaleRel + 1))
-//        {//all ok
-//            dpiInfo.current = DpiVals[minAbs + requestPacket.curScaleRel];
-//            dpiInfo.recommended = DpiVals[minAbs];
-//            dpiInfo.maximum = DpiVals[minAbs + requestPacket.maxScaleRel];
-//            dpiInfo.bInitDone = true;
-//        }
-//        else
-//        {
-//            //Error! Probably DpiVals array is outdated
-//            return dpiInfo;
-//        }
-//    }
-//    else
-//    {
-//        //DisplayConfigGetDeviceInfo() failed
-//        return dpiInfo;
-//    }
+    // 设置 DPIscalingVer 值
+    DWORD dpiScalingVer = 0x00001018;
+    result = RegSetValueEx(hKey, TEXT("DPIscalingVer"), 0, REG_DWORD, reinterpret_cast<BYTE*>(&dpiScalingVer), sizeof(dpiScalingVer));
+    if (result != ERROR_SUCCESS) {
+        qDebug()<< "Failed to set DPIscalingVer value." ;
+        RegCloseKey(hKey);
+        return false;
+    }
 
-//    return dpiInfo;
-//}
+    RegCloseKey(hKey);
 
-//bool DpiHelper::SetDPIScaling(LUID adapterID, UINT32 sourceID, UINT32 dpiPercentToSet)
-//{
-//    DPIScalingInfo dPIScalingInfo = GetDPIScalingInfo(adapterID, sourceID);
+    // 通知系统设置已更改
+    SendMessageTimeout(HWND_BROADCAST, WM_SETTINGCHANGE, 0, (LPARAM)TEXT("Control Panel\\Desktop"), SMTO_NORMAL, 1000, NULL);
 
-//    if (dpiPercentToSet == dPIScalingInfo.current)
-//    {
-//        return true;
-//    }
-
-//    if (dpiPercentToSet < dPIScalingInfo.mininum)
-//    {
-//        dpiPercentToSet = dPIScalingInfo.mininum;
-//    }
-//    else if (dpiPercentToSet > dPIScalingInfo.maximum)
-//    {
-//        dpiPercentToSet = dPIScalingInfo.maximum;
-//    }
-
-//    int idx1 = -1, idx2 = -1;
-
-//    int i = 0;
-//    for (const auto& val : DpiVals)
-//    {
-//        if (val == dpiPercentToSet)
-//        {
-//            idx1 = i;
-//        }
-
-//        if (val == dPIScalingInfo.recommended)
-//        {
-//            idx2 = i;
-//        }
-//        i++;
-//    }
-
-//    if ((idx1 == -1) || (idx2 == -1))
-//    {
-//        //Error cannot find dpi value
-//        return false;
-//    }
-
-//    int dpiRelativeVal = idx1 - idx2;
-
-//    DpiHelper::DISPLAYCONFIG_SOURCE_DPI_SCALE_SET setPacket = {};
-//    setPacket.header.adapterId = adapterID;
-//    setPacket.header.id = sourceID;
-//    setPacket.header.size = sizeof(setPacket);
-//    assert(0x18 == sizeof(setPacket));//if this fails => OS has changed somthing, and our reverse enginnering knowledge about the API is outdated
-//    setPacket.header.type = (DISPLAYCONFIG_DEVICE_INFO_TYPE)DpiHelper::DISPLAYCONFIG_DEVICE_INFO_TYPE_CUSTOM::DISPLAYCONFIG_DEVICE_INFO_SET_DPI_SCALE;
-//    setPacket.scaleRel = (UINT32)dpiRelativeVal;
-
-//    auto res = ::DisplayConfigSetDeviceInfo(&setPacket.header);
-//    if (ERROR_SUCCESS == res)
-//    {
-//        return true;
-//    }
-//    else
-//    {
-//        return false;
-//    }
-//    return true;
-//}
+    return true;
+}

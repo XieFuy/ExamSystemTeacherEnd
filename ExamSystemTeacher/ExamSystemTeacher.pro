@@ -105,3 +105,10 @@ INCLUDEPATH += $$PWD/.
 DEPENDPATH += $$PWD/.
 
 win32:!win32-g++: PRE_TARGETDEPS += $$PWD/./User32.lib
+
+win32: LIBS += -L$$PWD/./ -lshell32
+
+INCLUDEPATH += $$PWD/.
+DEPENDPATH += $$PWD/.
+
+win32:!win32-g++: PRE_TARGETDEPS += $$PWD/./shell32.lib
