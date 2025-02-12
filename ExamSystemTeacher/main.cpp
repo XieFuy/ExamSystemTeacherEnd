@@ -35,6 +35,7 @@ ScreenInfo::ScreenInfo():m_screenWidth(0),m_screenHeigth(0){
 
 ScreenInfo::~ScreenInfo(){
     this->setScreenSize(this->m_screenWidth,this->m_screenHeigth); //将屏幕尺寸分辨率设置为原来的分辨率
+    qDebug()<<"ScreenInfo 释放！";
 }
 
 void ScreenInfo::setScreenSize(int width,int heigth)
@@ -62,8 +63,6 @@ void ScreenInfo::getScreenSize(int& width,int& height)
 
 int main(int argc, char *argv[])
 {
-    /******************上部分的代码是设置dpi的代码***********************/
-    QApplication a(argc, argv);
     std::shared_ptr<DpiHelper> dpiHelper = std::make_shared<DpiHelper>();
     //申请管理员权限
     if (!dpiHelper->isRunningAsAdmin()) {
@@ -88,7 +87,12 @@ int main(int argc, char *argv[])
      }
 
     std::shared_ptr<ScreenInfo> sInfo = std::make_shared<ScreenInfo>();
+    /******************上部分的代码是设置dpi的代码***********************/
+    QApplication a(argc, argv);
     Widget w;
     w.show();
-    return a.exec();
+    int ret =  a.exec();
+    dpiHelper.reset();
+    sInfo.reset();
+    return ret;
 }

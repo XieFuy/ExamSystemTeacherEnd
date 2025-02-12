@@ -682,6 +682,10 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
     QObject::connect(this,&CMainMenueDlg::startShowCorrectTestPaper,this,&CMainMenueDlg::showCorrectTestPaperUI);
     QObject::connect(this,&CMainMenueDlg::startShowCorrectTestPaperIndex,this,&CMainMenueDlg::showCorrectTestPaperIndex);
 
+
+    QObject::connect(this->ui->pushButton_38,&QPushButton::clicked,this,&CMainMenueDlg::showLastCorrectTestPaper);
+    QObject::connect(this->ui->pushButton_42,&QPushButton::clicked,this,&CMainMenueDlg::showNextCorrectTestPaper);
+
     this->initDataBaseTestPaperReleaseTable();
     this->initStudentAnswerSingaleTable();
     this->initStudentAnswerMultiTable();
@@ -690,6 +694,51 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
     this->initCorrectTestPaperTableUI();
     this->initCorrectTestPaperTableContorl();
     this->initCommitTestPaperTable();   
+}
+
+void CMainMenueDlg::showLastCorrectTestPaper()
+{
+    if(this->m_correctTestPaperCount == "0")
+    {
+        return;
+    }
+    //防止恶意刷新
+    if(this->curPageIndexCorrect<= 1)
+    {
+        return ;
+    }
+    //清除当前表中的记录
+    this->clearCorrectTestPaperTable();
+    //给当前页递减，并且不能低于1
+    if(this->curPageIndexCorrect > 1)
+    {
+       this->curPageIndexCorrect -= 1;
+    }
+    this->getCurPageIndexCorrect();
+    this->getCorrectTestPaperCount();
+}
+
+void CMainMenueDlg::showNextCorrectTestPaper()
+{
+    if(this->m_correctTestPaperCount == "0") //如果查询的结果集为空则不进行操作
+    {
+        return;
+    }
+
+    if(QString::number(this->curPageIndexCorrect) == this->m_correctTestPaperCount)
+    {
+        return;
+    }
+    //清除当前表中的记录
+    this->clearCorrectTestPaperTable();
+
+    //给当前页自增，并且不能超过总页
+    if(QString::number(this->curPageIndexCorrect) != this->m_correctTestPaperCount)
+    {
+        this->curPageIndexCorrect += 1;
+    }
+    this->getCurPageIndexCorrect();
+    this->getCorrectTestPaperCount();
 }
 
 void CMainMenueDlg::showCorrectTestPaperIndex()

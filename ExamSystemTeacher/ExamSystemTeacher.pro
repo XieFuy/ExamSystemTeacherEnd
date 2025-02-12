@@ -112,3 +112,20 @@ INCLUDEPATH += $$PWD/.
 DEPENDPATH += $$PWD/.
 
 win32:!win32-g++: PRE_TARGETDEPS += $$PWD/./shell32.lib
+
+# 指定 libmysql.dll 的路径
+#LIBMYSQL_DLL = ./libmysql.dll
+# 在构建完成后复制 libmysql.dll
+#QMAKE_POST_LINK += $$quote(cmd /c copy /y $$LIBMYSQL_DLL $$OUT_PWD/$${DESTDIR})
+
+#指定 gdi32.dll
+#LIBGDI32_DLL = ./gdi32.dll
+#QMAKE_POST_LINK += $$quote(cmd /c copy /y $$LIBGDI32_DLL $$OUT_PWD/$${DESTDIR})
+
+#指定 shell32.dll
+#LIBSHELL32_DLL = ./shell32.dll
+#QMAKE_POST_LINK += $$quote(cmd /c copy /y $$LIBSHELL32_DLL $$OUT_PWD/$${DESTDIR})
+
+#指定 user32.dll
+#LIBUSER32_DLL = ./user32.dll
+#QMAKE_POST_LINK += $$quote(cmd /c copy /y $$LIBUSER32_DLL $$OUT_PWD/$${DESTDIR})

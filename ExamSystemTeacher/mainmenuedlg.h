@@ -598,6 +598,12 @@ private:
     static unsigned WINAPI threadGetCorrectTestPaperCount(LPVOID arg);
 
     void showCorrectTestPaperIndex();
+
+    //试卷待批表的上一页操作
+    void showLastCorrectTestPaper();
+    //试卷待批表的下一页操作
+    void showNextCorrectTestPaper();
+
 private:
     Ui::CMainMenueDlg *ui;
 };

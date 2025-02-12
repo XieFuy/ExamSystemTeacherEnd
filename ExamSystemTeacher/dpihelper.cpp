@@ -9,6 +9,7 @@ DpiHelper::~DpiHelper()
 {
     //进行设置回原来的dpi
     this->SetScalingPercentage(this->localScaling);
+    qDebug()<<"dpiHelper 释放！";
 }
 
 //targetDpi=baseDpi× （缩放比例 /100）
