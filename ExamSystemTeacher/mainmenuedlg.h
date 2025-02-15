@@ -604,6 +604,19 @@ private:
     //试卷待批表的下一页操作
     void showNextCorrectTestPaper();
 
+    //试卷批改表的模糊查询操作
+    void getCorrectTestPaperDataByName(QString testPaperName);
+    static unsigned WINAPI threadGetCorrectTestPaperDataByName(LPVOID arg);
+
+    //获取待批表模糊查询结果集的下标总数
+    void getCorrectTestPaperCountByName(QString testPaperName);
+    static unsigned WINAPI threadGetCorrectTestPaperCountByName(LPVOID arg);
+
+    //实现当进行模糊查询结果集的上一页
+    void getCorrectTestPaperLastByName(QString testPaperName);
+
+    //实现当进行模糊查询结果集的下一页
+    void getCorrectTestPaperNextByName(QString testPaperName);
 private:
     Ui::CMainMenueDlg *ui;
 };

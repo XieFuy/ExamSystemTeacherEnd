@@ -10,6 +10,65 @@ CMainMenueModel::~CMainMenueModel()
 
 }
 
+int CMainMenueModel::getCorrectTestPaperCountByName(const char* teacherId,const char* testPaperName)
+{
+    if(teacherId == nullptr || testPaperName == nullptr)
+    {
+        return -1;
+    }
+    std::shared_ptr<CDBHelper> dbHelper = std::make_shared<CDBHelper>();
+    std::unique_ptr<char[]> sqlBuf (new char[1024000]);
+    memset(sqlBuf.get(),'\0',sizeof(char) * 1024000);
+    std::string sql;
+    sprintf(sqlBuf.get(),"SELECT COUNT(DISTINCT testPaperId) AS uniqueTestPaperCount\n\
+FROM commitTestPaper\n\
+WHERE teacherId = '%s' AND testPaperName like '%%%s%%';",teacherId,testPaperName);
+    sql = sqlBuf.get();
+    int tableCount =  dbHelper->sqlQueryCount(sql,"ExamSystem"); //获取的是表的记录条数
+    tableCount -= 1; //减去最上面的一条记录
+    int result = (tableCount / 8) ;
+
+    if(result < 0) //表示总的记录条数小于8
+    {
+        result += 1;
+    }else
+    {
+        int yuShu = tableCount - (result * 8);
+        if(yuShu >= 0)
+        {
+            result += 1;
+        }
+    }
+    return result;
+}
+
+std::vector<std::vector<std::string>> CMainMenueModel::getCorrectTestPaperDataByName(const char* teacherId
+                                                                    ,const char* testPaperName
+                                                                    ,int& curIndex)
+{
+    if(teacherId == nullptr || testPaperName == nullptr || curIndex == -1)
+    {
+        return std::vector<std::vector<std::string>>();
+    }
+    std::shared_ptr<CDBHelper> dbHelper = std::make_shared<CDBHelper>();
+    std::unique_ptr<char[]> sqlBuf(new char[1024000]);
+    std::string sql;
+    memset(sqlBuf.get(),'\0',sizeof(char) * 1024000);
+    sprintf(sqlBuf.get(),"SELECT \n\
+testPaperName,\n\
+SUM(CASE WHEN correctStatus = '0' THEN 1 ELSE 0 END) AS pendingCount,\n\
+SUM(CASE WHEN correctStatus != '0' THEN 1 ELSE 0 END) AS correctedCount\n\
+FROM \n\
+commitTestPaper\n\
+WHERE\n\
+teacherId = '%s' AND testPaperName like '%%%s%%'\n\
+GROUP BY \n\
+testPaperName \n\
+limit 8 offset %d;",teacherId,testPaperName,(curIndex - 1)*8);
+    sql = sqlBuf.get();
+    return  dbHelper->sqlQuery(sql,"ExamSystem");
+}
+
 int CMainMenueModel::getCorrectTestPaperCount(const char* teacherId)
 {
     if(teacherId == nullptr)

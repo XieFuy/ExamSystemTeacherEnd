@@ -683,8 +683,34 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
     QObject::connect(this,&CMainMenueDlg::startShowCorrectTestPaperIndex,this,&CMainMenueDlg::showCorrectTestPaperIndex);
 
 
-    QObject::connect(this->ui->pushButton_38,&QPushButton::clicked,this,&CMainMenueDlg::showLastCorrectTestPaper);
-    QObject::connect(this->ui->pushButton_42,&QPushButton::clicked,this,&CMainMenueDlg::showNextCorrectTestPaper);
+    QObject::connect(this->ui->pushButton_38,&QPushButton::clicked,[=](){
+        QString testPaperName = this->ui->lineEdit_6->text().trimmed();
+        if(testPaperName != "") //按照模糊查询的结果集进行上一页操作
+        {
+            this->getCorrectTestPaperLastByName(testPaperName);
+        }else
+        {
+            this->showLastCorrectTestPaper();
+        }
+    });
+
+    QObject::connect(this->ui->pushButton_42,&QPushButton::clicked,[=](){
+        QString testPaperName = this->ui->lineEdit_6->text().trimmed();
+        if(testPaperName != "") //按照模糊查询的结果集进行上一页操作
+        {
+            this->getCorrectTestPaperNextByName(testPaperName);
+        }else
+        {
+            this->showNextCorrectTestPaper();
+        }
+    });
+
+    QObject::connect(this->ui->pushButton_26,&QPushButton::clicked,[=](){
+      this->curPageIndexCorrect = 1;
+      QString  testPaperName = this->ui->lineEdit_6->text().trimmed();
+      this->getCorrectTestPaperDataByName(testPaperName);
+      this->getCorrectTestPaperCountByName(testPaperName);
+    });
 
     this->initDataBaseTestPaperReleaseTable();
     this->initStudentAnswerSingaleTable();
@@ -694,6 +720,132 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
     this->initCorrectTestPaperTableUI();
     this->initCorrectTestPaperTableContorl();
     this->initCommitTestPaperTable();   
+}
+
+void CMainMenueDlg::getCorrectTestPaperLastByName(QString testPaperName)
+{
+    qDebug()<<"执行的是模糊查询结果集上一页！";
+    if(this->m_correctTestPaperCount == "0")
+    {
+        return;
+    }
+    //防止恶意刷新
+    if(this->curPageIndexCorrect<= 1)
+    {
+        return ;
+    }
+    //清除当前表中的记录
+    this->clearCorrectTestPaperTable();
+    //给当前页递减，并且不能低于1
+    if(this->curPageIndexCorrect > 1)
+    {
+       this->curPageIndexCorrect -= 1;
+    }
+    this->getCorrectTestPaperDataByName(testPaperName);
+    this->getCorrectTestPaperCountByName(testPaperName);
+}
+
+void CMainMenueDlg::getCorrectTestPaperNextByName(QString testPaperName)
+{
+    qDebug()<<"执行的是模糊查询结果集下一页！";
+    if(this->m_correctTestPaperCount == "0") //如果查询的结果集为空则不进行操作
+    {
+        return;
+    }
+
+    if(QString::number(this->curPageIndexCorrect) == this->m_correctTestPaperCount)
+    {
+        return;
+    }
+    //清除当前表中的记录
+    this->clearCorrectTestPaperTable();
+
+    //给当前页自增，并且不能超过总页
+    if(QString::number(this->curPageIndexCorrect) != this->m_correctTestPaperCount)
+    {
+        this->curPageIndexCorrect += 1;
+    }
+    this->getCorrectTestPaperDataByName(testPaperName);
+    this->getCorrectTestPaperCountByName(testPaperName);
+}
+
+typedef struct getCorrectTestPaperDataByNameArg{
+    QString testPaperName;
+    QString teacherId;
+    CMainMenueDlg* thiz;
+    int curIndex;
+    getCorrectTestPaperDataByNameArg()=default;
+    ~getCorrectTestPaperDataByNameArg()
+    {
+        qDebug()<<"GetCorrectTestPaperDataByNameArg 被释放！";
+    }
+}GetCorrectTestPaperDataByNameArg;
+
+void CMainMenueDlg::getCorrectTestPaperDataByName(QString testPaperName)
+{
+    std::shared_ptr<GetCorrectTestPaperDataByNameArg> arg = std::make_shared<GetCorrectTestPaperDataByNameArg>();
+    arg->testPaperName = testPaperName;
+    arg->teacherId = this->m_acount;
+    arg->curIndex = this->curPageIndexCorrect;
+    arg->thiz = this;
+    std::shared_ptr<GetCorrectTestPaperDataByNameArg>* p = new std::shared_ptr<GetCorrectTestPaperDataByNameArg>(arg);
+    HANDLE thread = (HANDLE)_beginthreadex(nullptr,0,&CMainMenueDlg::threadGetCorrectTestPaperDataByName,p,0,nullptr);
+}
+
+unsigned WINAPI CMainMenueDlg::threadGetCorrectTestPaperDataByName(LPVOID arg)
+{
+  std::shared_ptr<GetCorrectTestPaperDataByNameArg>* p = (std::shared_ptr<GetCorrectTestPaperDataByNameArg>*)arg;
+  std::shared_ptr<GetCorrectTestPaperDataByNameArg> gInfo = *p;
+  std::vector<std::vector<std::string>>ret =  gInfo->thiz->m_mainMenueContorller->getCorrectTestPaperDataByName(gInfo->teacherId
+                                                                    ,gInfo->testPaperName,gInfo->curIndex);
+
+  QVector<QVector<QString>>* result = new QVector<QVector<QString>>();
+  for(int i = 0 ; i < ret.size();i++)
+  {
+      QVector<QString> temp;
+      for(int j = 0 ; j < ret.at(i).size();j++)
+      {
+          QString str = QString::fromLocal8Bit(ret.at(i).at(j).c_str());
+          temp.push_back(str);
+      }
+      result->push_back(temp);
+  }
+  //发送回显信号
+  emit gInfo->thiz->startShowCorrectTestPaper(result);
+    delete p;
+//  //_endthreadex(0); //建议不要在线程函数中写();
+  return 0;
+}
+
+typedef struct getCorrectTestPaperCountByNameArg
+{
+    QString teacherId;
+    QString testPaperName;
+    CMainMenueDlg* thiz;
+}GetCorrectTestPaperCountByNameArg;
+
+void CMainMenueDlg::getCorrectTestPaperCountByName(QString testPaperName)
+{
+  std::shared_ptr<GetCorrectTestPaperCountByNameArg> arg = std::make_shared<GetCorrectTestPaperCountByNameArg>();
+  arg->teacherId = this->m_acount;
+  arg->testPaperName = testPaperName;
+  arg->thiz = this;
+  std::shared_ptr<GetCorrectTestPaperCountByNameArg>* p = new std::shared_ptr<GetCorrectTestPaperCountByNameArg>(arg);
+  _beginthreadex(nullptr,0,&CMainMenueDlg::threadGetCorrectTestPaperCountByName,p,0,nullptr);
+}
+
+unsigned WINAPI CMainMenueDlg::threadGetCorrectTestPaperCountByName(LPVOID arg)
+{
+   std::shared_ptr<GetCorrectTestPaperCountByNameArg>* p = (std::shared_ptr<GetCorrectTestPaperCountByNameArg>*)arg;
+   std::shared_ptr<GetCorrectTestPaperCountByNameArg> gInfo = *p;
+   int ret =  gInfo->thiz->m_mainMenueContorller->getCorrectTestPaperCountByName(gInfo->teacherId
+                                                                     ,gInfo->testPaperName);
+   qDebug()<<"ret: "<<ret;
+   gInfo->thiz->m_correctTestPaperCount = QString::number(ret);
+   //进行发送信号，进行显示总页数
+   emit gInfo->thiz->startShowCorrectTestPaperIndex();
+   delete p;
+   return 0;
 }
 
 void CMainMenueDlg::showLastCorrectTestPaper()
@@ -772,7 +924,7 @@ unsigned WINAPI CMainMenueDlg::threadGetCorrectTestPaperCount(LPVOID arg)
     //进行发送信号，进行显示总页数
     emit gInfo->thiz->startShowCorrectTestPaperIndex();
     delete p;
-    _endthreadex(0);
+//    //_endthreadex(0);
     return 0;
 }
 
@@ -785,7 +937,7 @@ unsigned WINAPI CMainMenueDlg::threadInitCommitTestPaperTable(LPVOID arg)
 {
     CMainMenueDlg* thiz = (CMainMenueDlg*)arg;
     thiz->m_mainMenueContorller->initCommitTestPaperTable();
-    _endthreadex(0);
+//    //_endthreadex(0);
     return 0;
 }
 
@@ -996,7 +1148,7 @@ unsigned WINAPI CMainMenueDlg::threadGetCurPageIndexCorrect(LPVOID arg)
 
     //发送回显信号
     emit gInfo->thiz->startShowCorrectTestPaper(result);
-    _endthreadex(0);
+//    //_endthreadex(0);
     return 0;
 }
 
@@ -1009,7 +1161,7 @@ unsigned WINAPI CMainMenueDlg::threadInitStudentAnswerSingaleTableEntry(LPVOID a
 {
     CMainMenueDlg* thiz = (CMainMenueDlg*)arg;
     thiz->m_mainMenueContorller->initStudentAnswerSingaleTable();
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -1022,7 +1174,7 @@ unsigned WINAPI CMainMenueDlg::threadInitDataBaseTestPaperReleaseTable(LPVOID ar
 {
     CMainMenueDlg* thiz = (CMainMenueDlg*)arg;
     thiz->m_mainMenueContorller->initDataBaseTestPaperReleaseTable();
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -1107,7 +1259,7 @@ unsigned WINAPI CMainMenueDlg::threadGetStudentManegerTableCountByStudentNameEnt
     //进行发送信号，进行显示总页数
     emit gInfo->thiz->startShowStudentManegerTableIndex();
     delete gInfo;
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -1151,7 +1303,7 @@ unsigned WINAPI CMainMenueDlg::threadGetStudentManegerCurPageDataByStudentName(L
     }
     //发送数据回显信号
     emit gInfo->thiz->startShowStudentManegerCurPagaUI(result);
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -1202,7 +1354,7 @@ unsigned WINAPI CMainMenueDlg::threadDeleteMultiManegerByStudentId(LPVOID arg)
     aInfo->thiz->ui->checkBox_10->setChecked(false);
     delete aInfo->studentIdLst;
     delete aInfo;
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -1245,7 +1397,7 @@ unsigned WINAPI CMainMenueDlg::threadDeleteStudentManegerByStudentId(LPVOID arg)
         dInfo->thiz->getStudentMenberCountData();
     }
     delete dInfo;
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -1381,7 +1533,7 @@ unsigned WINAPI CMainMenueDlg::threadGetStudentManegerTableCountEntry(LPVOID arg
     //进行发送信号，进行显示总页数
     emit gInfo->thiz->startShowStudentManegerTableIndex();
     delete gInfo;
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -1491,7 +1643,7 @@ unsigned WINAPI  CMainMenueDlg::showStudentHeadIcon(LPVOID arg)
     }
     emit  thiz->startShowStudentHeadIconUI(image);
     delete[] recvBuffer;
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -1590,7 +1742,7 @@ unsigned WINAPI CMainMenueDlg::threadGetStudentManegerCurPageData(LPVOID arg)
     //发送数据回显信号
     emit gInfo->thiz->startShowStudentManegerCurPagaUI(result);
     //emit gInfo->thiz->startShowStudentRequestTableUI(result);
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -1761,7 +1913,7 @@ unsigned WINAPI CMainMenueDlg::threadGetStudentMenberCountData(LPVOID arg)
     strResult += "人";
     gInfo->thiz->ui->label_78->setText(strResult);
     delete gInfo;
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -1842,7 +1994,7 @@ unsigned WINAPI CMainMenueDlg::threadShowClassIconInStudentManeger(LPVOID arg)
     delete[] recvBuffer;
 
     delete sInfo;
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -1904,7 +2056,7 @@ unsigned WINAPI CMainMenueDlg::threadDegreeMultiRequestByStudentId(LPVOID arg)
     delete aInfo;
     emit aInfo->thiz->ui->checkBox_9->toggled(false);
     aInfo->thiz->ui->checkBox_9->setChecked(false);
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -1954,7 +2106,7 @@ unsigned WINAPI CMainMenueDlg::threadAgreeMultiRequestByStudentId(LPVOID arg)
     delete aInfo;
     emit aInfo->thiz->ui->checkBox_9->toggled(false);
     aInfo->thiz->ui->checkBox_9->setChecked(false);
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -1987,7 +2139,7 @@ unsigned WINAPI CMainMenueDlg::threadDegreeStudentRequestByStudentId(LPVOID arg)
     dInfo->thiz->getStudentRequestTableData();
     dInfo->thiz->getStudentRequestTableCount();
     delete dInfo;
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -2000,7 +2152,7 @@ unsigned WINAPI CMainMenueDlg::threadInitJoinClassStudentManeageTable(LPVOID arg
 {
     CMainMenueDlg* thiz = (CMainMenueDlg*)arg;
     thiz->m_mainMenueContorller->initJoinClassStudentManeageTable();
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -2035,7 +2187,7 @@ unsigned WINAPI CMainMenueDlg::threadAgreeStudentRequestByStudentId(LPVOID arg)
    aInfo->thiz->getStudentRequestTableData();
    aInfo->thiz->getStudentRequestTableCount();
    delete aInfo;
-   _endthreadex(0);
+   //_endthreadex(0);
    return 0;
 }
 
@@ -2177,7 +2329,7 @@ unsigned WINAPI CMainMenueDlg::threadGetStudentRequestByRequestTimeCount(LPVOID 
    gInfo->thiz->m_studentRequestCount = QString::number(ret);
    emit gInfo->thiz->startShowStudentRequestIndexUI();
    delete gInfo;
-   _endthreadex(0);
+   //_endthreadex(0);
    return 0;
 }
 
@@ -2223,7 +2375,7 @@ unsigned WINAPI CMainMenueDlg::threadGetStudentRequestByRequestTime(LPVOID arg)
     //发送数据回显信号
     emit gInfo->thiz->startShowStudentRequestTableUI(result);
     delete gInfo;
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -2300,7 +2452,7 @@ unsigned WINAPI CMainMenueDlg::threadGetStudentRequestByStudentIdCount(LPVOID ar
     gInfo->thiz->m_studentRequestCount = QString::number(ret);
     emit gInfo->thiz->startShowStudentRequestIndexUI();
     delete gInfo;
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -2346,7 +2498,7 @@ unsigned WINAPI CMainMenueDlg::threadGetStudentRequestByStudentId(LPVOID arg)
     //发送数据回显信号
     emit gInfo->thiz->startShowStudentRequestTableUI(result);
     delete gInfo;
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -2425,7 +2577,7 @@ unsigned WINAPI CMainMenueDlg::threadGetStudentRequestByStudentNameCount(LPVOID 
     gInfo->thiz->m_studentRequestCount = QString::number(ret);
     emit gInfo->thiz->startShowStudentRequestIndexUI();
     delete gInfo;
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -2455,32 +2607,32 @@ unsigned WINAPI CMainMenueDlg::threadGetStudentRequestByCondition(LPVOID arg)
         emit gInfo->thiz->startGetStudentRequestTableData();
         emit gInfo->thiz->startGetStudentRequestCount();
         delete gInfo;
-        _endthreadex(0);
+        //_endthreadex(0);
         return 0;
     }else if(strCondition != "" && value == 0) //按学生姓名
     {
         gInfo->thiz->getStudentRequestByStudentName(strCondition);
         gInfo->thiz->getStudentRequestByStudentNameCount(strCondition);
         delete gInfo;
-        _endthreadex(0);
+        //_endthreadex(0);
         return 0;
     }else if(strCondition != "" && value == 1)//按学生学号
     {
         gInfo->thiz->getStudentRequestByStudentId(strCondition);
         gInfo->thiz->getStudentRequestByStudentIdCount(strCondition);
         delete gInfo;
-        _endthreadex(0);
+        //_endthreadex(0);
         return 0;
     }else if(strCondition != "" && value == 2)//按申请时间
     {
         gInfo->thiz->getStudentRequestByRequestTime(strCondition);
         gInfo->thiz->getStudentRequestByRequestTimeCount(strCondition);
         delete gInfo;
-        _endthreadex(0);
+        //_endthreadex(0);
         return 0;
     }
     delete gInfo;
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -2517,7 +2669,7 @@ unsigned WINAPI CMainMenueDlg::threadGetStudentRequestTableCountEntry(LPVOID arg
     //发送显示当前页的信号
     emit gInfo->thiz->startShowStudentRequestIndexUI();
     delete gInfo;
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -2691,7 +2843,7 @@ unsigned WINAPI CMainMenueDlg::threadGetStudentRequestTableDataEntry(LPVOID arg)
     //发送数据回显信号
     emit gInfo->thiz->startShowStudentRequestTableUI(result);
     delete gInfo;
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -2704,7 +2856,7 @@ unsigned WINAPI CMainMenueDlg::threadInitStudentRequestDataBaseTableEntry(LPVOID
 {
     CMainMenueDlg* thiz = (CMainMenueDlg*)arg;
     thiz->m_mainMenueContorller->initStudentRequestDataBaseTable();
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -2811,7 +2963,7 @@ unsigned WINAPI CMainMenueDlg::threadShowClassIconInStudentRequest(LPVOID arg)
     delete[] recvBuffer;
 
     delete sInfo;
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -2972,7 +3124,7 @@ unsigned WINAPI CMainMenueDlg::threadDeleteMultiClassInfo(LPVOID arg)
     dInfo->thiz->m_classCurPageIndex = 1;
     emit dInfo->thiz->startGetClassTableInfo();
     emit dInfo->thiz->startGetClassTableIndex();
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -3091,7 +3243,7 @@ unsigned WINAPI CMainMenueDlg::threadDeleteClassInfoByDateTimeEntry(LPVOID arg)
     emit dInfo->thiz->startGetClassTableInfo();
     emit dInfo->thiz->startGetClassTableIndex();
     delete dInfo;
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -3176,7 +3328,7 @@ unsigned WINAPI CMainMenueDlg::threadGetClassTableCountEntry(LPVOID arg)
     //进行发送信号，进行显示总页数
     emit gInfo->thiz->startShowClassTableIndex();
     delete gInfo;
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -3345,7 +3497,7 @@ unsigned WINAPI CMainMenueDlg::showClassIcon(LPVOID arg)
     emit  thiz->startShowClassIcon(image);
 //    delete[] pixmapData;
     delete[] recvBuffer;
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -3386,7 +3538,7 @@ void CMainMenueDlg::showClassTableInfo(QVector<QVector<QString>>* ret)
        }
 
        //显示试卷图标
-//       QString str = ret->at(i).at(0);
+//       QString str = ret->at(i).at//_endthreadex(0);
 //       this->m_testPaperName.at(i)->setText(str);
        QByteArray arr =  ret->at(i).at(0).toLocal8Bit();
        this->m_ClassIconPath = arr.data();
@@ -3454,7 +3606,7 @@ unsigned WINAPI CMainMenueDlg::threadGetClassTableDataEntry(LPVOID arg)
     }
     emit dInfo->thiz->startShowClassTable(result);
     delete dInfo;
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -3467,7 +3619,7 @@ unsigned WINAPI CMainMenueDlg::threadInitClassTableDatabaseEntry(LPVOID arg)
 {
     CMainMenueDlg* thiz = (CMainMenueDlg*)arg;
     thiz->m_mainMenueContorller->initClassTableDatabase();
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -3668,7 +3820,7 @@ unsigned WINAPI CMainMenueDlg::threadDeleteMultiClickBtnEntry(LPVOID arg)
       delete dInfo;
       dInfo->thiz->getCurPageIndexTableData();
       dInfo->thiz->getTablePageCount();
-      _endthreadex(0);
+      //_endthreadex(0);
       return 0;
 }
 
@@ -3693,7 +3845,7 @@ unsigned WINAPI CMainMenueDlg::threadDeleteFromShortAnswerEntry(LPVOID arg)
     DeleteFromShortAnswerArg* dInfo = ( DeleteFromShortAnswerArg*)arg;
     dInfo->thiz->m_mainMenueContorller->deleteFromShortAnswer(dInfo->acount,dInfo->createTime);
     delete dInfo;
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -3717,7 +3869,7 @@ unsigned WINAPI CMainMenueDlg::threadDeleteFromJudgeEntry(LPVOID arg)
     DeleteFromJudgeArg* dInfo = (DeleteFromJudgeArg*)arg;
     dInfo->thiz->m_mainMenueContorller->deleteFromJudge(dInfo->acount,dInfo->createTime);
     delete dInfo;
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -3742,7 +3894,7 @@ unsigned WINAPI CMainMenueDlg::threadDeleteFromMultiChoiseEntry(LPVOID arg)
     DeleteFromMultiChoiseArg* dInfo = (DeleteFromMultiChoiseArg*)arg;
     dInfo->thiz->m_mainMenueContorller->deleteFromMultiChoise(dInfo->acount,dInfo->createTime);
     delete dInfo;
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -3767,7 +3919,7 @@ unsigned WINAPI CMainMenueDlg::threadDeleteFromSignalChoiseEntry(LPVOID arg)
     DeleteFromSignalChoiseArg* dInfo = (DeleteFromSignalChoiseArg*)arg;
     dInfo->thiz->m_mainMenueContorller->deleteFromSignalChoise(dInfo->acount,dInfo->createTime);
     delete dInfo;
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -3835,7 +3987,7 @@ unsigned WINAPI CMainMenueDlg::threadUpdateTestPaperStatus(LPVOID arg)
     uInfo->thiz->getCurPageIndexTableData();
     uInfo->thiz->getTablePageCount();
     delete uInfo;
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -3860,7 +4012,7 @@ unsigned WINAPI CMainMenueDlg::threadDeleteTestPaperReleaseInfo(LPVOID arg)
      DeleteTestPaperReleaseInfoArg* dInfo = ( DeleteTestPaperReleaseInfoArg*)arg;
      dInfo->thiz->m_mainMenueContorller->deleteTestPaperReleaseInfo(dInfo->acount,dInfo->testPaperName);
      delete dInfo;
-     _endthreadex(0);
+     //_endthreadex(0);
      return 0;
 }
 
@@ -3905,7 +4057,7 @@ unsigned WINAPI CMainMenueDlg::threadDeleteClickBtnEntry(LPVOID arg)
    dInfo->thiz->getCurPageIndexTableData();
    dInfo->thiz->getTablePageCount();
    delete dInfo;
-   _endthreadex(0);
+   //_endthreadex(0);
    return 0;
 }
 
@@ -4024,7 +4176,7 @@ unsigned WINAPI CMainMenueDlg::threadGetTableDataByFindTestNameCountEntry(LPVOID
     gInfo->thiz->m_pageCount = QString::number(ret);
     emit gInfo->thiz->startShowPageIndex();
     delete gInfo;
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -4050,7 +4202,7 @@ unsigned WINAPI CMainMenueDlg::threadGetTablePageCountNotPublishedEntry(LPVOID a
     gInfo->thiz->m_pageCount =QString::number(ret);
     emit gInfo->thiz->startShowPageIndex();
     delete gInfo;
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -4075,7 +4227,7 @@ unsigned WINAPI CMainMenueDlg::threadGetTablePageCountPublishedEntry(LPVOID arg)
     int ret = gInfo->thiz->m_mainMenueContorller->getTablePageCountPublished(gInfo->acount,gInfo->status);
     gInfo->thiz->m_pageCount =QString::number(ret);
     emit gInfo->thiz->startShowPageIndex();
-    _endthreadex(0);
+    //_endthreadex(0);
     delete gInfo;
     return 0;
 }
@@ -4125,7 +4277,7 @@ unsigned WINAPI CMainMenueDlg::threadGetTableDataByFindTestNameEntry(LPVOID arg)
     }
     emit gInfo->thiz->startShowCurPageIndexTable(result);
     delete gInfo;
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -4444,7 +4596,7 @@ unsigned WINAPI CMainMenueDlg::threadGetStudentRequestByStudentName(LPVOID arg)
      //发送数据回显信号
      emit gInfo->thiz->startShowStudentRequestTableUI(result);
      delete gInfo;
-     _endthreadex(0);
+     //_endthreadex(0);
      return 0;
 }
 
@@ -4465,7 +4617,7 @@ unsigned WINAPI CMainMenueDlg::threadGetCurPageIndexTableData(LPVOID arg)
         result->push_back(temp);
     }
     emit thiz->startShowCurPageIndexTable(result);
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -4504,7 +4656,7 @@ unsigned WINAPI CMainMenueDlg::threadGetCurPageIndexTableDataPubulishedEntry(LPV
    }
    emit gInfo->thiz->startShowCurPageIndexTable(result);
    delete gInfo;
-   _endthreadex(0);
+   //_endthreadex(0);
    return 0;
 }
 
@@ -4545,7 +4697,7 @@ unsigned WINAPI CMainMenueDlg::threadGetCurPageIndexTableDataNotPubulishedEntry(
    }
    emit gInfo->thiz->startShowCurPageIndexTable(result);
    delete gInfo;
-   _endthreadex(0);
+   //_endthreadex(0);
    return 0;
 }
 
@@ -4558,7 +4710,7 @@ unsigned WINAPI CMainMenueDlg::threadInitStudentAnswerShortAnswerTableEntry(LPVO
 {
     CMainMenueDlg* thiz = (CMainMenueDlg*)arg;
     thiz->m_mainMenueContorller->initStudentAnswerShortAnswerTable();
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -4571,7 +4723,7 @@ unsigned WINAPI CMainMenueDlg::threadInitStudentAnswerJudgeTableEntry(LPVOID arg
 {
     CMainMenueDlg* thiz = (CMainMenueDlg*)arg;
     thiz->m_mainMenueContorller->initStudentAnswerJudgeTable();
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -4584,7 +4736,7 @@ unsigned WINAPI CMainMenueDlg::threadInitStudentAnswerMultiTableEntry(LPVOID arg
 {
     CMainMenueDlg* thiz = (CMainMenueDlg*)arg;
     thiz->m_mainMenueContorller->initStudentAnswerMultiTable();
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -4710,7 +4862,7 @@ unsigned WINAPI CMainMenueDlg::threadGetTablePageCountEntry(LPVOID arg)
     CMainMenueDlg* thiz = (CMainMenueDlg*)arg;
     thiz->m_pageCount = thiz->m_mainMenueContorller->getTablePageCount(thiz->m_acount);
     emit thiz->startShowPageIndex();
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -4801,7 +4953,7 @@ unsigned WINAPI CMainMenueDlg::threadAddShortAnswerInfoEntry(LPVOID arg)
     pram->thiz->m_mainMenueContorller->addShortAnswerInfo(pram->grade,pram->question,pram->referenceAnswer,
                                                        pram->order);
     delete pram;
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -4851,7 +5003,7 @@ unsigned WINAPI CMainMenueDlg::threadAddJudgeInfoEntry(LPVOID arg)
     aInfo->thiz->m_mainMenueContorller->addJudgeInfo(aInfo->grade,aInfo->question,aInfo->sessionTrue,
                                                      aInfo->sessionFalse,aInfo->correctAnswer,aInfo->order);
     delete aInfo;
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -4920,7 +5072,7 @@ unsigned WINAPI CMainMenueDlg::threadAddMultiChoiceInfoEntry(LPVOID arg)
                                                         aInfo->sessionD,aInfo->sessionE,aInfo->sessionF,
                                                         aInfo->correctOpetions,aInfo->order);
     delete aInfo;
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -4986,7 +5138,7 @@ unsigned WINAPI CMainMenueDlg::threadAddSignalChoiceInfoEntry(LPVOID arg)
                                                             aInfo->sessionC,aInfo->sessionD,
                                                             aInfo->correctOptions,aInfo->order);
     delete aInfo;
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -4997,7 +5149,7 @@ void CMainMenueDlg::deleteTreeItemRecursively(QTreeWidgetItem* item) {
     int childCount = item->childCount();
     for (int i = 0; i < childCount; ++i) {
         deleteTreeItemRecursively(item->takeChild(0)); // 递归删除子项，
-       /*  注意：takeChild(0)会移除并返回第一个子项，
+       /*  注意：takeChild//_endthreadex(0)会移除并返回第一个子项，
          因此每次循环都会处理下一个子项（因为列表已经更新）。
          如果您不希望修改原始子项列表（即不移除它们），
          则应使用child(i)来获取子项，并手动管理索引。
@@ -5030,7 +5182,7 @@ unsigned WINAPI CMainMenueDlg::threadInitTestPaperTableEntry(LPVOID arg)
 {
     CMainMenueDlg* thiz = (CMainMenueDlg*)arg;
     thiz->m_mainMenueContorller->initTestPaperTable();
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -5043,7 +5195,7 @@ unsigned WINAPI CMainMenueDlg::threadInitSingleChoiceTableEntry(LPVOID arg)
 {
     CMainMenueDlg* thiz = (CMainMenueDlg*)arg;
     thiz->m_mainMenueContorller->initSingleChoiceTable();
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -5056,7 +5208,7 @@ unsigned WINAPI CMainMenueDlg::threadInitMultiChoiceTableEntry(LPVOID arg)
 {
     CMainMenueDlg* thiz = (CMainMenueDlg*)arg;
     thiz->m_mainMenueContorller->initMultiChoiceTable();
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -5069,7 +5221,7 @@ unsigned WINAPI CMainMenueDlg::threadInitJudgeTableEntry(LPVOID arg)
 {
     CMainMenueDlg* thiz = (CMainMenueDlg*)arg;
     thiz->m_mainMenueContorller->initJudgeTable();
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -5082,7 +5234,7 @@ unsigned WINAPI CMainMenueDlg::threadInitShortAnswerTableEntry(LPVOID arg)
 {
     CMainMenueDlg* thiz = (CMainMenueDlg*)arg;
     thiz->m_mainMenueContorller->initShortAnswerTable();
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -5127,7 +5279,7 @@ unsigned WINAPI CMainMenueDlg::threadChangeGenderEntry(LPVOID arg)
     ChangeGenderArg* cInfo =  (ChangeGenderArg*)arg;
     cInfo->thiz->m_mainMenueContorller->changeGender(cInfo->isChecked,cInfo->thiz->m_acount);
     delete cInfo;
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -5151,7 +5303,7 @@ unsigned WINAPI CMainMenueDlg::threadGetTeacherAcountInfoDataEntry(LPVOID arg)
     std::vector<std::vector<std::string>> ret =  tInfo->thiz->m_mainMenueContorller->showTeacherAcountInfo(tInfo->acount); //view层调用conntorller层的接口全部写到子线程中
     emit tInfo->thiz->startShowTeacherAcountInfo(&ret);
     delete tInfo;
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -5268,7 +5420,7 @@ unsigned WINAPI CMainMenueDlg::threadShowHeadEntry(LPVOID arg)
 {
     CMainMenueDlg* thiz = (CMainMenueDlg*)arg;
     thiz->threadShowHead();
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -5276,7 +5428,7 @@ unsigned WINAPI CMainMenueDlg::threadInitTeacherInfoTableEntry(LPVOID arg)
 {
     CMainMenueDlg* thiz = (CMainMenueDlg*)arg;
     thiz->m_mainMenueContorller->initTeacherInfoTable();
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 

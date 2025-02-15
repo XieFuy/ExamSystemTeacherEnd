@@ -113,6 +113,10 @@ public:
      bool initCommitTestPaperTable();
      std::vector<std::vector<std::string>> getCurPageIndexCorrect(const char* teacherId,int curIndex);
      int  getCorrectTestPaperCount(const char* teacherId);
+     std::vector<std::vector<std::string>> getCorrectTestPaperDataByName(const char* teacherId
+                                                                         ,const char* testPaperName
+                                                                         ,int& curIndex);
+     int getCorrectTestPaperCountByName(const char* teacherId,const char* testPaperName);
 private:
       HANDLE m_mutex; //因为所有操作都是使用的一个CDBHelper对象，所以要给每一个执行sql的步骤进行上锁
 };

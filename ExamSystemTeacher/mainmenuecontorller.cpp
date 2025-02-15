@@ -5,7 +5,27 @@ CMainMenueContorller::CMainMenueContorller()
  this->m_mainMenueModel = new CMainMenueModel();
 }
 
-int CMainMenueContorller::getCorrectTestPaperCount(QString teacherId)
+int CMainMenueContorller::getCorrectTestPaperCountByName(QString& teacherId,QString& testPaperName)
+{
+    QByteArray teacherIdArr = teacherId.toLocal8Bit();
+    QByteArray testPaperNameArr = testPaperName.toLocal8Bit();
+    const char* pTeacherId = teacherIdArr.data();
+    const char* pTestPaperName = testPaperNameArr.data();
+    return this->m_mainMenueModel->getCorrectTestPaperCountByName(pTeacherId,pTestPaperName);
+}
+
+std::vector<std::vector<std::string>> CMainMenueContorller::getCorrectTestPaperDataByName(QString& teacherId
+                                                                    ,QString& testPaperName,int& curIndex)
+{
+    QByteArray teacherIdArr = teacherId.toLocal8Bit();
+    QByteArray testPaperNameArr = testPaperName.toLocal8Bit();
+
+    const char* pTeacherIdArr = teacherIdArr.data();
+    const char* pTestPaperName = testPaperNameArr.data();
+    return this->m_mainMenueModel->getCorrectTestPaperDataByName(pTeacherIdArr,pTestPaperName,curIndex);
+}
+
+int CMainMenueContorller::getCorrectTestPaperCount(QString& teacherId)
 {
     QByteArray teacherIdArr = teacherId.toLocal8Bit();
     const char* pTeacherId = teacherIdArr.data();
