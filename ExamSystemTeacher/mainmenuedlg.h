@@ -181,6 +181,14 @@ private:
     QString strDoubleWidgetStyleSheet; //双数行的widget表格样式字符串
 
     QString m_correctTestPaperCount;
+
+    //待批成员模块部分
+    QVector<QLabel*> m_correctMemberName;
+    QVector<QLabel*> m_correctMemberSubject;
+    QVector<QLabel*> m_correctMemberKeGuan;
+    QVector<QLabel*> m_correctMemberZhuGuan;
+    QVector<QLabel*> m_correctMemberSum;
+    QVector<QWidget*> m_correctMemberOperator;
 private:
     void showPageIndex();//显示分页查询的下标页
     void initTableWidgetHeader(); //初始化表头
@@ -617,6 +625,25 @@ private:
 
     //实现当进行模糊查询结果集的下一页
     void getCorrectTestPaperNextByName(QString testPaperName);
+
+    void bindOperatorCorrect();
+
+    //进入批改试卷页面
+    void joinCorrectTestPaper(QString testPaperName,QString teacherId);
+
+    //批改待批成员表UI
+    void initCorrectMemberTableUI();
+
+    //初始化批改人员表控件
+    void initCorrectMemberTableContorl();
+
+    //获取当前页待批学生的信息
+    void getCurPageCorrectMember();
+    static unsigned WINAPI threadGetCurPageCorrectMember(LPVOID arg);
+
+    //初始化简答题数据库评分表
+    void initCorrectShortAnswerTable();
+    static unsigned WINAPI threadCorrectShortAnswerTable(LPVOID arg);
 private:
     Ui::CMainMenueDlg *ui;
 };

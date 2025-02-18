@@ -100,7 +100,7 @@ unsigned WINAPI CClassSaveDlg::threadAddClassInfo(LPVOID arg)
 {
     CClassSaveDlg* thiz = (CClassSaveDlg*)arg;
     thiz->addClassInfo();
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -108,7 +108,7 @@ unsigned WINAPI CClassSaveDlg::threadUpLoadFile(LPVOID arg)
 {
  CClassSaveDlg* thiz = (CClassSaveDlg*)arg;
  thiz->upLoadFile(thiz->filePath);
- _endthreadex(0);
+ //_endthreadex(0);
  return 0;
 }
 

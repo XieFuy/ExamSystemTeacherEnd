@@ -73,6 +73,36 @@ typedef struct  addStudentAnswerSignalInfo{
     int order;
 }AddStudentAnswerSignalInfo;
 
+//TODO：接着这里继续
+unsigned WINAPI CTestPaperReleaseDlg::threadAddStudentShortAnswerCorrectInfo(LPVOID arg)
+{
+    std::shared_ptr<AddStudentAnswerSignalInfo>* p = (std::shared_ptr<AddStudentAnswerSignalInfo>*)arg;
+    std::shared_ptr<AddStudentAnswerSignalInfo> aInfo = *p;
+
+    QByteArray teacherIdArr= aInfo->teacherId.toLocal8Bit();
+    QByteArray classIdArr = aInfo->classId.toLocal8Bit();
+    QByteArray testPaperIdArr = aInfo->testPaperId.toLocal8Bit();
+    QByteArray StudentIdArr = aInfo->StudentId.toLocal8Bit();
+
+    const char* pTeacherId = teacherIdArr.data();
+    const char* pClassId = classIdArr.data();
+    const char* pTestPaperId = testPaperIdArr.data();
+    const char* pStudentId = StudentIdArr.data();
+
+    //进行数据库操作
+    std::shared_ptr<CDBHelper> dbHelper = std::make_shared<CDBHelper>();
+    std::unique_ptr<char[]> sqlBuf(new char[1024000]);
+    std::string sql;
+    memset(sqlBuf.get(),'\0',sizeof(char) * 1024000);
+    sprintf(sqlBuf.get(),"insert into `shortAnswerCorrect`(`teacherId`,`classId`,`testPaperId`,`studentId`,`order`) \
+values('%s','%s','%s','%s',%d);",pTeacherId,pClassId,pTestPaperId,pStudentId,aInfo->order);
+     sql = sqlBuf.get();
+    bool ret =  dbHelper->sqlExcute(sql,"ExamSystem");
+    delete p;
+    //_endthreadex(0);
+    return 0;
+}
+
 unsigned WINAPI CTestPaperReleaseDlg::threadAddStudentAnswerShortAnswerInfo(LPVOID arg)
 {
     std::shared_ptr<AddStudentAnswerSignalInfo>* p = (std::shared_ptr<AddStudentAnswerSignalInfo>*)arg;
@@ -99,7 +129,7 @@ values('%s','%s','%s','%s',%d);",pTeacherId,pClassId,pTestPaperId,pStudentId,aIn
      sql = sqlBuf.get();
     bool ret =  dbHelper->sqlExcute(sql,"ExamSystem");
     delete p;
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -129,7 +159,7 @@ values('%s','%s','%s','%s',%d);",pTeacherId,pClassId,pTestPaperId,pStudentId,aIn
      sql = sqlBuf.get();
     bool ret =  dbHelper->sqlExcute(sql,"ExamSystem");
     delete p;
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -159,7 +189,7 @@ values('%s','%s','%s','%s',%d);",pTeacherId,pClassId,pTestPaperId,pStudentId,aIn
      sql = sqlBuf.get();
     bool ret =  dbHelper->sqlExcute(sql,"ExamSystem");
     delete p;
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -190,7 +220,7 @@ values('%s','%s','%s','%s',%d);",pTeacherId,pClassId,pTestPaperId,pStudentId,aIn
      sql = sqlBuf.get();
     bool ret =  dbHelper->sqlExcute(sql,"ExamSystem");
     delete p;
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -252,7 +282,7 @@ unsigned WINAPI CTestPaperReleaseDlg::threadGetStudentIdVectorEntry(LPVOID arg)
     {
         gInfo->studentIdVec_out.push_back(QString::fromLocal8Bit(ret.at(i).at(0).c_str()));
     }
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -281,7 +311,7 @@ unsigned WINAPI CTestPaperReleaseDlg::threadGetTestPaperIdEntry(LPVOID arg)
     std::vector<std::vector<std::string>> ret =  dbHelper->sqlQuery(sql,"ExamSystem");
     QString strTestPaperId = QString::fromLocal8Bit(ret.at(0).at(0).c_str());
     gInfo->testPaperId_out  = strTestPaperId.toInt();
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -310,7 +340,7 @@ unsigned WINAPI CTestPaperReleaseDlg::threadGetClassIdEntry(LPVOID arg)
     std::vector<std::vector<std::string>> ret =  dbHelper->sqlQuery(sql,"ExamSystem");
     QString strClassId = QString::fromLocal8Bit(ret.at(0).at(0).c_str());
     gInfo->classId_out  = strClassId.toInt();
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -335,7 +365,7 @@ unsigned WINAPI CTestPaperReleaseDlg::threadGetTestPaperSignalOrderEntry(LPVOID 
     {
         tInfo->orderVec_out.push_back(QString::fromLocal8Bit(ret.at(i).at(0).c_str()).toInt());
     }
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -360,7 +390,7 @@ unsigned WINAPI CTestPaperReleaseDlg::threadGetTestPaperMultiOrderEntry(LPVOID a
     {
         gInfo->order_out.push_back(QString::fromLocal8Bit(ret.at(i).at(0).c_str()).toInt());
     }
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -385,7 +415,7 @@ unsigned WINAPI CTestPaperReleaseDlg::threadGetTestPaperJudgeOrderEntry(LPVOID a
     {
         gInfo->order_out.push_back(QString::fromLocal8Bit(ret.at(i).at(0).c_str()).toInt());
     }
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -410,7 +440,7 @@ unsigned WINAPI CTestPaperReleaseDlg::threadGetTestPaperShortAnswerEntry(LPVOID 
     {
         gInfo->order_out.push_back(QString::fromLocal8Bit(ret.at(i).at(0).c_str()).toInt());
     }
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -629,6 +659,23 @@ unsigned WINAPI CTestPaperReleaseDlg::threadAddTestPaperReleaseInfo(LPVOID arg)
         }
     }
 
+    //进行插入简答题评分记录
+    for(int i = 0 ; i < studentIdVecArg->studentIdVec_out.size();i++)
+    {
+        for(int j = 0;j < shortAnswerOrderArg->order_out.size();j++)
+        {
+            std::shared_ptr<AddStudentAnswerSignalInfo> arg = std::make_shared<AddStudentAnswerSignalInfo>();
+            arg->teacherId =QString::fromLocal8Bit(pAcount);
+            arg->classId = QString::number(classId);
+            arg->testPaperId = QString::number(testPaperId);
+            arg->StudentId  = studentIdVecArg->studentIdVec_out.at(i);
+            arg->order = shortAnswerOrderArg->order_out.at(j);
+            std::shared_ptr<AddStudentAnswerSignalInfo>* p = new std::shared_ptr<AddStudentAnswerSignalInfo>(arg);
+            //执行插入学生答案记录
+           _beginthreadex(nullptr,0,&CTestPaperReleaseDlg::threadAddStudentShortAnswerCorrectInfo,p,0,nullptr);
+        }
+    }
+
     /*for(int i = 0 ; i < ret2.size();i++)
     {
         std::shared_ptr<AddStudentAnswerSignalInfo> arg = std::make_shared<AddStudentAnswerSignalInfo>();
@@ -659,7 +706,7 @@ values('%s',%d,%d,'%s','%s',%d,%d,%d);",pAcount,classId,testPaperId,pStartTime,p
     sql = sqlBuf.get();
     dbHelper->sqlExcute(sql,"ExamSystem");
     delete aInfo;
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -740,7 +787,7 @@ c.`className`;",pAcount);
      emit gInfo->thiz->startShowSubject(result);
      delete[] sqlBuf;
      delete gInfo;
-     _endthreadex(0);
+     //_endthreadex(0);
      return 0;
 }
 

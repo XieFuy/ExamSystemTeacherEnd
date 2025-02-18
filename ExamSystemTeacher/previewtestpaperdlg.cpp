@@ -340,7 +340,7 @@ unsigned WINAPI CPreviewTestPaperDlg::threadGetCurIndexShortAnswerChoice(LPVOID 
     }
     emit gInfo->thiz->startShowShortAnswer(result);
     delete gInfo;
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -375,7 +375,7 @@ unsigned WINAPI CPreviewTestPaperDlg::threadGetShortAnswerCount(LPVOID arg)
     //显示对应的按钮数量
     emit gInfo->thiz->startShowShortAnswerBtn(shoertAnswerCount);
     delete gInfo;
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -478,7 +478,7 @@ unsigned WINAPI CPreviewTestPaperDlg::threadGetCurIndexJudegChoice(LPVOID arg)
 
     emit gInfo->thiz->startShowJudgeChoice(result);
     delete gInfo;
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -514,7 +514,7 @@ unsigned WINAPI CPreviewTestPaperDlg::threadGetJudgeChoiceCount(LPVOID arg)
     //显示对应的按钮数量
     emit gInfo->thiz->startShowJudegMenueBtn(judgeCount);
     delete gInfo;
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -588,7 +588,7 @@ unsigned WINAPI CPreviewTestPaperDlg::threadGetCurIndexMultiChoice(LPVOID arg)
 
     emit gInfo->thiz->startShowMultiChoice(result);
     delete gInfo;
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -624,7 +624,7 @@ unsigned WINAPI CPreviewTestPaperDlg::threadGetMultiChoiceCount(LPVOID arg)
     //    //显示对应的按钮数量
     emit gInfo->thiz->startShowMultiMenueBtn(multiCount);
     delete gInfo;
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -782,7 +782,7 @@ unsigned WINAPI CPreviewTestPaperDlg::threadGetCurIndexSignalChoice(LPVOID arg)
     }
     emit gInfo->thiz->startShowSignalChoice(result);
     delete gInfo;
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -810,7 +810,7 @@ unsigned WINAPI CPreviewTestPaperDlg::threadGetSignalChoiceCount(LPVOID arg)
     //显示对应的按钮数量
     emit gInfo->thiz->startShowMenueBtn(signalCount);
     delete gInfo;
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 

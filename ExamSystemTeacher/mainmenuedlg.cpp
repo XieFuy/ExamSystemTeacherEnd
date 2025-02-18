@@ -82,9 +82,9 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
     QObject::connect(this,&CMainMenueDlg::startInitTeacherInfoTable,this,&CMainMenueDlg::initTeacherInfoTable);
     emit this->startInitTeacherInfoTable();
 
-    QObject::connect(this->ui->pushButton,&QPushButton::clicked,[=](){
-        this->ui->stackedWidget->setCurrentIndex(5);
-    });
+//    QObject::connect(this->ui->pushButton,&QPushButton::clicked,[=](){
+//        this->ui->stackedWidget->setCurrentIndex(5);
+//    });
 
     QObject::connect(this->ui->pushButton_3,&QPushButton::clicked,[=](){
         this->ui->stackedWidget->setCurrentIndex(0);
@@ -712,6 +712,10 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
       this->getCorrectTestPaperCountByName(testPaperName);
     });
 
+    QObject::connect(this->ui->pushButton_43,&QPushButton::clicked,[=](){
+        this->ui->stackedWidget->setCurrentIndex(4);
+    });
+
     this->initDataBaseTestPaperReleaseTable();
     this->initStudentAnswerSingaleTable();
     this->initStudentAnswerMultiTable();
@@ -720,6 +724,36 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
     this->initCorrectTestPaperTableUI();
     this->initCorrectTestPaperTableContorl();
     this->initCommitTestPaperTable();   
+    this->initCorrectMemberTableUI();
+    this->initCorrectMemberTableContorl();
+    this->initCorrectShortAnswerTable();
+}
+
+void CMainMenueDlg::initCorrectMemberTableUI()
+{
+    this->ui->tableWidget_6->setRowCount(8);
+    this->ui->tableWidget_6->setColumnCount(6);
+    this->ui->tableWidget_6->horizontalHeader()->hide();
+    this->ui->tableWidget_6->verticalHeader()->hide();
+
+    //设置列宽
+    int width = this->ui->tableWidget_6->width();
+    int heigth = this->ui->tableWidget_6->height();
+    this->ui->tableWidget_6->setColumnWidth(0,width / 4);
+    this->ui->tableWidget_6->setColumnWidth(1,width / 6);
+    this->ui->tableWidget_6->setColumnWidth(2,width / 6);
+    this->ui->tableWidget_6->setColumnWidth(3,width / 6);
+    this->ui->tableWidget_6->setColumnWidth(4,width / 12);
+    this->ui->tableWidget_6->setColumnWidth(5,width / 6);
+
+    this->ui->tableWidget_6->setRowHeight(0,heigth/ 8);
+    this->ui->tableWidget_6->setRowHeight(1,heigth/ 8);
+    this->ui->tableWidget_6->setRowHeight(2,heigth/ 8);
+    this->ui->tableWidget_6->setRowHeight(3,heigth/ 8);
+    this->ui->tableWidget_6->setRowHeight(4,heigth/ 8);
+    this->ui->tableWidget_6->setRowHeight(5,heigth/ 8);
+    this->ui->tableWidget_6->setRowHeight(6,heigth/ 8);
+    this->ui->tableWidget_6->setRowHeight(7,heigth/ 8);
 }
 
 void CMainMenueDlg::getCorrectTestPaperLastByName(QString testPaperName)
@@ -815,6 +849,171 @@ unsigned WINAPI CMainMenueDlg::threadGetCorrectTestPaperDataByName(LPVOID arg)
     delete p;
 //  //_endthreadex(0); //建议不要在线程函数中写();
   return 0;
+}
+
+void CMainMenueDlg::initCorrectMemberTableContorl()
+{
+    // 学生名称
+    for(int i = 0 ; i < 8 ; i++)
+    {
+        QLabel* testName = new QLabel();
+        testName->setText("");
+        testName->setFont(QFont("黑体",12));
+        this->ui->tableWidget_6->setCellWidget(i,0,testName);
+        testName->setAlignment(Qt::AlignCenter);
+        this->m_correctMemberName.push_back(testName);
+    }
+
+    //科目
+    for(int i = 0 ; i < 8 ; i++)
+    {
+        QLabel* testName = new QLabel();
+        testName->setText("");
+        testName->setFont(QFont("黑体",12));
+        this->ui->tableWidget_6->setCellWidget(i,1,testName);
+        testName->setAlignment(Qt::AlignCenter);
+        this->m_correctMemberSubject.push_back(testName);
+
+    }
+
+    //客观题分数
+    for(int i = 0 ; i < 8;i++)
+    {
+        QLabel* testName = new QLabel();
+        testName->setText("");
+        testName->setFont(QFont("黑体",12));
+        this->ui->tableWidget_6->setCellWidget(i,2,testName);
+        testName->setAlignment(Qt::AlignCenter);
+        this->m_correctMemberKeGuan.push_back(testName);
+    }
+
+    //主观题分数
+    for(int i = 0 ; i < 8;i++)
+    {
+        QLabel* testName = new QLabel();
+        testName->setText("");
+        testName->setFont(QFont("黑体",12));
+        this->ui->tableWidget_6->setCellWidget(i,3,testName);
+        testName->setAlignment(Qt::AlignCenter);
+        this->m_correctMemberZhuGuan.push_back(testName);
+    }
+
+    //总分
+    for(int i = 0 ; i < 8;i++)
+    {
+        QLabel* testName = new QLabel();
+        testName->setText("");
+        testName->setFont(QFont("黑体",12));
+        this->ui->tableWidget_6->setCellWidget(i,4,testName);
+        testName->setAlignment(Qt::AlignCenter);
+        this->m_correctMemberSum.push_back(testName);
+    }
+
+    //操作
+    for(int i = 0 ; i < 8 ; i++)
+    {
+        QWidget* widget = new QWidget();
+        QPushButton* deleteBtn = new QPushButton("");
+        deleteBtn->setStyleSheet("QPushButton{border:none; border:1px solid #faa046; color:#faa046;border-radius:5;}QPushButton:hover{border:1px solid #50b8f7;color:#50b8f7;}");
+        deleteBtn->setParent(widget);
+        deleteBtn->setGeometry(70,20,100,30);
+        deleteBtn->setFont(QFont("黑体",12));
+        deleteBtn->setVisible(false);
+        this->ui->tableWidget_6->setCellWidget(i,5,widget);
+        this->m_correctMemberOperator.push_back(widget);
+    }
+
+    //进行设置表格样式
+    for(int i = 0 ; i < 8 ; i++)
+    {
+        //同一行的所有控件都进行设置同样的背景颜色
+        if(i % 2 == 0)//
+        {
+            this->m_correctMemberName.at(i)->setStyleSheet(strSignalLabelStyleSheet);
+            this->m_correctMemberSubject.at(i)->setStyleSheet(strSignalLabelStyleSheet);
+            this->m_correctMemberKeGuan.at(i)->setStyleSheet(strSignalLabelStyleSheet);
+            this->m_correctMemberZhuGuan.at(i)->setStyleSheet(strSignalLabelStyleSheet);
+            this->m_correctMemberSum.at(i)->setStyleSheet(strSignalLabelStyleSheet);
+            this->m_correctMemberOperator.at(i)->setStyleSheet(strSignalWidgetStyleSheet);
+        }else
+        {
+            this->m_correctMemberName.at(i)->setStyleSheet(strDoubleLabelStyleSheet);
+            this->m_correctMemberSubject.at(i)->setStyleSheet(strDoubleLabelStyleSheet);
+            this->m_correctMemberKeGuan.at(i)->setStyleSheet(strDoubleLabelStyleSheet);
+            this->m_correctMemberZhuGuan.at(i)->setStyleSheet(strDoubleLabelStyleSheet);
+            this->m_correctMemberSum.at(i)->setStyleSheet(strDoubleLabelStyleSheet);
+            this->m_correctMemberOperator.at(i)->setStyleSheet(strDoubleWidgetStyleSheet);
+        }
+    }
+}
+
+//TODO：明天继续
+typedef struct getCurPageCorrectMemberArg{
+//    QString
+}GetCurPageCorrectMemberArg;
+
+void CMainMenueDlg::getCurPageCorrectMember()
+{
+
+}
+
+unsigned WINAPI CMainMenueDlg::threadGetCurPageCorrectMember(LPVOID arg)
+{
+
+}
+
+void CMainMenueDlg::joinCorrectTestPaper(QString testPaperName,QString teacherId)
+{
+    this->ui->stackedWidget->setCurrentIndex(7);
+
+}
+
+void CMainMenueDlg::initCorrectShortAnswerTable()
+{
+    _beginthreadex(nullptr,0,&CMainMenueDlg::threadCorrectShortAnswerTable,this,0,nullptr);
+}
+
+unsigned WINAPI CMainMenueDlg::threadCorrectShortAnswerTable(LPVOID arg)
+{
+    CMainMenueDlg* thiz = (CMainMenueDlg*)arg;
+    thiz->m_mainMenueContorller->initCorrectShortAnswerTable();
+    return 0;
+}
+
+void CMainMenueDlg::bindOperatorCorrect()
+{
+    for(QVector<QWidget*>::iterator pos = this->m_correctOprator.begin(); pos != this->m_correctOprator.end();pos++)
+    {
+        QList<QPushButton*> ret = (*pos)->findChildren<QPushButton*>();
+        for(QPushButton* btn : ret)
+        {
+            if(btn->text() == "进入批改")
+            {
+                //绑定的删除操作的槽函数
+                QObject::connect(btn,&QPushButton::clicked,[=](){
+                    //进行遍历是哪一个按钮，并获取对应的行号
+                    int row = 0;
+                    for(int i = 0 ; i < this->m_correctOprator.size();i++)
+                    {
+                        QList<QPushButton*> buttons = this->m_correctOprator.at(i)->findChildren<QPushButton*>();
+                        for(QPushButton* clickedBtn: buttons)
+                        {
+                            if(clickedBtn == btn)
+                            {
+                                qDebug()<<"点击进入批改";
+                                QString testPaperName = this->m_correctTestPaperName.at(i)->text().trimmed();
+                                //职工id
+                                QString teacherId = this->m_acount;
+                                this->joinCorrectTestPaper(testPaperName,teacherId);
+                                break;
+                            }
+                        }
+                        row++;
+                    }
+                });
+            }
+        }
+    }
 }
 
 typedef struct getCorrectTestPaperCountByNameArg
@@ -1009,6 +1208,7 @@ void CMainMenueDlg::initCorrectTestPaperTableContorl()
             this->m_correctOprator.at(i)->setStyleSheet("QWidget{border:none;background-color:#FFFFFF;border-bottom:1px solid #646465;}");
         }
     }
+    this->bindOperatorCorrect();
 }
 
 void CMainMenueDlg::initCorrectTestPaperTableUI()
@@ -5291,6 +5491,7 @@ typedef struct teacherAcountInfoArg
 
 void CMainMenueDlg::getTeacherAcountInfoData()
 {
+    this->ui->stackedWidget->setCurrentIndex(5);
     TeacherAcountInfoArg* arg = new TeacherAcountInfoArg();
     arg->thiz = this;
     arg->acount = this->m_acount;
@@ -5301,7 +5502,18 @@ unsigned WINAPI CMainMenueDlg::threadGetTeacherAcountInfoDataEntry(LPVOID arg)
 {
     TeacherAcountInfoArg* tInfo = (TeacherAcountInfoArg*)arg;
     std::vector<std::vector<std::string>> ret =  tInfo->thiz->m_mainMenueContorller->showTeacherAcountInfo(tInfo->acount); //view层调用conntorller层的接口全部写到子线程中
-    emit tInfo->thiz->startShowTeacherAcountInfo(&ret);
+    std::vector<std::vector<std::string>>* result  = new std::vector<std::vector<std::string>>();
+    for(int i = 0 ; i < ret.size() ; i++)
+    {
+        std::vector<std::string> temp;
+        for(int j = 0 ; j < ret.at(i).size();j++)
+        {
+            temp.push_back(ret.at(i).at(j));
+        }
+        result->push_back(temp);
+    }
+
+    emit tInfo->thiz->startShowTeacherAcountInfo(result);
     delete tInfo;
     //_endthreadex(0);
     return 0;
@@ -5324,6 +5536,10 @@ void CMainMenueDlg::showTeacherAcountInfo(std::vector<std::vector<std::string>>*
         this->ui->radioButton_8->setChecked(true);
     }
     this->ui->label_41->setText(phoneNumber);
+    if(ret != nullptr)
+    {
+        delete ret;
+    }
 }
 
 void CMainMenueDlg::setLoginedAcount(QString acount)
@@ -5749,6 +5965,60 @@ CMainMenueDlg::~CMainMenueDlg()
         }
     }
     this->m_correctOprator.clear();
+
+    for(QLabel* lab : this->m_correctMemberName)
+    {
+        if(lab != nullptr)
+        {
+            delete lab;
+        }
+    }
+    this->m_correctMemberName.clear();
+
+    for(QLabel* lab : this->m_correctMemberSubject)
+    {
+        if(lab != nullptr)
+        {
+            delete lab;
+        }
+    }
+    this->m_correctMemberSubject.clear();
+
+    for(QLabel* lab : this->m_correctMemberKeGuan)
+    {
+        if(lab != nullptr)
+        {
+            delete lab;
+        }
+    }
+    this->m_correctMemberKeGuan.clear();
+
+    for(QLabel* lab : this->m_correctMemberZhuGuan)
+    {
+        if(lab != nullptr)
+        {
+            delete lab;
+        }
+    }
+    this->m_correctMemberZhuGuan.clear();
+
+    for(QLabel* lab : this->m_correctMemberSum)
+    {
+        if(lab != nullptr)
+        {
+            delete lab;
+        }
+    }
+    this->m_correctMemberSum.clear();
+
+    for(QWidget* widget : this->m_correctMemberOperator)
+    {
+        if(widget != nullptr)
+        {
+            delete widget;
+        }
+    }
+    this->m_correctMemberOperator.clear();
 
     //如果关闭界面，接收头像信息的线程还在执行的话就等待接收后结束线程
     WaitForSingleObject(this->m_recvHeadThead,INFINITE); //找到退出崩溃的原因，因为关闭界面的时候，接收头像线程还在执行，但是UI已经释放导致异常

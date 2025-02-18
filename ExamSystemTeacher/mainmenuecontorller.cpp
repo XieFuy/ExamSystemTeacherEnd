@@ -5,6 +5,11 @@ CMainMenueContorller::CMainMenueContorller()
  this->m_mainMenueModel = new CMainMenueModel();
 }
 
+bool CMainMenueContorller::initCorrectShortAnswerTable()
+{
+    return this->m_mainMenueModel->initCorrectShortAnswerTable();
+}
+
 int CMainMenueContorller::getCorrectTestPaperCountByName(QString& teacherId,QString& testPaperName)
 {
     QByteArray teacherIdArr = teacherId.toLocal8Bit();
@@ -142,7 +147,7 @@ unsigned WINAPI CMainMenueContorller::threadDeleteMultiManegerByStudentId(LPVOID
     DeleteMultiManegerByStudentIdArg* aInfo = (DeleteMultiManegerByStudentIdArg*)arg;
     aInfo->thiz->m_mainMenueModel->deleteStudentManegerByStudentId(aInfo->acount,aInfo->className,aInfo->studentId);
     delete aInfo;
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -242,7 +247,7 @@ unsigned WINAPI CMainMenueContorller::threadDegreeMultiRequestByStudentId(LPVOID
     DegreeMultiRequestByStudentIdArg* aInfo = (DegreeMultiRequestByStudentIdArg*)arg;
     aInfo->thiz->m_mainMenueModel->degreeStudentRequestByStudentId(aInfo->acount,aInfo->className,aInfo->studentId);
     delete aInfo;
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -286,7 +291,7 @@ unsigned WINAPI CMainMenueContorller::threadAgreeMultiRequestByStudentId(LPVOID 
     AgreeMultiRequestByStudentIdArg* aInfo = (AgreeMultiRequestByStudentIdArg*)arg;
     aInfo->thiz->m_mainMenueModel->agreeStudentRequestByStudentId(aInfo->acount,aInfo->className,aInfo->studentId);
     delete aInfo;
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -475,7 +480,7 @@ unsigned WINAPI CMainMenueContorller::threadDeleteMultiClassInfo(LPVOID arg)
     DeleteMultiClassInfoArg* dInfo = (DeleteMultiClassInfoArg*)arg;
     dInfo->thiz->m_mainMenueModel->deleteClassInfoByDateTime(dInfo->acount,dInfo->createTime,dInfo->className);
     delete dInfo;
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -582,7 +587,7 @@ unsigned WINAPI CMainMenueContorller::threadDeleteTestPaperRelease(LPVOID arg)
     DeleteFromSignalChoiseArg* dInfo = (DeleteFromSignalChoiseArg*)arg;
     dInfo->thiz->deleteTestPaperReleaseInfo(dInfo->acount,dInfo->createTime);
     delete dInfo;
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -591,7 +596,7 @@ unsigned WINAPI CMainMenueContorller::threadDeleteFromShortAnswer(LPVOID arg)
     DeleteFromSignalChoiseArg* dInfo = (DeleteFromSignalChoiseArg*)arg;
     dInfo->thiz->deleteFromShortAnswer(dInfo->acount,dInfo->createTime);
     delete dInfo;
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -609,7 +614,7 @@ unsigned WINAPI CMainMenueContorller::threadDeleteFromJudge(LPVOID arg)
     DeleteFromSignalChoiseArg* dInfo = (DeleteFromSignalChoiseArg*)arg;
     dInfo->thiz->deleteFromJudge(dInfo->acount,dInfo->createTime);
     delete dInfo;
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -627,7 +632,7 @@ unsigned WINAPI CMainMenueContorller::threadDeleteFromMultiChoise(LPVOID arg)
     DeleteFromSignalChoiseArg* dInfo = (DeleteFromSignalChoiseArg*)arg;
     dInfo->thiz->deleteFromMultiChoise(dInfo->acount,dInfo->createTime);
     delete dInfo;
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 
@@ -645,7 +650,7 @@ unsigned WINAPI CMainMenueContorller::threadDeleteFromSignalChoise(LPVOID arg)
     DeleteFromSignalChoiseArg* dInfo = (DeleteFromSignalChoiseArg*)arg;
     dInfo->thiz->deleteFromSignalChoise(dInfo->acount,dInfo->createTime);
     delete dInfo;
-    _endthreadex(0);
+    //_endthreadex(0);
     return 0;
 }
 

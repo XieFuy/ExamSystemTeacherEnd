@@ -39,6 +39,7 @@ private:
     static unsigned WINAPI threadAddStudentAnswerMultiInfo(LPVOID arg);
     static unsigned WINAPI threadAddStudentAnswerJudgeInfo(LPVOID arg);
     static unsigned WINAPI threadAddStudentAnswerShortAnswerInfo(LPVOID arg);
+    static unsigned WINAPI threadAddStudentShortAnswerCorrectInfo(LPVOID arg);
 
     static unsigned WINAPI threadGetClassIdEntry(LPVOID arg);
     static unsigned WINAPI threadGetTestPaperIdEntry(LPVOID arg);

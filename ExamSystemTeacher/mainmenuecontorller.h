@@ -113,6 +113,7 @@ public :
    std::vector<std::vector<std::string>> getCorrectTestPaperDataByName(QString& teacherId
                                                                        ,QString& testPaperName,int& curIndex);
    int getCorrectTestPaperCountByName(QString& teacherId,QString& testPaperName);
+   bool initCorrectShortAnswerTable();
  private:
     CMainMenueModel* m_mainMenueModel = nullptr;
 };
