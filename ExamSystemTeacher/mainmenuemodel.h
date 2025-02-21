@@ -118,6 +118,12 @@ public:
                                                                          ,int& curIndex);
      int getCorrectTestPaperCountByName(const char* teacherId,const char* testPaperName);
      bool initCorrectShortAnswerTable();
+     bool deleteSignalAnswer(const char* teacherId,const char* testPaperName);
+     bool deleteMultiAnswer(const char* teacherId,const char* testPaperName);
+     bool deleteJudgeAnswer(const char* teacherId,const char* testPaperName);
+     bool  deleteShortAnswer(const char* teacherId,const char* testPaperName);
+     bool  deleteCorrectShortAnswer(const char* teacherId,const char* testPaperName);
+     bool  deleteTestPaperCommitInfo(const char* teacherId,const char* testPaperName);
 private:
       HANDLE m_mutex; //因为所有操作都是使用的一个CDBHelper对象，所以要给每一个执行sql的步骤进行上锁
 };

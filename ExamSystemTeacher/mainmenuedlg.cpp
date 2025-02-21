@@ -4037,7 +4037,8 @@ void CMainMenueDlg::deleteFromShortAnswer(QString createTime)
     arg->thiz = this;
     arg->acount =this->m_acount;
     arg->createTime = createTime;
-    _beginthreadex(nullptr,0,&CMainMenueDlg::threadDeleteFromShortAnswerEntry,arg,0,nullptr);
+    HANDLE thread =(HANDLE)_beginthreadex(nullptr,0,&CMainMenueDlg::threadDeleteFromShortAnswerEntry,arg,0,nullptr);
+    this->m_deleteTestPaperThread.push_back(thread);
 }
 
 unsigned WINAPI CMainMenueDlg::threadDeleteFromShortAnswerEntry(LPVOID arg)
@@ -4061,7 +4062,8 @@ void CMainMenueDlg::deleteFromJudge(QString createTime)
     arg->thiz = this;
     arg->acount =this->m_acount;
     arg->createTime = createTime;
-    _beginthreadex(nullptr,0,&CMainMenueDlg::threadDeleteFromJudgeEntry,arg,0,nullptr);
+    HANDLE thread = (HANDLE) _beginthreadex(nullptr,0,&CMainMenueDlg::threadDeleteFromJudgeEntry,arg,0,nullptr);
+    this->m_deleteTestPaperThread.push_back(thread);
 }
 
 unsigned WINAPI CMainMenueDlg::threadDeleteFromJudgeEntry(LPVOID arg)
@@ -4086,7 +4088,8 @@ void CMainMenueDlg::deleteFromMultiChoise(QString createTime)
  arg->thiz = this;
  arg->acount = this->m_acount;
  arg->createTime =  createTime;
- _beginthreadex(nullptr,0,&CMainMenueDlg::threadDeleteFromMultiChoiseEntry,arg,0,nullptr);
+ HANDLE thread = (HANDLE)_beginthreadex(nullptr,0,&CMainMenueDlg::threadDeleteFromMultiChoiseEntry,arg,0,nullptr);
+ this->m_deleteTestPaperThread.push_back(thread);
 }
 
 unsigned WINAPI CMainMenueDlg::threadDeleteFromMultiChoiseEntry(LPVOID arg)
@@ -4111,7 +4114,8 @@ void CMainMenueDlg::deleteFromSignalChoise(QString createTime)
     arg->thiz =this;
     arg->acount = this->m_acount;
     arg->createTime = createTime;
-    _beginthreadex(nullptr,0,&CMainMenueDlg::threadDeleteFromSignalChoiseEntry,arg,0,nullptr);
+    HANDLE thread = (HANDLE)_beginthreadex(nullptr,0,&CMainMenueDlg::threadDeleteFromSignalChoiseEntry,arg,0,nullptr);
+    this->m_deleteTestPaperThread.push_back(thread);
 }
 
 unsigned WINAPI CMainMenueDlg::threadDeleteFromSignalChoiseEntry(LPVOID arg)
@@ -4191,6 +4195,140 @@ unsigned WINAPI CMainMenueDlg::threadUpdateTestPaperStatus(LPVOID arg)
     return 0;
 }
 
+//该结构体作为参数进行删除试卷答题记录
+typedef struct deleteAnswerArg{
+    QString teacherId;
+    QString testPaperName; //前端要进行限制用户进行存储重复的试卷名称信息，确保唯一性
+    CMainMenueDlg* thiz;
+}DeleteAnswerArg;
+
+void CMainMenueDlg::deleteSignalAnswer(QString testPaperName)
+{
+   std::shared_ptr<DeleteAnswerArg> arg = std::make_shared<DeleteAnswerArg>();
+   arg->teacherId = this->m_acount;
+   arg->testPaperName = testPaperName;
+   arg->thiz = this;
+   std::shared_ptr<DeleteAnswerArg>* p = new std::shared_ptr<DeleteAnswerArg>(arg);
+   HANDLE thread =(HANDLE)_beginthreadex(nullptr,0,&CMainMenueDlg::threadDeleteSignalAnswer,p,0,nullptr);
+   this->m_deleteTestPaperThread.push_back(thread);
+}
+
+unsigned WINAPI CMainMenueDlg::threadDeleteSignalAnswer(LPVOID arg)
+{
+    std::shared_ptr<DeleteAnswerArg>* p = (std::shared_ptr<DeleteAnswerArg>*)arg;
+    std::shared_ptr<DeleteAnswerArg> dInfo = *p;
+    dInfo->thiz->m_mainMenueContorller->deleteSignalAnswer(dInfo->teacherId
+                                                           ,dInfo->testPaperName);
+    delete p;
+    return 0;
+}
+
+void CMainMenueDlg::deleteTestPaperCommitInfo(QString testPaperName)
+{
+    std::shared_ptr<DeleteAnswerArg> arg = std::make_shared<DeleteAnswerArg>();
+    arg->teacherId = this->m_acount;
+    arg->testPaperName = testPaperName;
+    arg->thiz = this;
+    std::shared_ptr<DeleteAnswerArg>* p = new std::shared_ptr<DeleteAnswerArg>(arg);
+    HANDLE thread =(HANDLE)_beginthreadex(nullptr,0,&CMainMenueDlg::threadDeleteTestPaperCommitInfo,p,0,nullptr);
+    this->m_deleteTestPaperThread.push_back(thread);
+}
+
+unsigned WINAPI CMainMenueDlg::threadDeleteTestPaperCommitInfo(LPVOID arg)
+{
+    std::shared_ptr<DeleteAnswerArg>* p = (std::shared_ptr<DeleteAnswerArg>*)arg;
+    std::shared_ptr<DeleteAnswerArg> dInfo = *p;
+    dInfo->thiz->m_mainMenueContorller->deleteTestPaperCommitInfo(dInfo->teacherId
+                                                           ,dInfo->testPaperName);
+    delete p;
+    return 0;
+}
+
+void CMainMenueDlg::deleteCorrectShortAnswer(QString testPaperName)
+{
+    std::shared_ptr<DeleteAnswerArg> arg = std::make_shared<DeleteAnswerArg>();
+    arg->teacherId = this->m_acount;
+    arg->testPaperName = testPaperName;
+    arg->thiz = this;
+    std::shared_ptr<DeleteAnswerArg>* p = new std::shared_ptr<DeleteAnswerArg>(arg);
+    HANDLE thread =(HANDLE) _beginthreadex(nullptr,0,&CMainMenueDlg::threadDeleteCorrectShortAnswer,p,0,nullptr);
+    this->m_deleteTestPaperThread.push_back(thread);
+}
+
+unsigned WINAPI CMainMenueDlg::threadDeleteCorrectShortAnswer(LPVOID arg)
+{
+    std::shared_ptr<DeleteAnswerArg>* p = (std::shared_ptr<DeleteAnswerArg>*)arg;
+    std::shared_ptr<DeleteAnswerArg> dInfo = *p;
+    dInfo->thiz->m_mainMenueContorller->deleteCorrectShortAnswer(dInfo->teacherId
+                                                           ,dInfo->testPaperName);
+    delete p;
+    return 0;
+}
+
+void CMainMenueDlg::deleteShortAnswer(QString testPaperName)
+{
+    std::shared_ptr<DeleteAnswerArg> arg = std::make_shared<DeleteAnswerArg>();
+    arg->teacherId = this->m_acount;
+    arg->testPaperName = testPaperName;
+    arg->thiz = this;
+    std::shared_ptr<DeleteAnswerArg>* p = new std::shared_ptr<DeleteAnswerArg>(arg);
+    HANDLE thread = (HANDLE)_beginthreadex(nullptr,0,&CMainMenueDlg::threadDeleteShortAnswer,p,0,nullptr);
+    this->m_deleteTestPaperThread.push_back(thread);
+}
+
+unsigned WINAPI CMainMenueDlg::threadDeleteShortAnswer(LPVOID arg)
+{
+    std::shared_ptr<DeleteAnswerArg>* p = (std::shared_ptr<DeleteAnswerArg>*)arg;
+    std::shared_ptr<DeleteAnswerArg> dInfo = *p;
+    dInfo->thiz->m_mainMenueContorller->deleteShortAnswer(dInfo->teacherId
+                                                           ,dInfo->testPaperName);
+    delete p;
+    return 0;
+}
+
+void CMainMenueDlg::deleteJudgeAnswer(QString testPaperName)
+{
+    std::shared_ptr<DeleteAnswerArg> arg = std::make_shared<DeleteAnswerArg>();
+    arg->teacherId = this->m_acount;
+    arg->testPaperName = testPaperName;
+    arg->thiz = this;
+    std::shared_ptr<DeleteAnswerArg>* p = new std::shared_ptr<DeleteAnswerArg>(arg);
+    HANDLE thread =(HANDLE)_beginthreadex(nullptr,0,&CMainMenueDlg::threadDeleteJudgeAnswer,p,0,nullptr);
+    this->m_deleteTestPaperThread.push_back(thread);
+}
+
+unsigned WINAPI CMainMenueDlg::threadDeleteJudgeAnswer(LPVOID arg)
+{
+    std::shared_ptr<DeleteAnswerArg>* p = (std::shared_ptr<DeleteAnswerArg>*)arg;
+    std::shared_ptr<DeleteAnswerArg> dInfo = *p;
+    dInfo->thiz->m_mainMenueContorller->deleteJudgeAnswer(dInfo->teacherId
+                                                           ,dInfo->testPaperName);
+    delete p;
+    return 0;
+}
+
+void CMainMenueDlg::deleteMultiAnswer(QString testPaperName)
+{
+    std::shared_ptr<DeleteAnswerArg> arg = std::make_shared<DeleteAnswerArg>();
+    arg->teacherId = this->m_acount;
+    arg->testPaperName = testPaperName;
+    arg->thiz = this;
+    std::shared_ptr<DeleteAnswerArg>* p = new std::shared_ptr<DeleteAnswerArg>(arg);
+    HANDLE thread= (HANDLE)_beginthreadex(nullptr,0,&CMainMenueDlg::threadDeleteMultiAnswer,p,0,nullptr);
+    this->m_deleteTestPaperThread.push_back(thread);
+}
+
+//TODO:明天的控制层接着继续
+unsigned WINAPI CMainMenueDlg::threadDeleteMultiAnswer(LPVOID arg)
+{
+    std::shared_ptr<DeleteAnswerArg>* p = (std::shared_ptr<DeleteAnswerArg>*)arg;
+    std::shared_ptr<DeleteAnswerArg> dInfo = *p;
+    dInfo->thiz->m_mainMenueContorller->deleteMultiAnswer(dInfo->teacherId
+                                                           ,dInfo->testPaperName);
+    delete p;
+    return 0;
+}
+
 typedef struct deleteTestPaperReleaseInfoArg{
     CMainMenueDlg* thiz;
     QString acount;
@@ -4233,13 +4371,32 @@ void CMainMenueDlg::deleteClickBtn(int row)  //点击单次调用的函数
     qDebug()<<"testPaperName: "<<testPaperName;
 
 
+    //进行删除单选题、多选题、判断题的题库
     this->deleteFromSignalChoise(createTime);
     this->deleteFromMultiChoise(createTime);
     this->deleteFromJudge(createTime);
     this->deleteFromShortAnswer(createTime);
 
+    //进行删除该试卷的所有的答题记录
+    this->deleteSignalAnswer(testPaperName);
+    this->deleteMultiAnswer(testPaperName);
+    this->deleteJudgeAnswer(testPaperName);
+    this->deleteShortAnswer(testPaperName);
+
+    //进行删除该试卷的所有的简答题评分记录
+    this->deleteCorrectShortAnswer(testPaperName);
+
+    //进行删除该试卷的提交记录
+    this->deleteTestPaperCommitInfo(testPaperName);
+
+    //需要等待上面的任务都执行完毕才能进行删除试卷表的信息
+    WaitForMultipleObjects(this->m_deleteTestPaperThread.size()
+                           ,this->m_deleteTestPaperThread.data(),TRUE,INFINITE);
     //删除与该试卷的发布信息记录
     this->deleteTestPaperReleaseInfo(testPaperName); //这里要等记录先删除完毕再进行往下执行删除试卷信息
+
+    //进行清除存储句柄的容器
+    this->m_deleteTestPaperThread.clear();
 
     DeleteClickBtnArg* arg = new DeleteClickBtnArg();
     arg->thiz = this;
@@ -4947,8 +5104,14 @@ void CMainMenueDlg::getCurPageIndexTableData()
 
 void CMainMenueDlg::showCurPageIndexTable(QVector<QVector<QString>>* ret)
 {
+    if(ret == nullptr)
+    {
+        return;
+    }
     this->clearTestPaperTableContorl();
     qDebug()<<"获取已发布的数量："<<ret->size();
+    this->m_teacherIdVec.clear();
+    this->m_testPaperIdVec.clear();
    //将数据进行插入到表格中
    for(int i = 0 ; i < ret->size(); i++)
    {

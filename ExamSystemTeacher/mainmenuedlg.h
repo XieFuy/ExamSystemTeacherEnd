@@ -72,6 +72,7 @@ signals:
     void startShowCorrectTestPaper(QVector<QVector<QString>>* ret);
     void startShowCorrectTestPaperIndex();
 private:
+    QVector<HANDLE> m_deleteTestPaperThread; //进行删除试卷的线程任务
     CTestPaperReleaseDlg* m_testPaperReleaseDlg = nullptr;
     CExitLoginDlg* m_exitLoginDlg = nullptr;
     QTreeWidgetItem* m_signalOperator = nullptr; //单选题父项
@@ -313,6 +314,26 @@ private:
     //删除指定的试卷的发布信息
     void deleteTestPaperReleaseInfo(QString testPaperName);
     static unsigned WINAPI threadDeleteTestPaperReleaseInfo(LPVOID arg);
+
+    //删除试卷的单选题的答题记录表
+    void deleteSignalAnswer(QString testPaperName);
+    static unsigned WINAPI threadDeleteSignalAnswer(LPVOID arg);
+    //删除试卷的多选题的答题记录表
+    void deleteMultiAnswer(QString testPaperName);
+    static unsigned WINAPI threadDeleteMultiAnswer(LPVOID arg);
+    //删除试卷的判断题的答题记录表
+    void deleteJudgeAnswer(QString testPaperName);
+    static unsigned WINAPI threadDeleteJudgeAnswer(LPVOID arg);
+    //删除试卷的简答题的答题记录表
+    void deleteShortAnswer(QString testPaperName);
+    static unsigned WINAPI threadDeleteShortAnswer(LPVOID arg);
+    //删除试卷的简答题的评分记录表
+    void deleteCorrectShortAnswer(QString testPaperName);
+    static unsigned WINAPI threadDeleteCorrectShortAnswer(LPVOID arg);
+
+    //删除该份试卷的提交记录  明天接着继续
+    void deleteTestPaperCommitInfo(QString testPaperName);
+    static unsigned WINAPI threadDeleteTestPaperCommitInfo(LPVOID arg);
 
     //更新试卷状态信息
     void updateTestPaperStatus(QString testPaperName);

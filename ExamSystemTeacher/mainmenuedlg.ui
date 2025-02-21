@@ -465,7 +465,7 @@ color:#50b8f7;
     </rect>
    </property>
    <property name="currentIndex">
-    <number>7</number>
+    <number>1</number>
    </property>
    <widget class="QWidget" name="page">
     <widget class="QWidget" name="widget_3" native="true">
@@ -4881,7 +4881,7 @@ border:1px solid #646465;
 }</string>
       </property>
       <property name="text">
-       <string>试卷名称</string>
+       <string>   学生姓名</string>
       </property>
       <property name="alignment">
        <set>Qt::AlignCenter</set>

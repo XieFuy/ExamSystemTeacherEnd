@@ -5,6 +5,66 @@ CMainMenueContorller::CMainMenueContorller()
  this->m_mainMenueModel = new CMainMenueModel();
 }
 
+bool CMainMenueContorller::deleteTestPaperCommitInfo(QString& teacherId
+                                                     ,QString& testPaperName)
+{
+    QByteArray teacherIdArr = teacherId.toLocal8Bit();
+    QByteArray testPaperNameArr = testPaperName.toLocal8Bit();
+
+    const char* pTeacher = teacherIdArr.data();
+    const char* pTestPaperName = testPaperNameArr.data();
+    return this->m_mainMenueModel->deleteTestPaperCommitInfo(pTeacher,pTestPaperName);
+}
+
+bool CMainMenueContorller::deleteCorrectShortAnswer(QString& teacherId,QString& testPaperName)
+{
+    QByteArray teacherIdArr = teacherId.toLocal8Bit();
+    QByteArray testPaperNameArr = testPaperName.toLocal8Bit();
+
+    const char* pTeacher = teacherIdArr.data();
+    const char* pTestPaperName = testPaperNameArr.data();
+    return this->m_mainMenueModel->deleteCorrectShortAnswer(pTeacher,pTestPaperName);
+}
+
+bool CMainMenueContorller::deleteShortAnswer(QString& teacherId,QString& testPaperName)
+{
+    QByteArray teacherIdArr = teacherId.toLocal8Bit();
+    QByteArray testPaperNameArr = testPaperName.toLocal8Bit();
+
+    const char* pTeacher = teacherIdArr.data();
+    const char* pTestPaperName = testPaperNameArr.data();
+    return this->m_mainMenueModel->deleteShortAnswer(pTeacher,pTestPaperName);
+}
+
+bool CMainMenueContorller::deleteJudgeAnswer(QString& teacherId,QString& testPaperName)
+{
+    QByteArray teacherIdArr = teacherId.toLocal8Bit();
+    QByteArray testPaperNameArr = testPaperName.toLocal8Bit();
+
+    const char* pTeacher = teacherIdArr.data();
+    const char* pTestPaperName = testPaperNameArr.data();
+    return this->m_mainMenueModel->deleteJudgeAnswer(pTeacher,pTestPaperName);
+}
+
+bool CMainMenueContorller::deleteMultiAnswer(QString& teacherId,QString& testPaperName)
+{
+   QByteArray teacherIdArr = teacherId.toLocal8Bit();
+   QByteArray testPaperNameArr = testPaperName.toLocal8Bit();
+
+   const char* pTeacher = teacherIdArr.data();
+   const char* pTestPaperName = testPaperNameArr.data();
+   return this->m_mainMenueModel->deleteMultiAnswer(pTeacher,pTestPaperName);
+}
+
+bool CMainMenueContorller::deleteSignalAnswer(QString& teacherId,QString& testPaperName)
+{
+    QByteArray teacherIdArr = teacherId.toLocal8Bit();
+    QByteArray testPaperNameArr = testPaperName.toLocal8Bit();
+    const char* pTeacherId = teacherIdArr.data();
+    const char* pTestPaperName = testPaperNameArr.data();
+    return this->m_mainMenueModel->deleteSignalAnswer(pTeacherId,pTestPaperName);
+}
+
 bool CMainMenueContorller::initCorrectShortAnswerTable()
 {
     return this->m_mainMenueModel->initCorrectShortAnswerTable();

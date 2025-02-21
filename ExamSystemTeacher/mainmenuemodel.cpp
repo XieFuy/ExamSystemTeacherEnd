@@ -10,6 +10,120 @@ CMainMenueModel::~CMainMenueModel()
 
 }
 
+bool CMainMenueModel::deleteTestPaperCommitInfo(const char* teacherId
+                                                ,const char* testPaperName)
+{
+    if(teacherId == nullptr || testPaperName
+             == nullptr)
+    {
+        return false;
+    }
+    std::shared_ptr<CDBHelper> dbHelper = std::make_shared<CDBHelper>();
+    std::unique_ptr<char[]> sqlBuf(new char[1024000]);
+    std::string sql;
+    memset(sqlBuf.get(),'\0',sizeof(char) * 1024000);
+    sprintf(sqlBuf.get(),"DELETE FROM `commitTestPaper`\n\
+ WHERE `teacherId` = '%s'\n\
+ AND `testPaperId` IN (SELECT `testPaperId` FROM `testPaperInfo` WHERE `testPaperName` = '%s' AND `teacherId` = '%s');"
+            ,teacherId,testPaperName,teacherId);
+    sql = sqlBuf.get();
+    return dbHelper->sqlExcute(sql,"ExamSystem");
+}
+
+bool CMainMenueModel::deleteCorrectShortAnswer(const char* teacherId,const char* testPaperName)
+{
+    if(teacherId == nullptr || testPaperName
+             == nullptr)
+    {
+        return false;
+    }
+    std::shared_ptr<CDBHelper> dbHelper = std::make_shared<CDBHelper>();
+    std::unique_ptr<char[]> sqlBuf(new char[1024000]);
+    std::string sql;
+    memset(sqlBuf.get(),'\0',sizeof(char) * 1024000);
+    sprintf(sqlBuf.get(),"DELETE FROM `shortAnswerCorrect`\n\
+ WHERE `teacherId` = '%s'\n\
+ AND `testPaperId` IN (SELECT `testPaperId` FROM `testPaperInfo` WHERE `testPaperName` = '%s' AND `teacherId` = '%s');"
+            ,teacherId,testPaperName,teacherId);
+    sql = sqlBuf.get();
+    return dbHelper->sqlExcute(sql,"ExamSystem");
+}
+
+bool CMainMenueModel::deleteShortAnswer(const char* teacherId,const char* testPaperName)
+{
+    if(teacherId == nullptr || testPaperName
+             == nullptr)
+    {
+        return false;
+    }
+    std::shared_ptr<CDBHelper> dbHelper = std::make_shared<CDBHelper>();
+    std::unique_ptr<char[]> sqlBuf(new char[1024000]);
+    std::string sql;
+    memset(sqlBuf.get(),'\0',sizeof(char) * 1024000);
+    sprintf(sqlBuf.get(),"DELETE FROM `studentAnswerShortAnswer`\n\
+ WHERE `teacherId` = '%s'\n\
+ AND `testPaperId` IN (SELECT `testPaperId` FROM `testPaperInfo` WHERE `testPaperName` = '%s' AND `teacherId` = '%s');"
+            ,teacherId,testPaperName,teacherId);
+    sql = sqlBuf.get();
+    return dbHelper->sqlExcute(sql,"ExamSystem");
+}
+
+bool CMainMenueModel::deleteJudgeAnswer(const char* teacherId,const char* testPaperName)
+{
+    if(teacherId == nullptr || testPaperName
+             == nullptr)
+    {
+        return false;
+    }
+    std::shared_ptr<CDBHelper> dbHelper = std::make_shared<CDBHelper>();
+    std::unique_ptr<char[]> sqlBuf(new char[1024000]);
+    std::string sql;
+    memset(sqlBuf.get(),'\0',sizeof(char) * 1024000);
+    sprintf(sqlBuf.get(),"DELETE FROM `studentAnswerJudge`\n\
+ WHERE `teacherId` = '%s'\n\
+ AND `testPaperId` IN (SELECT `testPaperId` FROM `testPaperInfo` WHERE `testPaperName` = '%s' AND `teacherId` = '%s');"
+            ,teacherId,testPaperName,teacherId);
+    sql = sqlBuf.get();
+    return dbHelper->sqlExcute(sql,"ExamSystem");
+}
+
+bool CMainMenueModel::deleteMultiAnswer(const char* teacherId,const char* testPaperName)
+{
+   if(teacherId == nullptr || testPaperName
+            == nullptr)
+   {
+       return false;
+   }
+   std::shared_ptr<CDBHelper> dbHelper = std::make_shared<CDBHelper>();
+   std::unique_ptr<char[]> sqlBuf(new char[1024000]);
+   std::string sql;
+   memset(sqlBuf.get(),'\0',sizeof(char) * 1024000);
+   sprintf(sqlBuf.get(),"DELETE FROM `studentAnswerMulti`\n\
+WHERE `teacherId` = '%s'\n\
+AND `testPaperId` IN (SELECT `testPaperId` FROM `testPaperInfo` WHERE `testPaperName` = '%s' AND `teacherId` = '%s');"
+           ,teacherId,testPaperName,teacherId);
+   sql = sqlBuf.get();
+   return dbHelper->sqlExcute(sql,"ExamSystem");
+}
+
+bool CMainMenueModel::deleteSignalAnswer(const char* teacherId,const char* testPaperName)
+{
+    if(teacherId == nullptr || testPaperName == nullptr)
+    {
+        return false;
+    }
+    std::shared_ptr<CDBHelper> dbHelper = std::make_shared<CDBHelper>();
+    std::unique_ptr<char[]> sqlBuf(new char[1024000]);
+    std::string sql;
+    memset(sqlBuf.get(),'\0',sizeof(char) * 1024000);
+    sprintf(sqlBuf.get(),"DELETE FROM `studentAnswerSingal`\n\
+WHERE `teacherId` = '%s'\n\
+AND `testPaperId` IN (SELECT `testPaperId` FROM `testPaperInfo` WHERE `testPaperName` = '%s' AND `teacherId` = '%s');"
+            ,teacherId,testPaperName,teacherId);
+    sql = sqlBuf.get();
+    return dbHelper->sqlExcute(sql,"ExamSystem");
+}
+
 bool CMainMenueModel:: initCorrectShortAnswerTable()
 {
     std::shared_ptr<CDBHelper> dbHelper = std::make_shared<CDBHelper>();
@@ -1296,7 +1410,9 @@ COALESCE((SELECT COUNT(*) FROM shortAnswer sa WHERE sa.testPaperId = tp.testPape
 ) AS totalQuestionCount,\n\
 tp.saveTime,\n\
 t.name AS teacherName,\n\
-tp.publishStatus\n\
+tp.publishStatus,\n\
+tp.teacherId,\n\
+tp.testPaperId\n\
 FROM \n\
 testPaperInfo tp\n\
 JOIN \n\

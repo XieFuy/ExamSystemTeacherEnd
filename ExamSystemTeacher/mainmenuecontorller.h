@@ -114,6 +114,12 @@ public :
                                                                        ,QString& testPaperName,int& curIndex);
    int getCorrectTestPaperCountByName(QString& teacherId,QString& testPaperName);
    bool initCorrectShortAnswerTable();
+   bool deleteSignalAnswer(QString& teacherId,QString& testPaperName);
+   bool deleteMultiAnswer(QString& teacherId,QString& testPaperName);
+   bool deleteJudgeAnswer(QString& teacherId,QString& testPaperName);
+   bool deleteShortAnswer(QString& teacherId,QString& testPaperName);
+   bool  deleteCorrectShortAnswer(QString& teacherId,QString& testPaperName);
+   bool deleteTestPaperCommitInfo(QString& teacherId,QString& testPaperName);
  private:
     CMainMenueModel* m_mainMenueModel = nullptr;
 };
