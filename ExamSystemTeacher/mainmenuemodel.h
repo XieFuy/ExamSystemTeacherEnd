@@ -124,6 +124,10 @@ public:
      bool  deleteShortAnswer(const char* teacherId,const char* testPaperName);
      bool  deleteCorrectShortAnswer(const char* teacherId,const char* testPaperName);
      bool  deleteTestPaperCommitInfo(const char* teacherId,const char* testPaperName);
+     std::vector<std::vector<std::string>> getCurPageCorrectMember(const char* testPaperName,const char* teacherId
+                                                                   ,int& classId,int& testPaperId,int& curIndex);
+     int getCorrectMemberCount(const char* testPaperName,const char* teacherId
+                               ,int& classId,int& testPaperId);
 private:
       HANDLE m_mutex; //因为所有操作都是使用的一个CDBHelper对象，所以要给每一个执行sql的步骤进行上锁
 };

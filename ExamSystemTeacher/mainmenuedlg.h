@@ -71,6 +71,8 @@ signals:
     void startShowStudentManegerTableIndex();
     void startShowCorrectTestPaper(QVector<QVector<QString>>* ret);
     void startShowCorrectTestPaperIndex();
+    void startShowCorrectMemberUI(QVector<QVector<QString>>* ret);
+    void startShowCorrectMemberCount();
 private:
     QVector<HANDLE> m_deleteTestPaperThread; //进行删除试卷的线程任务
     CTestPaperReleaseDlg* m_testPaperReleaseDlg = nullptr;
@@ -183,6 +185,9 @@ private:
 
     QString m_correctTestPaperCount;
 
+    QVector<int> m_correctTestPaperClassIdVec;
+    QVector<int> m_correctTestPaperTestPaperIdVec;
+
     //待批成员模块部分
     QVector<QLabel*> m_correctMemberName;
     QVector<QLabel*> m_correctMemberSubject;
@@ -190,6 +195,9 @@ private:
     QVector<QLabel*> m_correctMemberZhuGuan;
     QVector<QLabel*> m_correctMemberSum;
     QVector<QWidget*> m_correctMemberOperator;
+
+    int m_correctMemberCurIndex;
+    QString m_correctMemberCount;
 private:
     void showPageIndex();//显示分页查询的下标页
     void initTableWidgetHeader(); //初始化表头
@@ -650,7 +658,7 @@ private:
     void bindOperatorCorrect();
 
     //进入批改试卷页面
-    void joinCorrectTestPaper(QString testPaperName,QString teacherId);
+    void joinCorrectTestPaper(QString testPaperName,QString teacherId,int classId,int testPaperId);
 
     //批改待批成员表UI
     void initCorrectMemberTableUI();
@@ -659,12 +667,21 @@ private:
     void initCorrectMemberTableContorl();
 
     //获取当前页待批学生的信息
-    void getCurPageCorrectMember();
+    void getCurPageCorrectMember(QString testPaperName,int classId,int testPaperId);
     static unsigned WINAPI threadGetCurPageCorrectMember(LPVOID arg);
 
     //初始化简答题数据库评分表
     void initCorrectShortAnswerTable();
     static unsigned WINAPI threadCorrectShortAnswerTable(LPVOID arg);
+
+    void showCorrectMemberUI(QVector<QVector<QString>>* ret);
+
+    void clearCorrectMemberUI();
+
+    void getCorrectMemberCount(QString testPaperName,int classId,int testPaperId);
+    static unsigned WINAPI threadGetCorrectMemberCount(LPVOID arg);
+
+    void showCorrectMemberCount();
 private:
     Ui::CMainMenueDlg *ui;
 };

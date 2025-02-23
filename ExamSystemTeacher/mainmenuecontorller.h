@@ -120,6 +120,10 @@ public :
    bool deleteShortAnswer(QString& teacherId,QString& testPaperName);
    bool  deleteCorrectShortAnswer(QString& teacherId,QString& testPaperName);
    bool deleteTestPaperCommitInfo(QString& teacherId,QString& testPaperName);
+   std::vector<std::vector<std::string>> getCurPageCorrectMember(QString& testPaperName,QString& teacherId
+                                                                 ,int& classId,int& testPaperId,int& curIndex);
+   int getCorrectMemberCount(QString& testPaperName,QString& teacherId
+                             ,int& classId,int& testPaperId);
  private:
     CMainMenueModel* m_mainMenueModel = nullptr;
 };

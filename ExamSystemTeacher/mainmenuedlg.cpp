@@ -45,6 +45,7 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
     this->m_pageCount = "";
     this->curPageIndex = 1;
     this->initTableWidgetHeader();
+    this->m_correctMemberCurIndex = 1;
 
     //生成控制层
     this->m_mainMenueContorller = new CMainMenueContorller();
@@ -716,6 +717,9 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
         this->ui->stackedWidget->setCurrentIndex(4);
     });
 
+    QObject::connect(this,&CMainMenueDlg::startShowCorrectMemberUI,this,&CMainMenueDlg::showCorrectMemberUI);
+    QObject::connect(this,&CMainMenueDlg::startShowCorrectMemberCount,this,&CMainMenueDlg::showCorrectMemberCount);
+
     this->initDataBaseTestPaperReleaseTable();
     this->initStudentAnswerSingaleTable();
     this->initStudentAnswerMultiTable();
@@ -727,6 +731,150 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
     this->initCorrectMemberTableUI();
     this->initCorrectMemberTableContorl();
     this->initCorrectShortAnswerTable();
+}
+
+void CMainMenueDlg::clearCorrectMemberUI()
+{
+    //清除学生姓名
+    for(QLabel* lab : this->m_correctMemberName)
+    {
+        if(lab != nullptr)
+        {
+            lab->setText("");
+        }
+    }
+
+    //清除科目
+    for(QLabel* lab : this->m_correctMemberSubject)
+    {
+        if(lab != nullptr)
+        {
+            lab->setText("");
+        }
+    }
+
+    //清除客观题
+    for(QLabel* lab : this->m_correctMemberKeGuan)
+    {
+        if(lab != nullptr)
+        {
+            lab->setText("");
+        }
+    }
+
+    //清除主观题
+    for(QLabel* lab : this->m_correctMemberZhuGuan)
+    {
+        if(lab != nullptr)
+        {
+            lab->setText("");
+        }
+    }
+
+    //清除总分
+    for(QLabel* lab : this->m_correctMemberSum)
+    {
+        if(lab != nullptr)
+        {
+            lab->setText("");
+        }
+    }
+
+    //清除操作
+    for(int i = 0 ; i < 8 ; i++)
+    {
+        QList<QPushButton*> optButton = this->m_correctMemberOperator.at(i)->findChildren<QPushButton*>();
+        for (QPushButton *button : optButton) {
+            button->setVisible(false);
+        }
+    }
+}
+
+void CMainMenueDlg::showCorrectMemberUI(QVector<QVector<QString>>* ret)
+{
+    if(ret == nullptr)
+    {
+        return ;
+    }
+
+    //进行清除当前表的UI
+    this->clearCorrectMemberUI();
+    //进行清除当前表的容器存储数据
+
+    //进行显示数据
+    for(int i = 0 ; i < ret->size(); i++)
+    {
+        //显示学生姓名
+        QString str = ret->at(i).at(1);
+        this->m_correctMemberName.at(i)->setText(str);
+
+        //显示科目
+        str = ret->at(i).at(2);
+        this->m_correctMemberSubject.at(i)->setText(str);
+
+        //显示客观分数
+        str = ret->at(i).at(3);
+        int num1 = str.toDouble();
+        this->m_correctMemberKeGuan.at(i)->setText(str);
+
+        //显示主观分数
+        str = ret->at(i).at(4);
+        int num2 = str.toDouble();
+        this->m_correctMemberZhuGuan.at(i)->setText(str);
+
+        //显示总分
+        double  num3 = num1 + num2;
+        str =  QString::number(num3);
+        this->m_correctMemberSum.at(i)->setText(str);
+
+        //显示操作按钮
+        QList<QPushButton*> optButton = this->m_correctMemberOperator.at(i)->findChildren<QPushButton*>();
+        for (QPushButton *button : optButton) {
+            button->setVisible(true);
+        }
+    }
+    delete ret;
+}
+
+void CMainMenueDlg::showCorrectMemberCount()
+{
+    QString first = QString::number(this->m_correctMemberCurIndex);
+    first += "/";
+    first += this->m_correctMemberCount;
+    this->ui->label_89->setText(first);
+}
+
+typedef struct getCorrectMemberCountArg{
+    QString testPaperName;
+    QString teacherId;
+    int classId;
+    int testPaperId;
+    CMainMenueDlg* thiz;
+}GetCorrectMemberCountArg;
+
+void CMainMenueDlg::getCorrectMemberCount(QString testPaperName,int classId,int testPaperId)
+{
+    std::shared_ptr<GetCorrectMemberCountArg> arg = std::make_shared<GetCorrectMemberCountArg>();
+    arg->testPaperName = testPaperName;
+    arg->classId = classId;
+    arg->teacherId = this->m_acount;
+    arg->testPaperId = testPaperId;
+    arg->thiz = this;
+    std::shared_ptr<GetCorrectMemberCountArg>* p = new std::shared_ptr<GetCorrectMemberCountArg>(arg);
+    _beginthreadex(nullptr,0,&CMainMenueDlg::threadGetCorrectMemberCount,p,0,nullptr);
+}
+
+unsigned WINAPI CMainMenueDlg::threadGetCorrectMemberCount(LPVOID arg)
+{
+   std::shared_ptr<GetCorrectMemberCountArg>* p = (std::shared_ptr<GetCorrectMemberCountArg>*)arg;
+   std::shared_ptr<GetCorrectMemberCountArg> gInfo = *p;
+   int ret =  gInfo->thiz->m_mainMenueContorller->getCorrectMemberCount(gInfo->testPaperName,gInfo->teacherId
+                                                             ,gInfo->classId,gInfo->testPaperId);
+   gInfo->thiz->m_correctMemberCount = QString::number(ret);
+   //发送新信号
+   emit gInfo->thiz->startShowCorrectMemberCount();
+   delete p;
+   return 0;
 }
 
 void CMainMenueDlg::initCorrectMemberTableUI()
@@ -873,7 +1021,6 @@ void CMainMenueDlg::initCorrectMemberTableContorl()
         this->ui->tableWidget_6->setCellWidget(i,1,testName);
         testName->setAlignment(Qt::AlignCenter);
         this->m_correctMemberSubject.push_back(testName);
-
     }
 
     //客观题分数
@@ -913,7 +1060,7 @@ void CMainMenueDlg::initCorrectMemberTableContorl()
     for(int i = 0 ; i < 8 ; i++)
     {
         QWidget* widget = new QWidget();
-        QPushButton* deleteBtn = new QPushButton("");
+        QPushButton* deleteBtn = new QPushButton("批改");
         deleteBtn->setStyleSheet("QPushButton{border:none; border:1px solid #faa046; color:#faa046;border-radius:5;}QPushButton:hover{border:1px solid #50b8f7;color:#50b8f7;}");
         deleteBtn->setParent(widget);
         deleteBtn->setGeometry(70,20,100,30);
@@ -947,25 +1094,61 @@ void CMainMenueDlg::initCorrectMemberTableContorl()
     }
 }
 
-//TODO：明天继续
 typedef struct getCurPageCorrectMemberArg{
-//    QString
+    QString testPaperName;
+    QString teacherId;
+    int classId;
+    int testPaperId;
+    int curIndex;
+    CMainMenueDlg* thiz;
 }GetCurPageCorrectMemberArg;
 
-void CMainMenueDlg::getCurPageCorrectMember()
+void CMainMenueDlg::getCurPageCorrectMember(QString testPaperName,int classId,int testPaperId)
 {
-
+   std::shared_ptr<GetCurPageCorrectMemberArg> arg = std::make_shared<GetCurPageCorrectMemberArg>();
+   //进行给参数赋值
+   arg->teacherId = this->m_acount;
+   arg->testPaperName = testPaperName;
+   arg->classId = classId;
+   arg->testPaperId = testPaperId;
+   arg->thiz = this;
+   arg->curIndex = this->m_correctMemberCurIndex;
+   std::shared_ptr<GetCurPageCorrectMemberArg>* p = new std::shared_ptr<GetCurPageCorrectMemberArg>(arg);
+   _beginthreadex(nullptr,0,&CMainMenueDlg::threadGetCurPageCorrectMember,p,0,nullptr);
 }
 
 unsigned WINAPI CMainMenueDlg::threadGetCurPageCorrectMember(LPVOID arg)
 {
-
+  std::shared_ptr<GetCurPageCorrectMemberArg>* p = (std::shared_ptr<GetCurPageCorrectMemberArg>*)arg;
+  std::shared_ptr<GetCurPageCorrectMemberArg> gInfo = *p;
+  //调用控制层
+  std::vector<std::vector<std::string>> ret =  gInfo->thiz->m_mainMenueContorller->getCurPageCorrectMember(gInfo->testPaperName
+                                                                                                           ,gInfo->teacherId,gInfo->classId
+                                                                                                          ,gInfo->testPaperId,gInfo->curIndex);
+  QVector<QVector<QString>>* result = new QVector<QVector<QString>>();
+  for(int i = 0 ; i < ret.size();i++)
+  {
+      QVector<QString> temp;
+      for(int j = 0 ; j < ret.at(i).size();j++)
+      {
+          QString str = QString::fromLocal8Bit(ret.at(i).at(j).c_str());
+          temp.push_back(str);
+      }
+      result->push_back(temp);
+  }
+  emit gInfo->thiz->startShowCorrectMemberUI(result);
+  delete p;
+  return 0;
 }
 
-void CMainMenueDlg::joinCorrectTestPaper(QString testPaperName,QString teacherId)
+
+//这里是点击进入批改试卷的逻辑
+void CMainMenueDlg::joinCorrectTestPaper(QString testPaperName,QString teacherId,int classId,int testPaperId)
 {
     this->ui->stackedWidget->setCurrentIndex(7);
-
+    this->ui->label_84->setText(testPaperName);
+    this->getCurPageCorrectMember(testPaperName,classId,testPaperId);
+    this->getCorrectMemberCount(testPaperName,classId,testPaperId);
 }
 
 void CMainMenueDlg::initCorrectShortAnswerTable()
@@ -1004,7 +1187,9 @@ void CMainMenueDlg::bindOperatorCorrect()
                                 QString testPaperName = this->m_correctTestPaperName.at(i)->text().trimmed();
                                 //职工id
                                 QString teacherId = this->m_acount;
-                                this->joinCorrectTestPaper(testPaperName,teacherId);
+                                int classId = this->m_correctTestPaperClassIdVec.at(row);
+                                int testPaperId = this->m_correctTestPaperTestPaperIdVec.at(row);
+                                this->joinCorrectTestPaper(testPaperName,teacherId,classId,testPaperId);
                                 break;
                             }
                         }
@@ -1282,7 +1467,9 @@ void CMainMenueDlg::showCorrectTestPaperUI(QVector<QVector<QString>>* ret)
         return ;
     }
     //进行UI显示
-   this->clearCorrectTestPaperTable();
+    this->clearCorrectTestPaperTable();
+    this->m_correctTestPaperClassIdVec.clear(); //清除保证记录的都是当前页的
+    this->m_correctTestPaperTestPaperIdVec.clear();//清除保证记录的都是当前页的
    //将数据进行插入到表格中
    for(int i = 0 ; i < ret->size(); i++)
    {
@@ -1297,6 +1484,16 @@ void CMainMenueDlg::showCorrectTestPaperUI(QVector<QVector<QString>>* ret)
        //显示已批人数
        str = ret->at(i).at(2);
        this->m_corrected.at(i)->setText(str);
+
+       //进行存储课程Id
+       str = ret->at(i).at(3);
+       int num = str.toInt();
+       this->m_correctTestPaperClassIdVec.push_back(num);
+
+       //进行存储试卷id
+       str = ret->at(i).at(4);
+       num = str.toInt();
+       this->m_correctTestPaperTestPaperIdVec.push_back(num);
 
        //显示操作按钮
        QList<QPushButton*> optButton = this->m_correctOprator.at(i)->findChildren<QPushButton*>();

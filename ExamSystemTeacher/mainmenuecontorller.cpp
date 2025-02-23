@@ -5,6 +5,28 @@ CMainMenueContorller::CMainMenueContorller()
  this->m_mainMenueModel = new CMainMenueModel();
 }
 
+int CMainMenueContorller::getCorrectMemberCount(QString& testPaperName,QString& teacherId
+                          ,int& classId,int& testPaperId)
+{
+    QByteArray testPaperNameArr = testPaperName.toLocal8Bit();
+    QByteArray teacherIdArr = teacherId.toLocal8Bit();
+
+    const char* pTestPaperName = testPaperNameArr.data();
+    const char* pTeacherId = teacherIdArr.data();
+    return this->m_mainMenueModel->getCorrectMemberCount(pTestPaperName,pTeacherId,classId,testPaperId);
+}
+
+std::vector<std::vector<std::string>> CMainMenueContorller::getCurPageCorrectMember(QString& testPaperName,QString& teacherId
+                                                              ,int& classId,int& testPaperId,int& curIndex)
+{
+    QByteArray testPaperNameArr = testPaperName.toLocal8Bit();
+    QByteArray teacherIdArr = teacherId.toLocal8Bit();
+
+    const char* pTestPaperName = testPaperNameArr.data();
+    const char* pTeacherId = teacherIdArr.data();
+    return this->m_mainMenueModel->getCurPageCorrectMember(pTestPaperName,pTeacherId,classId,testPaperId,curIndex);
+}
+
 bool CMainMenueContorller::deleteTestPaperCommitInfo(QString& teacherId
                                                      ,QString& testPaperName)
 {
