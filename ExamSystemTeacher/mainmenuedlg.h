@@ -23,6 +23,7 @@
 #include "classsavedlg.h"
 #include "testpaperreleasedlg.h"
 #include "previewtestpaperdlg.h"
+#include "correctsubjectivequestionsdlg.h"
 
 namespace Ui {
 class CMainMenueDlg;  //主菜单管理页面
@@ -198,6 +199,14 @@ private:
 
     int m_correctMemberCurIndex;
     QString m_correctMemberCount;
+
+    QString m_tmpTestPaperName;
+    int m_classId;  //表示当前进入批改的科目id
+    int m_testPaperId;//表示当前进入批改的试卷id
+    QVector<QString> m_correctMemberStudentId;//存储所有的
+
+    //客观题评分界面
+    std::shared_ptr<CCorrectSubjectiveQuestionsDlg> m_correctSubjectDlg; //主科对话框
 private:
     void showPageIndex();//显示分页查询的下标页
     void initTableWidgetHeader(); //初始化表头
@@ -682,6 +691,14 @@ private:
     static unsigned WINAPI threadGetCorrectMemberCount(LPVOID arg);
 
     void showCorrectMemberCount();
+
+    void showLastCorrectMember();
+
+    void showNextCorrectMember();
+
+    void bindCorrectMemberOperator();//进行绑定批改成员
+
+    void joinCorrectSubjectDlg(QString studentName,QString subject,QString testPaperName,QString studentId);//进入到批改对话框界面
 private:
     Ui::CMainMenueDlg *ui;
 };

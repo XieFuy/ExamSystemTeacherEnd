@@ -720,6 +720,10 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
     QObject::connect(this,&CMainMenueDlg::startShowCorrectMemberUI,this,&CMainMenueDlg::showCorrectMemberUI);
     QObject::connect(this,&CMainMenueDlg::startShowCorrectMemberCount,this,&CMainMenueDlg::showCorrectMemberCount);
 
+
+    QObject::connect(this->ui->pushButton_44,&QPushButton::clicked,this,&CMainMenueDlg::showLastCorrectMember);
+    QObject::connect(this->ui->pushButton_45,&QPushButton::clicked,this,&CMainMenueDlg::showNextCorrectMember);
+
     this->initDataBaseTestPaperReleaseTable();
     this->initStudentAnswerSingaleTable();
     this->initStudentAnswerMultiTable();
@@ -731,6 +735,121 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
     this->initCorrectMemberTableUI();
     this->initCorrectMemberTableContorl();
     this->initCorrectShortAnswerTable();
+}
+
+void CMainMenueDlg::showLastCorrectMember()
+{
+    if(this->m_correctMemberCount == "0")
+    {
+        return;
+    }
+    //防止恶意刷新
+    if(this->m_correctMemberCurIndex <= 1)
+    {
+        return ;
+    }
+    //清除当前表中的记录
+    this->clearCorrectMemberUI();
+    //给当前页递减，并且不能低于1
+    if(this->m_correctMemberCurIndex > 1)
+    {
+       this->m_correctMemberCurIndex -= 1;
+    }
+    this->getCurPageCorrectMember(this->m_tmpTestPaperName,this->m_classId
+                                  ,this->m_testPaperId);
+
+    this->getCorrectMemberCount(this->m_tmpTestPaperName,this->m_classId
+                                ,this->m_testPaperId);
+}
+
+void CMainMenueDlg::joinCorrectSubjectDlg(QString studentName,QString subject,QString testPaperName,QString studentId)
+{
+    this->m_correctSubjectDlg = std::make_shared<CCorrectSubjectiveQuestionsDlg>();
+    this->m_correctSubjectDlg->move((this->width() - this->m_correctSubjectDlg->width()) / 2
+                                    ,(this->height() - this->m_correctSubjectDlg->height()) /2);
+    this->m_correctSubjectDlg->testPaperName = testPaperName;
+    this->m_correctSubjectDlg->studentName = studentName;
+    this->m_correctSubjectDlg->subject = subject;
+
+    this->m_correctSubjectDlg->teacherId = this->m_acount;
+    this->m_correctSubjectDlg->studentId = studentId;
+    this->m_correctSubjectDlg->classId = this->m_classId;
+    this->m_correctSubjectDlg->testPaperId = this->m_testPaperId;
+
+    this->m_correctSubjectDlg->show();
+    emit this->m_correctSubjectDlg->startShowDlg();
+    this->hide();
+    QObject::connect(this->m_correctSubjectDlg.get(),&CCorrectSubjectiveQuestionsDlg::rejected,[=](){
+        this->show();
+        if(this->m_correctSubjectDlg.get() != nullptr)
+        {
+            this->m_correctSubjectDlg.reset();
+        }
+    });
+}
+
+void CMainMenueDlg::bindCorrectMemberOperator()
+{
+    //获取参数等操作
+    for(QVector<QWidget*>::iterator pos = this->m_correctMemberOperator.begin(); pos != this->m_correctMemberOperator.end();pos++)
+    {
+        QList<QPushButton*> ret = (*pos)->findChildren<QPushButton*>();
+        for(QPushButton* btn : ret)
+        {
+            if(btn->text() == "批改")
+            {
+                //绑定的删除操作的槽函数
+                QObject::connect(btn,&QPushButton::clicked,[=](){
+                    //进行遍历是哪一个按钮，并获取对应的行号
+                    int row = 0;
+                    for(int i = 0 ; i < this->m_correctMemberOperator.size();i++)
+                    {
+                        QList<QPushButton*> buttons = this->m_correctMemberOperator.at(i)->findChildren<QPushButton*>();
+                        for(QPushButton* clickedBtn: buttons)
+                        {
+                            if(clickedBtn == btn)
+                            {
+                                qDebug()<<"点击进入批改";
+                                QString testPaperName = this->m_tmpTestPaperName;
+                                QString studentName = this->m_correctMemberName.at(row)->text().trimmed();
+                                QString subject = this->m_correctMemberSubject.at(row)->text().trimmed();
+                                QString studentId = this->m_correctMemberStudentId.at(row).trimmed();
+                                this->joinCorrectSubjectDlg(studentName,subject,testPaperName,studentId);
+                                break;
+                            }
+                        }
+                        row++;
+                    }
+                });
+            }
+        }
+    }
+}
+
+void CMainMenueDlg::showNextCorrectMember()
+{
+    if(this->m_correctMemberCount == "0") //如果查询的结果集为空则不进行操作
+    {
+        return;
+    }
+
+    if(QString::number(this->m_correctMemberCurIndex) == this->m_correctMemberCount)
+    {
+        return;
+    }
+    //清除当前表中的记录
+    this->clearCorrectMemberUI();
+
+    //给当前页自增，并且不能超过总页
+    if(QString::number(this->m_correctMemberCurIndex) != this->m_correctMemberCount)
+    {
+        this->m_correctMemberCurIndex += 1;
+    }
+    this->getCurPageCorrectMember(this->m_tmpTestPaperName,this->m_classId
+                                  ,this->m_testPaperId);
+
+    this->getCorrectMemberCount(this->m_tmpTestPaperName,this->m_classId
+                                ,this->m_testPaperId);
 }
 
 void CMainMenueDlg::clearCorrectMemberUI()
@@ -798,12 +917,15 @@ void CMainMenueDlg::showCorrectMemberUI(QVector<QVector<QString>>* ret)
     }
 
     //进行清除当前表的UI
-    this->clearCorrectMemberUI();
+    this->clearCorrectMemberUI();  
     //进行清除当前表的容器存储数据
+    this->m_correctMemberStudentId.clear();
 
     //进行显示数据
     for(int i = 0 ; i < ret->size(); i++)
     {
+        this->m_correctMemberStudentId.push_back(ret->at(i).at(0));
+
         //显示学生姓名
         QString str = ret->at(i).at(1);
         this->m_correctMemberName.at(i)->setText(str);
@@ -1092,6 +1214,7 @@ void CMainMenueDlg::initCorrectMemberTableContorl()
             this->m_correctMemberOperator.at(i)->setStyleSheet(strDoubleWidgetStyleSheet);
         }
     }
+    this->bindCorrectMemberOperator();
 }
 
 typedef struct getCurPageCorrectMemberArg{
@@ -1145,6 +1268,10 @@ unsigned WINAPI CMainMenueDlg::threadGetCurPageCorrectMember(LPVOID arg)
 //这里是点击进入批改试卷的逻辑
 void CMainMenueDlg::joinCorrectTestPaper(QString testPaperName,QString teacherId,int classId,int testPaperId)
 {
+    this->m_tmpTestPaperName = testPaperName;
+    this->m_classId = classId;
+    this->m_testPaperId = testPaperId;
+
     this->ui->stackedWidget->setCurrentIndex(7);
     this->ui->label_84->setText(testPaperName);
     this->getCurPageCorrectMember(testPaperName,classId,testPaperId);

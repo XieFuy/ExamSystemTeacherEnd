@@ -11,6 +11,9 @@ CONFIG += c++11
 SOURCES += \
     classsavedlg.cpp \
     clientsocket.cpp \
+    correctsubjectivequestionscontorler.cpp \
+    correctsubjectivequestionsdlg.cpp \
+    correctsubjectivequestionsmodel.cpp \
     datetimeselectdlg.cpp \
     dbhelper.cpp \
     dpihelper.cpp \
@@ -37,6 +40,9 @@ SOURCES += \
 HEADERS += \
     classsavedlg.h \
     clientsocket.h \
+    correctsubjectivequestionscontorler.h \
+    correctsubjectivequestionsdlg.h \
+    correctsubjectivequestionsmodel.h \
     datetimeselectdlg.h \
     dbhelper.h \
     dpihelper.h \
@@ -61,6 +67,7 @@ HEADERS += \
 
 FORMS += \
     classsavedlg.ui \
+    correctsubjectivequestionsdlg.ui \
     datetimeselectdlg.ui \
     exitlogindlg.ui \
     mainmenuedlg.ui \
