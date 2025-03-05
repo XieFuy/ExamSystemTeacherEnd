@@ -465,7 +465,7 @@ color:#50b8f7;
     </rect>
    </property>
    <property name="currentIndex">
-    <number>4</number>
+    <number>1</number>
    </property>
    <widget class="QWidget" name="page">
     <widget class="QWidget" name="widget_3" native="true">

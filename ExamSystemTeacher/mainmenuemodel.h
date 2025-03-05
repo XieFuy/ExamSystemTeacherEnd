@@ -128,6 +128,8 @@ public:
                                                                    ,int& classId,int& testPaperId,int& curIndex);
      int getCorrectMemberCount(const char* testPaperName,const char* teacherId
                                ,int& classId,int& testPaperId);
+     bool deleteTestPaperCorrectInfo(const char* testPaperName
+                                     ,const char* teacherId);
 private:
       HANDLE m_mutex; //因为所有操作都是使用的一个CDBHelper对象，所以要给每一个执行sql的步骤进行上锁
 };

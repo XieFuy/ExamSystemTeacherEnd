@@ -96,7 +96,7 @@ void CCorrectSubjectiveQuestionsDlg::getLastShortAnswerChoice()
     {
         this->order -= 1;
         //重新显示题号高光
-         emit this->m_shortAnswerChoice.at(this->order - 1)->clicked();
+        emit this->m_shortAnswerChoice.at(this->order - 1)->clicked();
     }
 }
 

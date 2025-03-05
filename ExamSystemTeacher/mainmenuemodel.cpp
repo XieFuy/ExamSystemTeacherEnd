@@ -291,6 +291,27 @@ bool CMainMenueModel::deleteTestPaperCommitInfo(const char* teacherId
  AND `testPaperId` IN (SELECT `testPaperId` FROM `testPaperInfo` WHERE `testPaperName` = '%s' AND `teacherId` = '%s');"
             ,teacherId,testPaperName,teacherId);
     sql = sqlBuf.get();
+    qDebug()<<QString::fromLocal8Bit(sql.c_str());
+    return dbHelper->sqlExcute(sql,"ExamSystem");
+}
+
+bool CMainMenueModel::deleteTestPaperCorrectInfo(const char* testPaperName
+                                ,const char* teacherId)
+{
+    if(testPaperName == nullptr || teacherId == nullptr)
+    {
+        return false;
+    }
+    std::shared_ptr<CDBHelper> dbHelper = std::make_shared<CDBHelper>();
+    std::unique_ptr<char[]> sqlBuf(new char[1024000]);
+    std::string sql;
+    memset(sqlBuf.get(),'\0',sizeof(char) * 1024000);
+    sprintf(sqlBuf.get(),"delete from `shortAnswerCorrect` \
+where `teacherId` = '%s'  and  `testPaperId` in \
+(SELECT `testPaperId` FROM `testPaperInfo` \
+WHERE `testPaperName` = '%s' AND `teacherId` = '%s');"
+            ,teacherId,testPaperName,teacherId);
+    sql = sqlBuf.get();
     return dbHelper->sqlExcute(sql,"ExamSystem");
 }
 
@@ -662,7 +683,7 @@ bool CMainMenueModel::deleteTestPaperReleaseInfo(const char* acount,const char* 
     memset(sqlBuf,'\0',sizeof(char) * 1024000);
     std::string sql;  
     //进行删除单选题学生答案记录
-   sprintf(sqlBuf,"delete from `studentAnswerSingal` where `teacherId` = '%s' and `testPaperId` in (SELECT DISTINCT `testPaperId` \n\
+   /*sprintf(sqlBuf,"delete from `studentAnswerSingal` where `teacherId` = '%s' and `testPaperId` in (SELECT DISTINCT `testPaperId` \n\
 FROM `testPaperInfo` \n\
 WHERE `teacherId` = '%s' AND `testPaperName` = '%s');",acount,acount,testPaperName);
    sql = sqlBuf;
@@ -690,14 +711,14 @@ WHERE `teacherId` = '%s' AND `testPaperName` = '%s');",acount,acount,testPaperNa
 FROM `testPaperInfo` \n\
 WHERE `teacherId` = '%s' AND `testPaperName` = '%s');",acount,acount,testPaperName);
     sql = sqlBuf;
-    ret =  dbHelper->sqlExcute(sql,"ExamSystem");
+    ret =  dbHelper->sqlExcute(sql,"ExamSystem");*/
 
     memset(sqlBuf,'\0',sizeof(char) * 1024000);
     sprintf(sqlBuf,"delete from `testPaperRelease` where `teacherId` = '%s' and `testPaperId` in (SELECT DISTINCT `testPaperId` \n\
 FROM `testPaperInfo` \n\
 WHERE `teacherId` = '%s' AND `testPaperName` = '%s');",acount,acount,testPaperName);
     sql = sqlBuf;
-    ret =  dbHelper->sqlExcute(sql,"ExamSystem");
+    int ret =  dbHelper->sqlExcute(sql,"ExamSystem");
     delete[] sqlBuf;
     return ret;
 }

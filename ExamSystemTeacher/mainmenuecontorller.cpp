@@ -38,6 +38,17 @@ bool CMainMenueContorller::deleteTestPaperCommitInfo(QString& teacherId
     return this->m_mainMenueModel->deleteTestPaperCommitInfo(pTeacher,pTestPaperName);
 }
 
+bool CMainMenueContorller::deleteTestPaperCorrectInfo(QString& testPaperName
+                                                      ,QString& teacherId)
+{
+    QByteArray testPaperNameArr = testPaperName.toLocal8Bit();
+    QByteArray teacherIdArr = teacherId.toLocal8Bit();
+    const char* pTestPaperName = testPaperNameArr.data();
+    const char* pTeacherId = teacherIdArr.data();
+    return this->m_mainMenueModel->deleteTestPaperCorrectInfo(pTestPaperName
+                                                              ,pTeacherId);
+}
+
 bool CMainMenueContorller::deleteCorrectShortAnswer(QString& teacherId,QString& testPaperName)
 {
     QByteArray teacherIdArr = teacherId.toLocal8Bit();
@@ -86,6 +97,7 @@ bool CMainMenueContorller::deleteSignalAnswer(QString& teacherId,QString& testPa
     const char* pTestPaperName = testPaperNameArr.data();
     return this->m_mainMenueModel->deleteSignalAnswer(pTeacherId,pTestPaperName);
 }
+
 
 bool CMainMenueContorller::initCorrectShortAnswerTable()
 {
@@ -615,35 +627,95 @@ bool CMainMenueContorller::deleteMultiClickBtn(QString acount,QList<QString> cre
         QByteArray createTimeArr = createTimeLst.at(i).toLocal8Bit();
         const char* pCreateTime = createTimeArr.data();
 
+        //删除单选题题库
         DeleteFromSignalChoiseArg* arg = new DeleteFromSignalChoiseArg();
         arg->thiz = this;
         arg->acount = acount;
         arg->createTime = createTimeLst.at(i);
         HANDLE thread1 = (HANDLE)_beginthreadex(nullptr,0,&CMainMenueContorller::threadDeleteFromSignalChoise,arg,0,nullptr);
 
+        //删除多选题题库
         DeleteFromSignalChoiseArg* arg2 = new DeleteFromSignalChoiseArg();
         arg2->thiz = this;
         arg2->acount = acount;
         arg2->createTime = createTimeLst.at(i);
         HANDLE thread2 = (HANDLE)_beginthreadex(nullptr,0,&CMainMenueContorller::threadDeleteFromMultiChoise,arg2,0,nullptr);
 
+        //删除判断题题库
         DeleteFromSignalChoiseArg* arg3 = new DeleteFromSignalChoiseArg();
         arg3->thiz = this;
         arg3->acount = acount;
         arg3->createTime = createTimeLst.at(i);
         HANDLE thread3 = (HANDLE)_beginthreadex(nullptr,0,&CMainMenueContorller::threadDeleteFromJudge,arg3,0,nullptr);
 
+        //删除简答题题库
         DeleteFromSignalChoiseArg* arg4 = new DeleteFromSignalChoiseArg();
         arg4->thiz = this;
         arg4->acount = acount;
         arg4->createTime = createTimeLst.at(i);
         HANDLE thread4 = (HANDLE)_beginthreadex(nullptr,0,&CMainMenueContorller::threadDeleteFromShortAnswer,arg4,0,nullptr);
 
-        //先从题库中删除属于该试卷的所有试题
-        //ret = this->m_mainMenueModel->deleteFromSignalChoise(pAcount,pCreateTime);
-//        ret = this->m_mainMenueModel->deleteFromMultiChoise(pAcount,pCreateTime);
-//        ret = this->m_mainMenueModel->deleteFromJudge(pAcount,pCreateTime);
-//        ret = this->m_mainMenueModel->deleteFromShortAnswer(pAcount,pCreateTime);
+        //进行删除单选题答题记录
+        DeleteFromSignalChoiseArg* arg6 = new DeleteFromSignalChoiseArg();
+        arg6->thiz = this;
+        arg6->acount = acount;
+        arg6->createTime = testPaperIdLst.at(i);
+        HANDLE thread6 = (HANDLE)_beginthreadex(nullptr,0,&CMainMenueContorller::threadDeleteSignalAnswer,arg6,0,nullptr);
+
+        //进行删除多选题的答题记录
+        DeleteFromSignalChoiseArg* arg7 = new DeleteFromSignalChoiseArg();
+        arg7->thiz = this;
+        arg7->acount = acount;
+        arg7->createTime = testPaperIdLst.at(i);
+        HANDLE thread7 = (HANDLE)_beginthreadex(nullptr,0,&CMainMenueContorller::threadDeleteMultiAnswer,arg7,0,nullptr);
+
+        //进行删除判断题的答题记录
+        DeleteFromSignalChoiseArg* arg8 = new DeleteFromSignalChoiseArg();
+        arg8->thiz = this;
+        arg8->acount = acount;
+        arg8->createTime = testPaperIdLst.at(i);
+        HANDLE thread8 = (HANDLE)_beginthreadex(nullptr,0,&CMainMenueContorller::threadDeleteJudgeAnswer,arg8,0,nullptr);
+
+        //进行删除简答题的答题记录
+        DeleteFromSignalChoiseArg* arg9 = new DeleteFromSignalChoiseArg();
+        arg9->thiz = this;
+        arg9->acount = acount;
+        arg9->createTime = testPaperIdLst.at(i);
+        HANDLE thread9 = (HANDLE)_beginthreadex(nullptr,0,&CMainMenueContorller::threadDeleteShortAnswer,arg9,0,nullptr);
+
+        //进行删除该试卷的所有的简答题评分记录
+        DeleteFromSignalChoiseArg* arg10 = new DeleteFromSignalChoiseArg();
+        arg10->thiz = this;
+        arg10->acount = acount;
+        arg10->createTime = testPaperIdLst.at(i);
+        HANDLE thread10 = (HANDLE)_beginthreadex(nullptr,0,&CMainMenueContorller::threadDeleteShortAnswer,arg10,0,nullptr);
+
+        //进行删除该试卷的提交记录
+        DeleteFromSignalChoiseArg* arg11 = new DeleteFromSignalChoiseArg();
+        arg11->thiz = this;
+        arg11->acount = acount;
+        arg11->createTime = testPaperIdLst.at(i);
+        HANDLE thread11 = (HANDLE)_beginthreadex(nullptr,0,&CMainMenueContorller::threadDeleteTestPaperCommitInfo,arg11,0,nullptr);
+
+        //进行删除简答题批改表记录
+        DeleteFromSignalChoiseArg* arg12 = new DeleteFromSignalChoiseArg();
+        arg12->thiz = this;
+        arg12->acount = acount;
+        arg12->createTime = testPaperIdLst.at(i);
+        HANDLE thread12 = (HANDLE)_beginthreadex(nullptr,0,&CMainMenueContorller::threadDeleteTestPaperCorrectInfo,arg12,0,nullptr);
+
+        //需要等待上面的任务都执行完毕才能进行删除试卷表的信息
+        WaitForSingleObject(thread1,INFINITE);
+        WaitForSingleObject(thread2,INFINITE);
+        WaitForSingleObject(thread3,INFINITE);
+        WaitForSingleObject(thread4,INFINITE);
+        WaitForSingleObject(thread6,INFINITE);
+        WaitForSingleObject(thread7,INFINITE);
+        WaitForSingleObject(thread8,INFINITE);
+        WaitForSingleObject(thread9,INFINITE);
+        WaitForSingleObject(thread10,INFINITE);
+        WaitForSingleObject(thread11,INFINITE);
+        WaitForSingleObject(thread12,INFINITE);
 
         //开启线程进行删除该试卷的发布信息
         DeleteFromSignalChoiseArg* arg5 = new DeleteFromSignalChoiseArg();
@@ -651,18 +723,58 @@ bool CMainMenueContorller::deleteMultiClickBtn(QString acount,QList<QString> cre
         arg5->acount = acount;
         arg5->createTime = testPaperIdLst.at(i);  //这里要传的是试卷名称不是试卷id ，懒得该变量名 包括函数参数也是
         HANDLE thread5 = (HANDLE)_beginthreadex(nullptr,0,&CMainMenueContorller::threadDeleteTestPaperRelease,arg5,0,nullptr);
-
-        //再进行删除题库中的试卷信息
-        //等待四个线程结束时进行执行
-        WaitForSingleObject(thread1,INFINITE);
-        WaitForSingleObject(thread2,INFINITE);
-        WaitForSingleObject(thread3,INFINITE);
-        WaitForSingleObject(thread4,INFINITE);
         WaitForSingleObject(thread5,INFINITE);
+
         ret = this->m_mainMenueModel->deleteClickBtn(pAcount,pCreateTime);
     }
     return ret;
 }
+
+unsigned WINAPI CMainMenueContorller::threadDeleteMultiAnswer(LPVOID arg)
+{
+    DeleteFromSignalChoiseArg* dInfo = (DeleteFromSignalChoiseArg*)arg;
+    dInfo->thiz->deleteMultiAnswer(dInfo->acount,dInfo->createTime);
+    delete dInfo;
+    //_endthreadex(0);
+    return 0;
+}
+
+unsigned WINAPI CMainMenueContorller::threadDeleteJudgeAnswer(LPVOID arg)
+{
+    DeleteFromSignalChoiseArg* dInfo = (DeleteFromSignalChoiseArg*)arg;
+    dInfo->thiz->deleteJudgeAnswer(dInfo->acount,dInfo->createTime);
+    delete dInfo;
+    //_endthreadex(0);
+    return 0;
+}
+
+unsigned WINAPI CMainMenueContorller::threadDeleteShortAnswer(LPVOID arg)
+{
+    DeleteFromSignalChoiseArg* dInfo = (DeleteFromSignalChoiseArg*)arg;
+    dInfo->thiz->deleteShortAnswer(dInfo->acount,dInfo->createTime);
+    delete dInfo;
+    //_endthreadex(0);
+    return 0;
+}
+
+unsigned WINAPI CMainMenueContorller::threadDeleteTestPaperCorrectInfo(LPVOID arg)
+{
+     DeleteFromSignalChoiseArg* dInfo = (DeleteFromSignalChoiseArg*)arg;
+     dInfo->thiz->deleteTestPaperCorrectInfo(dInfo->createTime,dInfo->acount);
+     delete dInfo;
+     return 0;
+}
+
+unsigned WINAPI CMainMenueContorller::threadDeleteTestPaperCommitInfo(LPVOID arg)
+{
+    DeleteFromSignalChoiseArg* dInfo = (DeleteFromSignalChoiseArg*)arg;
+    dInfo->thiz->deleteTestPaperCommitInfo(dInfo->acount,dInfo->createTime);
+    delete dInfo;
+    //_endthreadex(0);
+    return 0;
+}
+
+
 
 unsigned WINAPI CMainMenueContorller::threadDeleteTestPaperRelease(LPVOID arg)
 {
@@ -677,6 +789,14 @@ unsigned WINAPI CMainMenueContorller::threadDeleteFromShortAnswer(LPVOID arg)
 {
     DeleteFromSignalChoiseArg* dInfo = (DeleteFromSignalChoiseArg*)arg;
     dInfo->thiz->deleteFromShortAnswer(dInfo->acount,dInfo->createTime);
+    delete dInfo;
+    //_endthreadex(0);
+    return 0;
+}
+unsigned CMainMenueContorller::WINAPI threadDeleteSignalAnswer(LPVOID arg)
+{
+    DeleteFromSignalChoiseArg* dInfo = (DeleteFromSignalChoiseArg*)arg;
+    dInfo->thiz->deleteSignalAnswer(dInfo->acount,dInfo->createTime);
     delete dInfo;
     //_endthreadex(0);
     return 0;

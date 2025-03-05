@@ -699,6 +699,10 @@ private:
     void bindCorrectMemberOperator();//进行绑定批改成员
 
     void joinCorrectSubjectDlg(QString studentName,QString subject,QString testPaperName,QString studentId);//进入到批改对话框界面
+
+    //进行删除简答题批改表记录
+    void deleteTestPaperCorrectInfo(QString testPaperName);
+    static unsigned WINAPI threadDeleteTestPaperCorrectInfo(LPVOID arg);
 private:
     Ui::CMainMenueDlg *ui;
 };

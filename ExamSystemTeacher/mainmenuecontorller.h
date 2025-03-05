@@ -115,15 +115,22 @@ public :
    int getCorrectTestPaperCountByName(QString& teacherId,QString& testPaperName);
    bool initCorrectShortAnswerTable();
    bool deleteSignalAnswer(QString& teacherId,QString& testPaperName);
+   static unsigned WINAPI threadDeleteSignalAnswer(LPVOID arg);
    bool deleteMultiAnswer(QString& teacherId,QString& testPaperName);
+   static unsigned WINAPI threadDeleteMultiAnswer(LPVOID arg);
    bool deleteJudgeAnswer(QString& teacherId,QString& testPaperName);
+   static unsigned WINAPI threadDeleteJudgeAnswer(LPVOID arg);
    bool deleteShortAnswer(QString& teacherId,QString& testPaperName);
+   static unsigned WINAPI threadDeleteShortAnswer(LPVOID arg);
    bool  deleteCorrectShortAnswer(QString& teacherId,QString& testPaperName);
    bool deleteTestPaperCommitInfo(QString& teacherId,QString& testPaperName);
+   static unsigned WINAPI threadDeleteTestPaperCommitInfo(LPVOID arg);
    std::vector<std::vector<std::string>> getCurPageCorrectMember(QString& testPaperName,QString& teacherId
                                                                  ,int& classId,int& testPaperId,int& curIndex);
    int getCorrectMemberCount(QString& testPaperName,QString& teacherId
                              ,int& classId,int& testPaperId);
+   bool deleteTestPaperCorrectInfo(QString& testPaperName,QString& teacherId);
+   static unsigned WINAPI threadDeleteTestPaperCorrectInfo(LPVOID arg);
  private:
     CMainMenueModel* m_mainMenueModel = nullptr;
 };
