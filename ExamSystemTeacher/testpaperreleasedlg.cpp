@@ -96,7 +96,7 @@ unsigned WINAPI CTestPaperReleaseDlg::threadAddStudentShortAnswerCorrectInfo(LPV
     memset(sqlBuf.get(),'\0',sizeof(char) * 1024000);
     sprintf(sqlBuf.get(),"insert into `shortAnswerCorrect`(`teacherId`,`classId`,`testPaperId`,`studentId`,`order`) \
 values('%s','%s','%s','%s',%d);",pTeacherId,pClassId,pTestPaperId,pStudentId,aInfo->order);
-     sql = sqlBuf.get();
+    sql = sqlBuf.get();
     bool ret =  dbHelper->sqlExcute(sql,"ExamSystem");
     delete p;
     //_endthreadex(0);
@@ -551,6 +551,8 @@ unsigned WINAPI CTestPaperReleaseDlg::threadAddTestPaperReleaseInfo(LPVOID arg)
 
     //等待所有的线程都完成才进行获取值进行插入操作
     //进行插入单选题答题记录
+    QVector<HANDLE> temp;
+    qDebug()<<studentIdVecArg->studentIdVec_out.size()<<" "<<signalOrderArg->orderVec_out.size();
     for(int i = 0 ; i < studentIdVecArg->studentIdVec_out.size();i++)
     {
         for(int j = 0;j < signalOrderArg->orderVec_out.size();j++)
@@ -564,10 +566,12 @@ unsigned WINAPI CTestPaperReleaseDlg::threadAddTestPaperReleaseInfo(LPVOID arg)
 
             std::shared_ptr<AddStudentAnswerSignalInfo>* p = new std::shared_ptr<AddStudentAnswerSignalInfo>(arg);
             //执行插入学生答案单选题记录
-           _beginthreadex(nullptr,0,&CTestPaperReleaseDlg::threadAddStudentAnswerSignalInfo,p,0,nullptr);
+            HANDLE thread = (HANDLE)_beginthreadex(nullptr,0,&CTestPaperReleaseDlg::threadAddStudentAnswerSignalInfo,p,0,nullptr);
+            temp.push_back(thread);
         }
     }
-
+    WaitForMultipleObjects(temp.size(),temp.data(),TRUE,INFINITE);
+    temp.clear();
 
     /*for(int i = 0 ; i < ret2.size();i++)
     {
@@ -583,6 +587,7 @@ unsigned WINAPI CTestPaperReleaseDlg::threadAddTestPaperReleaseInfo(LPVOID arg)
     }*/
 
     //进行插入多选题答题记录
+    qDebug()<<studentIdVecArg->studentIdVec_out.size()<<" "<<multiOrderArg->order_out.size();
     for(int i = 0 ; i < studentIdVecArg->studentIdVec_out.size();i++)
     {
         for(int j = 0;j < multiOrderArg->order_out.size();j++)
@@ -595,9 +600,12 @@ unsigned WINAPI CTestPaperReleaseDlg::threadAddTestPaperReleaseInfo(LPVOID arg)
             arg->order = multiOrderArg->order_out.at(j);
             std::shared_ptr<AddStudentAnswerSignalInfo>* p = new std::shared_ptr<AddStudentAnswerSignalInfo>(arg);
             //执行插入学生答案记录
-           _beginthreadex(nullptr,0,&CTestPaperReleaseDlg::threadAddStudentAnswerMultiInfo,p,0,nullptr);
+            HANDLE thread = (HANDLE)_beginthreadex(nullptr,0,&CTestPaperReleaseDlg::threadAddStudentAnswerMultiInfo,p,0,nullptr);
+            temp.push_back(thread);
         }
     }
+    WaitForMultipleObjects(temp.size(),temp.data(),TRUE,INFINITE);
+    temp.clear();
 
     /*for(int i = 0 ; i < ret2.size();i++)
     {
@@ -612,6 +620,7 @@ unsigned WINAPI CTestPaperReleaseDlg::threadAddTestPaperReleaseInfo(LPVOID arg)
        _beginthreadex(nullptr,0,&CTestPaperReleaseDlg::threadAddStudentAnswerMultiInfo,p,0,nullptr);
     }*/
 
+    qDebug()<<studentIdVecArg->studentIdVec_out.size()<<" "<<judgeOrderArg->order_out.size();
     //进行插入判断题答题记录
     for(int i = 0 ; i < studentIdVecArg->studentIdVec_out.size();i++)
     {
@@ -628,7 +637,8 @@ unsigned WINAPI CTestPaperReleaseDlg::threadAddTestPaperReleaseInfo(LPVOID arg)
            _beginthreadex(nullptr,0,&CTestPaperReleaseDlg::threadAddStudentAnswerJudgeInfo,p,0,nullptr);
         }
     }
-
+    WaitForMultipleObjects(temp.size(),temp.data(),TRUE,INFINITE);
+    temp.clear();
     /*for(int i = 0 ; i < ret2.size();i++)
     {
         std::shared_ptr<AddStudentAnswerSignalInfo> arg = std::make_shared<AddStudentAnswerSignalInfo>();
@@ -642,6 +652,7 @@ unsigned WINAPI CTestPaperReleaseDlg::threadAddTestPaperReleaseInfo(LPVOID arg)
        _beginthreadex(nullptr,0,&CTestPaperReleaseDlg::threadAddStudentAnswerJudgeInfo,p,0,nullptr);
     }*/
 
+    qDebug()<<studentIdVecArg->studentIdVec_out.size()<<" "<<shortAnswerOrderArg->order_out.size();
     //进行插入简答题答题记录
     for(int i = 0 ; i < studentIdVecArg->studentIdVec_out.size();i++)
     {
@@ -658,6 +669,8 @@ unsigned WINAPI CTestPaperReleaseDlg::threadAddTestPaperReleaseInfo(LPVOID arg)
            _beginthreadex(nullptr,0,&CTestPaperReleaseDlg::threadAddStudentAnswerShortAnswerInfo,p,0,nullptr);
         }
     }
+    WaitForMultipleObjects(temp.size(),temp.data(),TRUE,INFINITE);
+    temp.clear();
 
     //进行插入简答题评分记录
     for(int i = 0 ; i < studentIdVecArg->studentIdVec_out.size();i++)
@@ -675,6 +688,8 @@ unsigned WINAPI CTestPaperReleaseDlg::threadAddTestPaperReleaseInfo(LPVOID arg)
            _beginthreadex(nullptr,0,&CTestPaperReleaseDlg::threadAddStudentShortAnswerCorrectInfo,p,0,nullptr);
         }
     }
+    WaitForMultipleObjects(temp.size(),temp.data(),TRUE,INFINITE);
+    temp.clear();
 
     /*for(int i = 0 ; i < ret2.size();i++)
     {
