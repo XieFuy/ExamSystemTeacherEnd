@@ -65,6 +65,7 @@ CCorrectSubjectiveQuestionsDlg::CCorrectSubjectiveQuestionsDlg(QWidget *parent) 
             //获取当先题的题干，学生答案,参考答案
             this->getCurOrderShortAnswer();
             this->getCurOrderAnswer();
+            this->getCurShortAnswerScore();
         });
     }
 
@@ -79,10 +80,69 @@ CCorrectSubjectiveQuestionsDlg::CCorrectSubjectiveQuestionsDlg(QWidget *parent) 
     QObject::connect(this,&CCorrectSubjectiveQuestionsDlg::startShowShortAnswerBtn,this,&CCorrectSubjectiveQuestionsDlg::showSHortAnswerBtn);
     QObject::connect(this->ui->pushButton_249,&QPushButton::clicked,this,&CCorrectSubjectiveQuestionsDlg::getLastShortAnswerChoice);
     QObject::connect(this->ui->pushButton_250,&QPushButton::clicked,this,&CCorrectSubjectiveQuestionsDlg::getNextShortAnswerChoice);
-
+    QObject::connect(this,&CCorrectSubjectiveQuestionsDlg::startShowInfo,this,&CCorrectSubjectiveQuestionsDlg::showInfo);
+    QObject::connect(this->ui->pushButton_27,&QPushButton::clicked,[=](){
+        this->updateShortAnserScore(this->ui->lineEdit->text().trimmed());
+    });
+    QObject::connect(this,&CCorrectSubjectiveQuestionsDlg::startShowScore,this,&CCorrectSubjectiveQuestionsDlg::showScore);
     this->getShoerAnswerCount();
     //进行回显第一题
     emit this->ui->pushButton_251->clicked();
+}
+
+void CCorrectSubjectiveQuestionsDlg::showScore(QVector<QVector<QString>>* ret)
+{
+    if(ret == nullptr)
+    {
+        return ;
+    }
+    for(int i = 0 ; i < ret->size();i++)
+    {
+        //显示已经进行的评分
+        QString str = ret->at(i).at(0);
+        qDebug()<<"score:"<<str;
+        if(str == "0") //默认是未赋分对控件进行清空
+        {
+            this->ui->lineEdit->clear();
+        }else
+        {
+            this->ui->lineEdit->setText(str);
+        }
+    }
+    delete ret;
+}
+
+typedef struct updateShortAnserScoreArg{
+    QString score;
+    CCorrectSubjectiveQuestionsDlg* thiz;
+}UpdateShortAnserScoreArg;
+
+void CCorrectSubjectiveQuestionsDlg::updateShortAnserScore(QString score)
+{
+    std::shared_ptr<UpdateShortAnserScoreArg> arg = std::make_shared<UpdateShortAnserScoreArg>();
+    arg->thiz = this;
+    arg->score = score;
+    std::shared_ptr<UpdateShortAnserScoreArg>* p = new std::shared_ptr<UpdateShortAnserScoreArg>(arg);
+    _beginthreadex(nullptr,0,&CCorrectSubjectiveQuestionsDlg::threadUpdateShortAnserScore,p,0,nullptr);
+}
+
+unsigned WINAPI CCorrectSubjectiveQuestionsDlg::threadUpdateShortAnserScore(LPVOID arg)
+{
+    std::shared_ptr<UpdateShortAnserScoreArg>* p = (std::shared_ptr<UpdateShortAnserScoreArg>*)arg;
+    std::shared_ptr<UpdateShortAnserScoreArg> uInfo = *p;
+    uInfo->thiz->m_contorler->updateShortAnserScore(uInfo->thiz->studentId,
+                                                    uInfo->thiz->teacherId,uInfo->thiz->classId,
+                                                    uInfo->thiz->testPaperId,uInfo->thiz->order,uInfo->score);
+    //进行显示提示
+    emit uInfo->thiz->startShowInfo();
+    delete p;
+    return 0;
+}
+
+void CCorrectSubjectiveQuestionsDlg::showInfo()
+{
+    std::shared_ptr<QMessageBox> box = std::make_shared<QMessageBox>(QMessageBox::Information,"提示","赋分成功!",QMessageBox::Ok);
+    box->exec();
 }
 
 void CCorrectSubjectiveQuestionsDlg::getShoerAnswerCount()
@@ -98,6 +158,32 @@ void CCorrectSubjectiveQuestionsDlg::getLastShortAnswerChoice()
         //重新显示题号高光
         emit this->m_shortAnswerChoice.at(this->order - 1)->clicked();
     }
+}
+
+void CCorrectSubjectiveQuestionsDlg::getCurShortAnswerScore()
+{
+    _beginthreadex(nullptr,0,&CCorrectSubjectiveQuestionsDlg::threadGetCurShortAnswerScore,this,0,nullptr);
+}
+
+unsigned WINAPI CCorrectSubjectiveQuestionsDlg::threadGetCurShortAnswerScore(LPVOID arg)
+{
+    CCorrectSubjectiveQuestionsDlg* thiz = (CCorrectSubjectiveQuestionsDlg*)arg;
+    std::vector<std::vector<std::string>> ret = thiz->m_contorler->getCurShortAnswerScore(thiz->teacherId,thiz->studentId
+                                              ,thiz->classId,thiz->testPaperId,thiz->order);
+
+    QVector<QVector<QString>>* result = new QVector<QVector<QString>>();
+    for(int i = 0 ; i < ret.size();i++)
+    {
+        QVector<QString> temp;
+        for(int j = 0 ; j < ret.at(i).size();j++)
+        {
+            QString str = QString::fromLocal8Bit(ret.at(i).at(j).c_str());
+            temp.push_back(str);
+        }
+        result->push_back(temp);
+    }
+    emit thiz->startShowScore(result);
+    return 0;
 }
 
 void CCorrectSubjectiveQuestionsDlg::getNextShortAnswerChoice()

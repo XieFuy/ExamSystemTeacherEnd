@@ -3988,7 +3988,7 @@ unsigned WINAPI CMainMenueDlg::showClassIcon(LPVOID arg)
     //发送数据包
     char* packet = clientSocket->getPacket();
     long long packetSize = clientSocket->getPacketSize();
-    int size =  clientSocket->Send(packet);
+    int size =  clientSocket->Send(packet); //客户端发送的数据包大小是固定的
     qDebug()<<"send size: "<<size;
 
     //先获取服务端发送的文件大小 8字节

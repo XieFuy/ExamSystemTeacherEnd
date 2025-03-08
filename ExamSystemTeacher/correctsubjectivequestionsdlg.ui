@@ -1495,6 +1495,14 @@ border-radius:25;
      <height>31</height>
     </rect>
    </property>
+   <property name="font">
+    <font>
+     <family>黑体</family>
+     <pointsize>12</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
   </widget>
   <widget class="QLabel" name="label_4">
    <property name="geometry">

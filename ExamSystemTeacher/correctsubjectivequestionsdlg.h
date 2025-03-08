@@ -6,6 +6,7 @@
 #include <windows.h>
 #include <memory>
 #include "correctsubjectivequestionscontorler.h"
+#include <QMessageBox>
 
 namespace Ui {
 class CCorrectSubjectiveQuestionsDlg;
@@ -24,6 +25,8 @@ signals:
     void startShowShortAnswer(QVector<QVector<QString>>* ret);
     void startShowAnswer(QVector<QVector<QString>>* ret);
     void startShowShortAnswerBtn(int count);
+    void startShowInfo();
+    void startShowScore(QVector<QVector<QString>>* ret);
 private:
     void getCurOrderShortAnswer(); //获取当前题的
     static unsigned WINAPI threadGetCurOrderShortAnswer(LPVOID arg);
@@ -46,6 +49,18 @@ private:
     //下一题
     void getNextShortAnswerChoice();
 
+    //进行批改简答题进行赋分
+    void updateShortAnserScore(QString score);
+    static unsigned WINAPI threadUpdateShortAnserScore(LPVOID arg);
+
+    //进行显示提示赋分成功。
+    void showInfo();
+
+    //进行获取当前题的赋分数据
+    void getCurShortAnswerScore();
+    static unsigned WINAPI threadGetCurShortAnswerScore(LPVOID arg);
+
+    void showScore(QVector<QVector<QString>>* ret);
 private:
     QVector<QPushButton*> m_shortAnswerChoice;
     int order;
