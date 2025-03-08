@@ -936,12 +936,12 @@ void CMainMenueDlg::showCorrectMemberUI(QVector<QVector<QString>>* ret)
 
         //显示客观分数
         str = ret->at(i).at(3);
-        int num1 = str.toDouble();
+        double num1 = str.toDouble();
         this->m_correctMemberKeGuan.at(i)->setText(str);
 
         //显示主观分数
         str = ret->at(i).at(4);
-        int num2 = str.toDouble();
+        double num2 = str.toDouble();
         this->m_correctMemberZhuGuan.at(i)->setText(str);
 
         //显示总分
