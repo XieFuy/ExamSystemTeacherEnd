@@ -5,6 +5,24 @@ CCorrectSubjectiveQuestionsModel::CCorrectSubjectiveQuestionsModel()
 
 }
 
+bool CCorrectSubjectiveQuestionsModel::updateTestPaperCorrectStatus(const char* teacherId,const char* studentId
+                                                                   ,int& classId,int& testPaperId)
+{
+    if(teacherId == nullptr || studentId == nullptr)
+    {
+        return false;
+    }
+    std::shared_ptr<CDBHelper> dbHelper = std::make_shared<CDBHelper>();
+    std::unique_ptr<char[]> sqlBuf(new char[1024000]);
+    std::string sql;
+    memset(sqlBuf.get(),'\0',sizeof(char) * 1024000);
+    sprintf(sqlBuf.get(),"update  `commitTestPaper` set `correctStatus` = '1' \
+where `teacherId` = '%s' and `classId` = %d  and `testPaperId` = %d and `studentId` = '%s';"
+            ,teacherId,classId,testPaperId,studentId);
+    sql = sqlBuf.get();
+    return dbHelper->sqlExcute(sql,"ExamSystem");
+}
+
 std::vector<std::vector<std::string>> CCorrectSubjectiveQuestionsModel::getCurShortAnswerScore(const char* teacherId,const char* studentId
                                                              ,int& classId,int& testPaperId,int& order)
 {

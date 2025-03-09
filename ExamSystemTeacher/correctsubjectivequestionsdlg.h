@@ -61,6 +61,9 @@ private:
     static unsigned WINAPI threadGetCurShortAnswerScore(LPVOID arg);
 
     void showScore(QVector<QVector<QString>>* ret);
+
+    void updateTestPaperCorrectStatus();
+    static unsigned WINAPI threadUpdateTestPaperCorrectStatus(LPVOID arg);
 private:
     QVector<QPushButton*> m_shortAnswerChoice;
     int order;

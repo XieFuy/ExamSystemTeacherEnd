@@ -18,6 +18,9 @@ CCorrectSubjectiveQuestionsDlg::CCorrectSubjectiveQuestionsDlg(QWidget *parent) 
         this->ui->label_84->setText(this->testPaperName);
         this->ui->label_87->setText(this->subject);
         this->ui->label_86->setText(this->studentName);
+
+        //进行更新试卷批改状态
+        this->updateTestPaperCorrectStatus();
     });
 
     QObject::connect(this->ui->pushButton_26,&QPushButton::clicked,[=](){
@@ -88,6 +91,19 @@ CCorrectSubjectiveQuestionsDlg::CCorrectSubjectiveQuestionsDlg(QWidget *parent) 
     this->getShoerAnswerCount();
     //进行回显第一题
     emit this->ui->pushButton_251->clicked();
+}
+
+void CCorrectSubjectiveQuestionsDlg::updateTestPaperCorrectStatus()
+{
+    _beginthreadex(nullptr,0,&CCorrectSubjectiveQuestionsDlg::CCorrectSubjectiveQuestionsDlg::threadUpdateTestPaperCorrectStatus,this,0,nullptr);
+}
+
+unsigned WINAPI CCorrectSubjectiveQuestionsDlg::threadUpdateTestPaperCorrectStatus(LPVOID arg)
+{
+    CCorrectSubjectiveQuestionsDlg* thiz = (CCorrectSubjectiveQuestionsDlg*)arg;
+    thiz->m_contorler->updateTestPaperCorrectStatus(thiz->teacherId,thiz->studentId
+                                                    ,thiz->classId,thiz->testPaperId);
+    return 0;
 }
 
 void CCorrectSubjectiveQuestionsDlg::showScore(QVector<QVector<QString>>* ret)

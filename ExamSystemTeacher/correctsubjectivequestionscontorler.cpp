@@ -5,6 +5,17 @@ CCorrectSubjectiveQuestionsContorler::CCorrectSubjectiveQuestionsContorler()
    this->m_model  = std::make_shared<CCorrectSubjectiveQuestionsModel>();
 }
 
+bool CCorrectSubjectiveQuestionsContorler::updateTestPaperCorrectStatus(QString& teacherId,QString& studentId
+                                                                   ,int& classId,int& testPaperId)
+{
+    QByteArray teacherIdArr = teacherId.toLocal8Bit();
+    QByteArray studentIdArr = studentId.toLocal8Bit();
+
+    const char* pTeacherId = teacherIdArr.data();
+    const char* pStudentId = studentIdArr.data();
+    return this->m_model->updateTestPaperCorrectStatus(pTeacherId,pStudentId,classId,testPaperId);
+}
+
 std::vector<std::vector<std::string>> CCorrectSubjectiveQuestionsContorler::getCurShortAnswerScore(QString& teacherId,QString& studentId
                                                              ,int& classId,int& testPaperId,int& order)
 {

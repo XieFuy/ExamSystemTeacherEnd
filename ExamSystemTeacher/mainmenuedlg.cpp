@@ -715,6 +715,8 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
 
     QObject::connect(this->ui->pushButton_43,&QPushButton::clicked,[=](){
         this->ui->stackedWidget->setCurrentIndex(4);
+        //进行更新刷新当前页的试卷批发人数状态
+        this->getCurPageIndexCorrect();
     });
 
     QObject::connect(this,&CMainMenueDlg::startShowCorrectMemberUI,this,&CMainMenueDlg::showCorrectMemberUI);
@@ -1640,7 +1642,6 @@ typedef struct getCurPageIndexCorrectArg{
     int curIndex;
 }GetCurPageIndexCorrectArg;
 
-//TODO:明天接着这里写
 void CMainMenueDlg::getCurPageIndexCorrect()
 {
   std::shared_ptr<GetCurPageIndexCorrectArg> arg = std::make_shared<GetCurPageIndexCorrectArg>();
