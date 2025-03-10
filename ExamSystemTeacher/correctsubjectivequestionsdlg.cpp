@@ -6,13 +6,15 @@ CCorrectSubjectiveQuestionsDlg::CCorrectSubjectiveQuestionsDlg(QWidget *parent) 
     ui(new Ui::CCorrectSubjectiveQuestionsDlg)
 {
     ui->setupUi(this);
-    this->setWindowTitle("主观题批改对话框");
-    this->setWindowIcon(QIcon(":/icons/judge.png"));
+//    this->setWindowTitle("主观题批改对话框");
+//    this->setWindowIcon(QIcon(":/icons/judge.png"));
+    this->setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
     this->testPaperName = "";
     this->studentName = "";
     this->subject = "";
     this->order = 1;
     this->m_contorler = std::make_shared<CCorrectSubjectiveQuestionsContorler>();
+    this->isExist = false;
 
     QObject::connect(this,&CCorrectSubjectiveQuestionsDlg::startShowDlg,[=](){
         this->ui->label_84->setText(this->testPaperName);
@@ -24,6 +26,8 @@ CCorrectSubjectiveQuestionsDlg::CCorrectSubjectiveQuestionsDlg(QWidget *parent) 
     });
 
     QObject::connect(this->ui->pushButton_26,&QPushButton::clicked,[=](){
+        //进行存储该学生的成绩
+        this->checkScoreExist();
         emit this->rejected();
     });
 
@@ -91,6 +95,28 @@ CCorrectSubjectiveQuestionsDlg::CCorrectSubjectiveQuestionsDlg(QWidget *parent) 
     this->getShoerAnswerCount();
     //进行回显第一题
     emit this->ui->pushButton_251->clicked();
+}
+
+void CCorrectSubjectiveQuestionsDlg::checkScoreExist()
+{
+   HANDLE thread =(HANDLE)_beginthreadex(nullptr,0,&CCorrectSubjectiveQuestionsDlg::threadCheckScoreExist,this,0,nullptr);
+   WaitForSingleObject(thread,INFINITE);
+}
+
+unsigned WINAPI CCorrectSubjectiveQuestionsDlg::threadCheckScoreExist(LPVOID arg)
+{
+    CCorrectSubjectiveQuestionsDlg* thiz = (CCorrectSubjectiveQuestionsDlg*)arg;
+    int ret =  thiz->m_contorler->checkScoreExist(thiz->teacherId,thiz->studentId
+                                       ,thiz->classId,thiz->testPaperId);
+    //根据结果处理发送不同的信号
+    if(ret == 0)
+    {
+       thiz->isExist = false;
+    }else if(ret > 0)
+    {
+       thiz->isExist = true;
+    }
+    return 0;
 }
 
 void CCorrectSubjectiveQuestionsDlg::updateTestPaperCorrectStatus()

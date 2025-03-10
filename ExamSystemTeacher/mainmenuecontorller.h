@@ -131,6 +131,10 @@ public :
                              ,int& classId,int& testPaperId);
    bool deleteTestPaperCorrectInfo(QString& testPaperName,QString& teacherId);
    static unsigned WINAPI threadDeleteTestPaperCorrectInfo(LPVOID arg);
+   bool initStudentScoreTable();
+   bool insertStudentScore(QString& teacherId,QString& studetId
+                           ,int& classId,int& testPaperId
+                           ,double& keGuanScore,double& zhuGuanScore);
  private:
     CMainMenueModel* m_mainMenueModel = nullptr;
 };

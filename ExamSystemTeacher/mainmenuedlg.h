@@ -698,11 +698,22 @@ private:
 
     void bindCorrectMemberOperator();//进行绑定批改成员
 
-    void joinCorrectSubjectDlg(QString studentName,QString subject,QString testPaperName,QString studentId);//进入到批改对话框界面
+    void joinCorrectSubjectDlg(QString studentName,QString subject,QString testPaperName,QString studentId,QString keGuanScore,QString zhuGuanScore);//进入到批改对话框界面
 
     //进行删除简答题批改表记录
     void deleteTestPaperCorrectInfo(QString testPaperName);
     static unsigned WINAPI threadDeleteTestPaperCorrectInfo(LPVOID arg);
+
+    //创建学生成绩数据库表
+    void initStudentScoreTable();
+    static unsigned WINAPI threadInitStudentScoreTable(LPVOID arg);
+
+    //进行插入学生成绩记录
+    void insertStudentScore(QString teacherId,QString studetId,int classId,int testPaperId,double keGuanScore,double zhuGuanScore);
+    static unsigned WINAPI threadInsertStudentScore(LPVOID arg);
+    //进行更新学生成绩记录
+    void updateStudentScore(QString teacherId,QString studetId,int classId,int testPaperId,double keGuanScore,double zhuGuanScore);
+    static unsigned WINAPI threadUpdateStudentScore(LPVOID arg);
 private:
     Ui::CMainMenueDlg *ui;
 };

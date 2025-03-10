@@ -22,6 +22,8 @@ public:
                                                                  ,int& classId,int& testPaperId,int& order);
     bool updateTestPaperCorrectStatus(const char* teacherId,const char* studentId
                                                                        ,int& classId,int& testPaperId);
+    int checkScoreExist(const char* teacherId,const char* studentId
+                        ,int& classId,int& testPaperId);
 };
 
 #endif // CCORRECTSUBJECTIVEQUESTIONSMODEL_H

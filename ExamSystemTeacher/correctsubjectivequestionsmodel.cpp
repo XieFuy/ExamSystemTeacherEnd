@@ -5,6 +5,24 @@ CCorrectSubjectiveQuestionsModel::CCorrectSubjectiveQuestionsModel()
 
 }
 
+int CCorrectSubjectiveQuestionsModel::checkScoreExist(const char* teacherId,const char* studentId
+                    ,int& classId,int& testPaperId)
+{
+    if(teacherId == nullptr || studentId == nullptr)
+    {
+        return -1;
+    }
+    std::shared_ptr<CDBHelper> dbHelper = std::make_shared<CDBHelper>();
+    std::unique_ptr<char[]> sqlBuf(new char[1024000]);
+    std::string sql;
+    memset(sqlBuf.get(),'\0',sizeof(char) * 1024000);
+    sprintf(sqlBuf.get(),"select count(*) from `scoreCount` \
+where `teacherId` = '%s' and `studentId` = '%s' and `classId` = %d and `testPaperId` = %d;"
+            ,teacherId,studentId,classId,testPaperId);
+    sql = sqlBuf.get();
+    return dbHelper->sqlQueryCount(sql,"ExamSystem");
+}
+
 bool CCorrectSubjectiveQuestionsModel::updateTestPaperCorrectStatus(const char* teacherId,const char* studentId
                                                                    ,int& classId,int& testPaperId)
 {

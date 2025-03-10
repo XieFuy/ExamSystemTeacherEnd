@@ -737,6 +737,7 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
     this->initCorrectMemberTableUI();
     this->initCorrectMemberTableContorl();
     this->initCorrectShortAnswerTable();
+    this->initStudentScoreTable();
 }
 
 void CMainMenueDlg::showLastCorrectMember()
@@ -764,11 +765,11 @@ void CMainMenueDlg::showLastCorrectMember()
                                 ,this->m_testPaperId);
 }
 
-void CMainMenueDlg::joinCorrectSubjectDlg(QString studentName,QString subject,QString testPaperName,QString studentId)
+void CMainMenueDlg::joinCorrectSubjectDlg(QString studentName,QString subject,QString testPaperName,QString studentId,QString keGuanScore,QString zhuGuanScore)
 {
     this->m_correctSubjectDlg = std::make_shared<CCorrectSubjectiveQuestionsDlg>();
-    this->m_correctSubjectDlg->move((this->width() - this->m_correctSubjectDlg->width()) / 2
-                                    ,(this->height() - this->m_correctSubjectDlg->height()) /2);
+    this->m_correctSubjectDlg->move((this->width() - this->m_correctSubjectDlg->width()) / 2 + 30
+                                    ,(this->height() - this->m_correctSubjectDlg->height()) /2 + 10);
     this->m_correctSubjectDlg->testPaperName = testPaperName;
     this->m_correctSubjectDlg->studentName = studentName;
     this->m_correctSubjectDlg->subject = subject;
@@ -781,14 +782,91 @@ void CMainMenueDlg::joinCorrectSubjectDlg(QString studentName,QString subject,QS
     this->m_correctSubjectDlg->show();
     emit this->m_correctSubjectDlg->startShowDlg();
     this->hide();
+
     QObject::connect(this->m_correctSubjectDlg.get(),&CCorrectSubjectiveQuestionsDlg::rejected,[=](){
         this->show();
+        if(this->m_correctSubjectDlg->isExist == false) //不存在成绩进行插入添加
+        {
+            double dKeGuanScore = keGuanScore.toDouble();
+            double dZhuGuanScore = zhuGuanScore.toDouble();
+            this->insertStudentScore(this->m_acount,studentId,this->m_classId,this->m_testPaperId,dKeGuanScore,dZhuGuanScore);
+        }else //存在进行更新成绩
+        {
+            double dKeGuanScore = keGuanScore.toDouble();
+            double dZhuGuanScore = zhuGuanScore.toDouble();
+            this->updateStudentScore(this->m_acount,studentId,this->m_classId,this->m_testPaperId,dKeGuanScore,dZhuGuanScore);
+        }
         if(this->m_correctSubjectDlg.get() != nullptr)
         {
             this->m_correctSubjectDlg.reset();
         }
     });
 }
+
+typedef struct insertStudentScoreArg{
+    QString teacherId;
+    QString studentId;
+    int classId;
+    int testPaperId;
+    double keGuanScore;
+    double zhuGuanScore;
+    CMainMenueDlg* thiz;
+}InsertStudentScoreArg;
+
+void CMainMenueDlg::insertStudentScore(QString teacherId,QString studetId
+                        ,int classId,int testPaperId
+                        ,double keGuanScore,double zhuGuanScore)
+{
+    std::shared_ptr<InsertStudentScoreArg> arg = std::make_shared<InsertStudentScoreArg>();
+    arg->teacherId = teacherId;
+    arg->studentId = studetId;
+    arg->classId = classId;
+    arg->testPaperId = testPaperId;
+    arg->keGuanScore = keGuanScore;
+    arg->zhuGuanScore = zhuGuanScore;
+    arg->thiz = this;
+    std::shared_ptr<InsertStudentScoreArg> *p = new std::shared_ptr<InsertStudentScoreArg>(arg);
+    HANDLE thread =(HANDLE)_beginthreadex(nullptr,0,&CMainMenueDlg::threadInsertStudentScore,p,0,nullptr);
+    WaitForSingleObject(thread,INFINITE);
+}
+
+unsigned WINAPI CMainMenueDlg::threadInsertStudentScore(LPVOID arg)
+{
+    std::shared_ptr<InsertStudentScoreArg>* p = (std::shared_ptr<InsertStudentScoreArg>*)arg;
+    std::shared_ptr<InsertStudentScoreArg> iInfo = *p;
+    iInfo->thiz->m_mainMenueContorller->insertStudentScore(iInfo->teacherId,iInfo->studentId
+                                                           ,iInfo->classId,iInfo->testPaperId
+                                                           ,iInfo->keGuanScore,iInfo->zhuGuanScore);
+    delete p;
+    return 0;
+}
+
+void CMainMenueDlg::updateStudentScore(QString teacherId,QString studetId,int classId
+                        ,int testPaperId,double keGuanScore
+                        ,double zhuGuanScore)
+{
+    std::shared_ptr<InsertStudentScoreArg> arg = std::make_shared<InsertStudentScoreArg>();
+    arg->teacherId = teacherId;
+    arg->studentId = studetId;
+    arg->classId = classId;
+    arg->testPaperId = testPaperId;
+    arg->keGuanScore = keGuanScore;
+    arg->zhuGuanScore = zhuGuanScore;
+    arg->thiz = this;
+    std::shared_ptr<InsertStudentScoreArg> *p = new std::shared_ptr<InsertStudentScoreArg>(arg);
+    HANDLE thread = (HANDLE)_beginthreadex(nullptr,0,&CMainMenueDlg::threadUpdateStudentScore,p,0,nullptr);
+    WaitForSingleObject(thread,INFINITE);
+}
+
+unsigned WINAPI CMainMenueDlg::threadUpdateStudentScore(LPVOID arg)
+{
+    std::shared_ptr<InsertStudentScoreArg>* p = (std::shared_ptr<InsertStudentScoreArg>*)arg;
+    std::shared_ptr<InsertStudentScoreArg> iInfo = *p;
+    //iInfo->thiz->m_mainMenueContorller->
+    delete p;
+    return 0;
+}
+
 
 void CMainMenueDlg::bindCorrectMemberOperator()
 {
@@ -816,7 +894,9 @@ void CMainMenueDlg::bindCorrectMemberOperator()
                                 QString studentName = this->m_correctMemberName.at(row)->text().trimmed();
                                 QString subject = this->m_correctMemberSubject.at(row)->text().trimmed();
                                 QString studentId = this->m_correctMemberStudentId.at(row).trimmed();
-                                this->joinCorrectSubjectDlg(studentName,subject,testPaperName,studentId);
+                                QString keGuanScore = this->m_correctMemberKeGuan.at(row)->text().trimmed();
+                                QString zhuGuanScore = this->m_correctMemberZhuGuan.at(row)->text().trimmed();
+                                this->joinCorrectSubjectDlg(studentName,subject,testPaperName,studentId,keGuanScore,zhuGuanScore);
                                 break;
                             }
                         }
@@ -1121,6 +1201,18 @@ unsigned WINAPI CMainMenueDlg::threadGetCorrectTestPaperDataByName(LPVOID arg)
     delete p;
 //  //_endthreadex(0); //建议不要在线程函数中写();
   return 0;
+}
+
+void CMainMenueDlg::initStudentScoreTable()
+{
+    _beginthreadex(nullptr,0,&CMainMenueDlg::threadInitStudentScoreTable,this,0,nullptr);
+}
+
+unsigned WINAPI CMainMenueDlg::threadInitStudentScoreTable(LPVOID arg)
+{
+    CMainMenueDlg* thiz = (CMainMenueDlg*)arg;
+    thiz->m_mainMenueContorller->initStudentScoreTable();
+    return 0;
 }
 
 void CMainMenueDlg::initCorrectMemberTableContorl()

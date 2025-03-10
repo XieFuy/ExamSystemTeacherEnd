@@ -10,6 +10,47 @@ CMainMenueModel::~CMainMenueModel()
 
 }
 
+bool CMainMenueModel::insertStudentScore(const char* teacherId,const char* studetId
+                        ,int& classId,int& testPaperId
+                        ,double& keGuanScore,double& zhuGuanScore)
+{
+    if(teacherId == nullptr || studetId == nullptr)
+    {
+        return false;
+    }
+    std::shared_ptr<CDBHelper> dbHelper = std::make_shared<CDBHelper>();
+    std::unique_ptr<char[]> sqlBuf(new char[1024000]);
+    std::string sql;
+    memset(sqlBuf.get(),'\0',sizeof(char) * 1024000);
+    sprintf(sqlBuf.get(),"insert into `scoreCount` (`teacherId`,`classId`,`testPaperId`,`studentId`,`keGuanScore`,`shuGuanScore`) \
+values ('%s',%d,%d,'%s',%f,%f);",teacherId,classId,testPaperId,studetId,keGuanScore,zhuGuanScore);
+    sql = sqlBuf.get();
+    return dbHelper->sqlExcute(sql,"ExamSystem");
+}
+
+bool CMainMenueModel::initStudentScoreTable()
+{
+    std::shared_ptr<CDBHelper> dbHelper = std::make_shared<CDBHelper>();
+    std::unique_ptr<char[]> sqlBuf(new char[1024000]);
+    std::string sql;
+    memset(sqlBuf.get(),'\0',sizeof(char) * 1024000);
+    sprintf(sqlBuf.get(),"create table if not exists `scoreCount`(\n\
+`id` integer primary key auto_increment,\n\
+`teacherId` varchar(20)  not null,\n\
+foreign key(`teacherId`) references `Teacher`(`teacherId`),\n\
+`classId` integer not null ,  \n\
+foreign key(`classId`) references `class`(`id`),\n\
+`testPaperId` integer not null,\n\
+foreign key(`testPaperId`) references `testPaperInfo`(`testPaperId`),\n\
+`studentId` varchar(20) not null,\n\
+foreign key(`studentId`) references `Student`(`studentId`),\n\
+`keGuanScore` double not null default 0.0,\n\
+`shuGuanScore` double not null default 0.0\n\
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;");
+    sql = sqlBuf.get();
+    return dbHelper->sqlExcute(sql,"ExamSystem");
+}
+
 std::vector<std::vector<std::string>> CMainMenueModel::getCurPageCorrectMember(const char* testPaperName
                                                               ,const char* teacherId
                                                               ,int& classId,int& testPaperId,int& curIndex)

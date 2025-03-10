@@ -27,6 +27,10 @@ signals:
     void startShowShortAnswerBtn(int count);
     void startShowInfo();
     void startShowScore(QVector<QVector<QString>>* ret);
+    void startEmitReturnSignal(QString teacherId,QString studentId
+                               ,int classId,int testPaperId,bool isExist);
+    void startSendSignal(QString teacherId,QString studentId
+                         ,int classId,int testPaperId,bool isExist);
 private:
     void getCurOrderShortAnswer(); //获取当前题的
     static unsigned WINAPI threadGetCurOrderShortAnswer(LPVOID arg);
@@ -64,12 +68,17 @@ private:
 
     void updateTestPaperCorrectStatus();
     static unsigned WINAPI threadUpdateTestPaperCorrectStatus(LPVOID arg);
+
+    void checkScoreExist();//进行检查当前学生的成绩是否存在
+    static unsigned WINAPI threadCheckScoreExist(LPVOID arg);
+
 private:
     QVector<QPushButton*> m_shortAnswerChoice;
     int order;
     std::shared_ptr<CCorrectSubjectiveQuestionsContorler> m_contorler;
-    int count;
+    int count;   
 public:
+    bool isExist;
     QString testPaperName;
     QString studentName;
     QString subject;

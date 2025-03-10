@@ -21,6 +21,8 @@ public:
                                                                  ,int& classId,int& testPaperId,int& order);
     bool updateTestPaperCorrectStatus(QString& teacherId,QString& studentId
                                                                        ,int& classId,int& testPaperId);
+    int checkScoreExist(QString& teacherId,QString& studentId
+                        ,int& classId,int& testPaperId);
 private:
     std::shared_ptr<CCorrectSubjectiveQuestionsModel> m_model;
 };
