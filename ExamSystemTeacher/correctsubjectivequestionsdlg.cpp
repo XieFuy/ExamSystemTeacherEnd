@@ -6,9 +6,9 @@ CCorrectSubjectiveQuestionsDlg::CCorrectSubjectiveQuestionsDlg(QWidget *parent) 
     ui(new Ui::CCorrectSubjectiveQuestionsDlg)
 {
     ui->setupUi(this);
-//    this->setWindowTitle("主观题批改对话框");
-//    this->setWindowIcon(QIcon(":/icons/judge.png"));
-    this->setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
+    this->setWindowTitle("主观题批改对话框");
+    this->setWindowIcon(QIcon(":/icons/judge.png"));
+//    this->setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
     this->testPaperName = "";
     this->studentName = "";
     this->subject = "";

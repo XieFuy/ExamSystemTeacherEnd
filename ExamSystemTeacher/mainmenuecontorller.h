@@ -135,6 +135,9 @@ public :
    bool insertStudentScore(QString& teacherId,QString& studetId
                            ,int& classId,int& testPaperId
                            ,double& keGuanScore,double& zhuGuanScore);
+   bool updateStudentScore(QString& teacherId,QString& studetId,int& classId
+                           ,int& testPaperId,double& keGuanScore
+                           ,double& zhuGuanScore);
  private:
     CMainMenueModel* m_mainMenueModel = nullptr;
 };

@@ -134,6 +134,9 @@ public:
      bool insertStudentScore(const char* teacherId,const char* studetId
                              ,int& classId,int& testPaperId
                              ,double& keGuanScore,double& zhuGuanScore);
+     bool updateStudentScore(const char* teacherId,const char* studetId,int& classId
+                             ,int& testPaperId,double& keGuanScore
+                             ,double& zhuGuanScore);
 private:
       HANDLE m_mutex; //因为所有操作都是使用的一个CDBHelper对象，所以要给每一个执行sql的步骤进行上锁
 };

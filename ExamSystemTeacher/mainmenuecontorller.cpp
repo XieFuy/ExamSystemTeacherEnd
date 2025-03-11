@@ -10,6 +10,17 @@ bool CMainMenueContorller::initStudentScoreTable()
     return this->m_mainMenueModel->initStudentScoreTable();
 }
 
+bool  CMainMenueContorller::updateStudentScore(QString& teacherId,QString& studetId,int& classId
+                        ,int& testPaperId,double& keGuanScore
+                        ,double& zhuGuanScore)
+{
+    QByteArray teacherIdArr = teacherId.toLocal8Bit();
+    QByteArray studentIdArr = studetId.toLocal8Bit();
+    const char* pTeacherId = teacherIdArr.data();
+    const char* pStudentId = studentIdArr.data();
+    return this->m_mainMenueModel->updateStudentScore(pTeacherId,pStudentId,classId,testPaperId,keGuanScore,zhuGuanScore);
+}
+
 bool CMainMenueContorller::insertStudentScore(QString& teacherId,QString& studetId
                         ,int& classId,int& testPaperId
                         ,double& keGuanScore,double& zhuGuanScore)

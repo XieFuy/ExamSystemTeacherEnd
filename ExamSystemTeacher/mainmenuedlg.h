@@ -74,6 +74,7 @@ signals:
     void startShowCorrectTestPaperIndex();
     void startShowCorrectMemberUI(QVector<QVector<QString>>* ret);
     void startShowCorrectMemberCount();
+    void showEndSignal();
 private:
     QVector<HANDLE> m_deleteTestPaperThread; //进行删除试卷的线程任务
     CTestPaperReleaseDlg* m_testPaperReleaseDlg = nullptr;
@@ -207,6 +208,7 @@ private:
 
     //客观题评分界面
     std::shared_ptr<CCorrectSubjectiveQuestionsDlg> m_correctSubjectDlg; //主科对话框
+
 private:
     void showPageIndex();//显示分页查询的下标页
     void initTableWidgetHeader(); //初始化表头
@@ -698,7 +700,7 @@ private:
 
     void bindCorrectMemberOperator();//进行绑定批改成员
 
-    void joinCorrectSubjectDlg(QString studentName,QString subject,QString testPaperName,QString studentId,QString keGuanScore,QString zhuGuanScore);//进入到批改对话框界面
+    void joinCorrectSubjectDlg(QString studentName,QString subject,QString testPaperName,QString studentId,int row);//进入到批改对话框界面
 
     //进行删除简答题批改表记录
     void deleteTestPaperCorrectInfo(QString testPaperName);

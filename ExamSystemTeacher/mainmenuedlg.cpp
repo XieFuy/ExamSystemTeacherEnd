@@ -1,6 +1,9 @@
 #include "mainmenuedlg.h"
 #include "ui_mainmenuedlg.h"
 
+// 定义一个槽连接对象
+QMetaObject::Connection connection;
+
 CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
     QDialog(parent),
     ui(new Ui::CMainMenueDlg)
@@ -765,7 +768,7 @@ void CMainMenueDlg::showLastCorrectMember()
                                 ,this->m_testPaperId);
 }
 
-void CMainMenueDlg::joinCorrectSubjectDlg(QString studentName,QString subject,QString testPaperName,QString studentId,QString keGuanScore,QString zhuGuanScore)
+void CMainMenueDlg::joinCorrectSubjectDlg(QString studentName,QString subject,QString testPaperName,QString studentId,int row)
 {
     this->m_correctSubjectDlg = std::make_shared<CCorrectSubjectiveQuestionsDlg>();
     this->m_correctSubjectDlg->move((this->width() - this->m_correctSubjectDlg->width()) / 2 + 30
@@ -785,21 +788,27 @@ void CMainMenueDlg::joinCorrectSubjectDlg(QString studentName,QString subject,QS
 
     QObject::connect(this->m_correctSubjectDlg.get(),&CCorrectSubjectiveQuestionsDlg::rejected,[=](){
         this->show();
-        if(this->m_correctSubjectDlg->isExist == false) //不存在成绩进行插入添加
-        {
+        //逻辑是应该先将当前页面的分数进行刷新后，再进行添加数据
+        this->getCurPageCorrectMember(testPaperName,this->m_classId,this->m_testPaperId);
+        connection =  QObject::connect(this,&CMainMenueDlg::showEndSignal,[=](){
+            //需要等待UI进行完全刷新了再进行获取数据
+            QString keGuanScore = this->m_correctMemberKeGuan.at(row)->text().trimmed();
+            QString zhuGuanScore = this->m_correctMemberZhuGuan.at(row)->text().trimmed();
             double dKeGuanScore = keGuanScore.toDouble();
             double dZhuGuanScore = zhuGuanScore.toDouble();
-            this->insertStudentScore(this->m_acount,studentId,this->m_classId,this->m_testPaperId,dKeGuanScore,dZhuGuanScore);
-        }else //存在进行更新成绩
-        {
-            double dKeGuanScore = keGuanScore.toDouble();
-            double dZhuGuanScore = zhuGuanScore.toDouble();
-            this->updateStudentScore(this->m_acount,studentId,this->m_classId,this->m_testPaperId,dKeGuanScore,dZhuGuanScore);
-        }
-        if(this->m_correctSubjectDlg.get() != nullptr)
-        {
-            this->m_correctSubjectDlg.reset();
-        }
+            if(this->m_correctSubjectDlg->isExist == false) //不存在成绩进行插入添加
+            {
+                this->insertStudentScore(this->m_acount,studentId,this->m_classId,this->m_testPaperId,dKeGuanScore,dZhuGuanScore);
+            }else //存在进行更新成绩
+            {
+                this->updateStudentScore(this->m_acount,studentId,this->m_classId,this->m_testPaperId,dKeGuanScore,dZhuGuanScore);
+            }
+            if(this->m_correctSubjectDlg.get() != nullptr)
+            {
+                this->m_correctSubjectDlg.reset();
+                QObject::disconnect(connection);
+            }
+        });
     });
 }
 
@@ -862,7 +871,9 @@ unsigned WINAPI CMainMenueDlg::threadUpdateStudentScore(LPVOID arg)
 {
     std::shared_ptr<InsertStudentScoreArg>* p = (std::shared_ptr<InsertStudentScoreArg>*)arg;
     std::shared_ptr<InsertStudentScoreArg> iInfo = *p;
-    //iInfo->thiz->m_mainMenueContorller->
+    iInfo->thiz->m_mainMenueContorller->updateStudentScore(iInfo->teacherId,iInfo->studentId
+                                                           ,iInfo->classId,iInfo->testPaperId
+                                                           ,iInfo->keGuanScore,iInfo->zhuGuanScore);
     delete p;
     return 0;
 }
@@ -893,10 +904,8 @@ void CMainMenueDlg::bindCorrectMemberOperator()
                                 QString testPaperName = this->m_tmpTestPaperName;
                                 QString studentName = this->m_correctMemberName.at(row)->text().trimmed();
                                 QString subject = this->m_correctMemberSubject.at(row)->text().trimmed();
-                                QString studentId = this->m_correctMemberStudentId.at(row).trimmed();
-                                QString keGuanScore = this->m_correctMemberKeGuan.at(row)->text().trimmed();
-                                QString zhuGuanScore = this->m_correctMemberZhuGuan.at(row)->text().trimmed();
-                                this->joinCorrectSubjectDlg(studentName,subject,testPaperName,studentId,keGuanScore,zhuGuanScore);
+                                QString studentId = this->m_correctMemberStudentId.at(row).trimmed();     
+                                this->joinCorrectSubjectDlg(studentName,subject,testPaperName,studentId,row);
                                 break;
                             }
                         }
@@ -1038,6 +1047,7 @@ void CMainMenueDlg::showCorrectMemberUI(QVector<QVector<QString>>* ret)
         }
     }
     delete ret;
+    emit this->showEndSignal();
 }
 
 void CMainMenueDlg::showCorrectMemberCount()
@@ -1331,7 +1341,7 @@ void CMainMenueDlg::getCurPageCorrectMember(QString testPaperName,int classId,in
    arg->thiz = this;
    arg->curIndex = this->m_correctMemberCurIndex;
    std::shared_ptr<GetCurPageCorrectMemberArg>* p = new std::shared_ptr<GetCurPageCorrectMemberArg>(arg);
-   _beginthreadex(nullptr,0,&CMainMenueDlg::threadGetCurPageCorrectMember,p,0,nullptr);
+   HANDLE thread = (HANDLE)_beginthreadex(nullptr,0,&CMainMenueDlg::threadGetCurPageCorrectMember,p,0,nullptr);
 }
 
 unsigned WINAPI CMainMenueDlg::threadGetCurPageCorrectMember(LPVOID arg)

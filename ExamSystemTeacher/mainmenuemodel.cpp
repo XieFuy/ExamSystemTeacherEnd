@@ -10,6 +10,26 @@ CMainMenueModel::~CMainMenueModel()
 
 }
 
+bool CMainMenueModel::updateStudentScore(const char* teacherId,const char* studetId,int& classId
+                        ,int& testPaperId,double& keGuanScore
+                        ,double& zhuGuanScore)
+{
+    if(teacherId == nullptr || studetId == nullptr)
+    {
+        return false;
+    }
+    std::shared_ptr<CDBHelper> dbHelper = std::make_shared<CDBHelper>();
+    std::unique_ptr<char[]> sqlBuf(new char[1024000]);
+    std::string sql;
+    memset(sqlBuf.get(),'\0',sizeof(char) * 1024000);
+    sprintf(sqlBuf.get(),"update `scoreCount`  set `keGuanScore` = %f, `shuGuanScore` = %f \
+where `teacherId` = '%s' and `studentId` = '%s' and `classId`  = %d and `testPaperId` = %d;"
+            ,keGuanScore,zhuGuanScore,teacherId,studetId,classId,testPaperId);
+    sql = sqlBuf.get();
+    qDebug()<< sql.c_str();
+    return dbHelper->sqlExcute(sql,"ExamSystem");
+}
+
 bool CMainMenueModel::insertStudentScore(const char* teacherId,const char* studetId
                         ,int& classId,int& testPaperId
                         ,double& keGuanScore,double& zhuGuanScore)
