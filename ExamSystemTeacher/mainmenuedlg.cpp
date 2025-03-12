@@ -4545,6 +4545,24 @@ void CMainMenueDlg::deleteFromSignalChoise(QString createTime)
     this->m_deleteTestPaperThread.push_back(thread);
 }
 
+void CMainMenueDlg::deleteStudentScoreInfo(QString testPaperName)
+{
+    DeleteFromSignalChoiseArg* arg = new DeleteFromSignalChoiseArg();
+    arg->thiz =this;
+    arg->acount = this->m_acount;
+    arg->createTime = testPaperName;
+    HANDLE thread = (HANDLE)_beginthreadex(nullptr,0,&CMainMenueDlg::threadDeleteStudentScoreInfo,arg,0,nullptr);
+    this->m_deleteTestPaperThread.push_back(thread);
+}
+
+unsigned WINAPI CMainMenueDlg::threadDeleteStudentScoreInfo(LPVOID arg)
+{
+    DeleteFromSignalChoiseArg* dInfo = (DeleteFromSignalChoiseArg*)arg;
+    dInfo->thiz->m_mainMenueContorller->deleteStudentScoreInfo(dInfo->acount,dInfo->createTime);
+    delete dInfo;
+    return 0;
+}
+
 void CMainMenueDlg::deleteTestPaperCorrectInfo(QString testPaperName)
 {
     DeleteFromSignalChoiseArg* arg = new DeleteFromSignalChoiseArg();
@@ -4836,6 +4854,9 @@ void CMainMenueDlg::deleteClickBtn(int row)  //点击单次调用的函数
 
     //进行删除简答题批改表记录
     this->deleteTestPaperCorrectInfo(testPaperName);
+
+    //进行删除成绩表记录
+    this->deleteStudentScoreInfo(testPaperName);
 
     //需要等待上面的任务都执行完毕才能进行删除试卷表的信息
     WaitForMultipleObjects(this->m_deleteTestPaperThread.size()

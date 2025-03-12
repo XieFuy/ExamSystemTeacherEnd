@@ -138,6 +138,8 @@ public :
    bool updateStudentScore(QString& teacherId,QString& studetId,int& classId
                            ,int& testPaperId,double& keGuanScore
                            ,double& zhuGuanScore);
+   bool deleteStudentScoreInfo(QString& teacherId,QString& testPaperName);
+   static unsigned WINAPI threadDeleteStudentScoreInfo(LPVOID arg);
  private:
     CMainMenueModel* m_mainMenueModel = nullptr;
 };

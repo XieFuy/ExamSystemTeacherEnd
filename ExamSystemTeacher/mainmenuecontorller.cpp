@@ -10,6 +10,15 @@ bool CMainMenueContorller::initStudentScoreTable()
     return this->m_mainMenueModel->initStudentScoreTable();
 }
 
+bool CMainMenueContorller::deleteStudentScoreInfo(QString& teacherId,QString& testPaperName)
+{
+    QByteArray teacherIdArr = teacherId.toLocal8Bit();
+    QByteArray testPaperNameArr = testPaperName.toLocal8Bit();
+    const char* pTeacherId = teacherIdArr.data();
+    const char* pTestPaperName = testPaperNameArr.data();
+    return this->m_mainMenueModel->deleteStudentScoreInfo(pTeacherId,pTestPaperName);
+}
+
 bool  CMainMenueContorller::updateStudentScore(QString& teacherId,QString& studetId,int& classId
                         ,int& testPaperId,double& keGuanScore
                         ,double& zhuGuanScore)
@@ -731,6 +740,13 @@ bool CMainMenueContorller::deleteMultiClickBtn(QString acount,QList<QString> cre
         arg12->createTime = testPaperIdLst.at(i);
         HANDLE thread12 = (HANDLE)_beginthreadex(nullptr,0,&CMainMenueContorller::threadDeleteTestPaperCorrectInfo,arg12,0,nullptr);
 
+        //进行删除学生成绩记录
+        DeleteFromSignalChoiseArg* arg13 = new DeleteFromSignalChoiseArg();
+        arg13->thiz = this;
+        arg13->acount = acount;
+        arg13->createTime = testPaperIdLst.at(i);
+        HANDLE thread13 = (HANDLE)_beginthreadex(nullptr,0,&CMainMenueContorller::threadDeleteStudentScoreInfo,arg13,0,nullptr);
+
         //需要等待上面的任务都执行完毕才能进行删除试卷表的信息
         WaitForSingleObject(thread1,INFINITE);
         WaitForSingleObject(thread2,INFINITE);
@@ -743,7 +759,7 @@ bool CMainMenueContorller::deleteMultiClickBtn(QString acount,QList<QString> cre
         WaitForSingleObject(thread10,INFINITE);
         WaitForSingleObject(thread11,INFINITE);
         WaitForSingleObject(thread12,INFINITE);
-
+        WaitForSingleObject(thread13,INFINITE);
         //开启线程进行删除该试卷的发布信息
         DeleteFromSignalChoiseArg* arg5 = new DeleteFromSignalChoiseArg();
         arg5->thiz = this;
@@ -790,6 +806,14 @@ unsigned WINAPI CMainMenueContorller::threadDeleteTestPaperCorrectInfo(LPVOID ar
      dInfo->thiz->deleteTestPaperCorrectInfo(dInfo->createTime,dInfo->acount);
      delete dInfo;
      return 0;
+}
+
+unsigned WINAPI CMainMenueContorller::threadDeleteStudentScoreInfo(LPVOID arg)
+{
+    DeleteFromSignalChoiseArg* dInfo = (DeleteFromSignalChoiseArg*)arg;
+    dInfo->thiz->deleteStudentScoreInfo(dInfo->createTime,dInfo->acount);
+    delete dInfo;
+    return 0;
 }
 
 unsigned WINAPI CMainMenueContorller::threadDeleteTestPaperCommitInfo(LPVOID arg)

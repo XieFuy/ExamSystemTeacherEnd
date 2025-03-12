@@ -706,6 +706,10 @@ private:
     void deleteTestPaperCorrectInfo(QString testPaperName);
     static unsigned WINAPI threadDeleteTestPaperCorrectInfo(LPVOID arg);
 
+    //进行删除学生成绩表记录
+    void deleteStudentScoreInfo(QString testPaperName);
+    static unsigned WINAPI threadDeleteStudentScoreInfo(LPVOID arg);
+
     //创建学生成绩数据库表
     void initStudentScoreTable();
     static unsigned WINAPI threadInitStudentScoreTable(LPVOID arg);

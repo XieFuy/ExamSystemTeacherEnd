@@ -10,6 +10,23 @@ CMainMenueModel::~CMainMenueModel()
 
 }
 
+bool CMainMenueModel::deleteStudentScoreInfo(const char* teacherId,const char* testPaperName)
+{
+    if(teacherId == nullptr || testPaperName == nullptr)
+    {
+        return false;
+    }
+    std::shared_ptr<CDBHelper> dbHelper = std::make_shared<CDBHelper>();
+    std::unique_ptr<char[]> sqlBuf(new char[1024000]);
+    std::string sql;
+    memset(sqlBuf.get(),'\0',sizeof(char) * 1024000);
+    sprintf(sqlBuf.get(),"delete from `scoreCount` \
+where `teacherId` = '%s' and  `testPaperId` in (select `testPaperId` from `testPaperInfo` where `testPaperName` = '%s' and `teacherId` = '%s');"
+            ,teacherId,testPaperName,teacherId);
+    sql = sqlBuf.get();
+    return dbHelper->sqlExcute(sql,"ExamSystem");
+}
+
 bool CMainMenueModel::updateStudentScore(const char* teacherId,const char* studetId,int& classId
                         ,int& testPaperId,double& keGuanScore
                         ,double& zhuGuanScore)
