@@ -24,6 +24,7 @@ bool CMainMenueModel::deleteStudentScoreInfo(const char* teacherId,const char* t
 where `teacherId` = '%s' and  `testPaperId` in (select `testPaperId` from `testPaperInfo` where `testPaperName` = '%s' and `teacherId` = '%s');"
             ,teacherId,testPaperName,teacherId);
     sql = sqlBuf.get();
+    qDebug()<<sql.c_str();
     return dbHelper->sqlExcute(sql,"ExamSystem");
 }
 

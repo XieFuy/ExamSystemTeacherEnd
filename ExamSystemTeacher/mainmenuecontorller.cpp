@@ -655,7 +655,7 @@ typedef struct deleteFromSignalChoiseArg
 bool CMainMenueContorller::deleteMultiClickBtn(QString acount,QList<QString> createTimeLst,QList<QString>& testPaperIdLst)
 {
     bool ret = false;
-    QByteArray acountArr = acount.toUtf8();
+    QByteArray acountArr = acount.toLocal8Bit();
     const char* pAcount = acountArr.data();
     //打印一遍时间列表
     for(int i = 0 ; i < createTimeLst.size();i++)
@@ -811,7 +811,7 @@ unsigned WINAPI CMainMenueContorller::threadDeleteTestPaperCorrectInfo(LPVOID ar
 unsigned WINAPI CMainMenueContorller::threadDeleteStudentScoreInfo(LPVOID arg)
 {
     DeleteFromSignalChoiseArg* dInfo = (DeleteFromSignalChoiseArg*)arg;
-    dInfo->thiz->deleteStudentScoreInfo(dInfo->createTime,dInfo->acount);
+    dInfo->thiz->deleteStudentScoreInfo(dInfo->acount,dInfo->createTime);
     delete dInfo;
     return 0;
 }
