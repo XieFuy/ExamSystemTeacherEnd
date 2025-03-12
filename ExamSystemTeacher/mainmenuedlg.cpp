@@ -4429,7 +4429,7 @@ void CMainMenueDlg::deleteMultiClickBtn()
     //将复选框进行设置为未选中
     for(int i = 0 ; i < this->m_checkVec.size();i++)
     {
-        QList<QCheckBox*> ret =  this->m_checkVec.at(i)->findChildren<QCheckBox*>();
+        QList<QCheckBox*> ret = this->m_checkVec.at(i)->findChildren<QCheckBox*>();
         for(QCheckBox* check : ret)
         {
             check->setChecked(false);

@@ -102,7 +102,7 @@ std::vector<std::vector<std::string>> CMainMenueModel::getCurPageCorrectMember(c
     std::unique_ptr<char[]> sqlBuf(new char[1024000]);
     std::string sql;
     memset(sqlBuf.get(),'\0',sizeof(char) * 1024000);
-    sprintf(sqlBuf.get(),"SELECT \n\
+    /*sprintf(sqlBuf.get(),"SELECT \n\
 studentInfo.studentId,\n\
 studentInfo.studentName,\n\
 studentInfo.subjectName,\n\
@@ -205,9 +205,116 @@ AND `classId` = %d\n\
 AND `testPaperId` = %d\n\
 GROUP BY studentId\n\
 ) AS subjectiveScore\n\
-ON studentInfo.studentId = subjectiveScore.studentId LIMIT 8 OFFSET %d;"
+ON studentInfo.studentId = subjectiveScore.studentId \n\
+WHERE objectiveTotalScore <> 0 \n\
+LIMIT 8 OFFSET %d;"
             ,testPaperName,teacherId,teacherId,teacherId,testPaperId,classId,teacherId
-            ,testPaperId,classId,teacherId,testPaperId,classId,teacherId,teacherId,classId,testPaperId,(curIndex - 1) * 8);
+            ,testPaperId,classId,teacherId,testPaperId,classId,teacherId,teacherId,classId,testPaperId,(curIndex - 1) * 8);*/
+
+    sprintf(sqlBuf.get(),"SELECT *\n\
+FROM (\n\
+SELECT \n\
+studentInfo.studentId,\n\
+studentInfo.studentName,\n\
+studentInfo.subjectName,\n\
+IFNULL(objectiveScore.totalScore, 0) AS objectiveTotalScore,\n\
+IFNULL(subjectiveScore.totalScore, 0) AS subjectiveTotalScore\n\
+FROM \n\
+(\n\
+SELECT \n\
+si.studentId AS studentId,\n\
+si.name AS studentName,\n\
+c.className AS subjectName\n\
+FROM \n\
+testPaperInfo tpi\n\
+JOIN testPaperRelease tpr ON tpi.testPaperId = tpr.testPaperId\n\
+JOIN class c ON tpr.classId = c.id\n\
+JOIN joinClassStudentManeage jcsm ON c.className = jcsm.className\n\
+JOIN StudentInfo si ON jcsm.studentId = si.studentId\n\
+WHERE \n\
+tpi.testPaperName = '%s'\n\
+AND tpi.teacherId = '%s'\n\
+AND c.teacherId = '%s'\n\
+AND jcsm.teacherId = '%s'\n\
+) AS studentInfo\n\
+LEFT JOIN \n\
+(\n\
+SELECT \n\
+studentId,\n\
+SUM(score) AS totalScore\n\
+FROM (\n\
+SELECT \n\
+sas.studentId,\n\
+IF(sas.AnswerGiven = sc.correctOptions, sc.grade, 0) AS score\n\
+FROM \n\
+studentAnswerSingal sas\n\
+JOIN singleChoice sc \n\
+ON sas.testPaperId = sc.testPaperId \n\
+AND sas.order = sc.order\n\
+WHERE \n\
+sas.testPaperId = %d\n\
+AND sas.classId = %d\n\
+AND sas.teacherId = '%s'\n\
+UNION ALL\n\
+SELECT \n\
+sam.studentId,\n\
+SUM(\n\
+IF(\n\
+FIND_IN_SET('A', sam.AnswerGiven) = FIND_IN_SET('A', mc.correctOptions)\n\
+AND FIND_IN_SET('B', sam.AnswerGiven) = FIND_IN_SET('B', mc.correctOptions)\n\
+AND FIND_IN_SET('C', sam.AnswerGiven) = FIND_IN_SET('C', mc.correctOptions)\n\
+AND FIND_IN_SET('D', sam.AnswerGiven) = FIND_IN_SET('D', mc.correctOptions)\n\
+AND FIND_IN_SET('E', sam.AnswerGiven) = FIND_IN_SET('E', mc.correctOptions)\n\
+AND FIND_IN_SET('F', sam.AnswerGiven) = FIND_IN_SET('F', mc.correctOptions),\n\
+mc.grade, 0\n\
+)\n\
+) AS score\n\
+FROM \n\
+studentAnswerMulti sam\n\
+JOIN multiChoice mc \n\
+ON sam.testPaperId = mc.testPaperId \n\
+AND sam.order = mc.order\n\
+WHERE \n\
+sam.testPaperId = %d\n\
+AND sam.classId = %d\n\
+AND sam.teacherId = '%s'\n\
+GROUP BY sam.studentId\n\
+UNION ALL\n\
+SELECT \n\
+saj.studentId,\n\
+IF(saj.AnswerGiven = j.correctAnswer, j.grade, 0) AS score\n\
+FROM \n\
+studentAnswerJudge saj\n\
+JOIN judge j \n\
+ON saj.testPaperId = j.testPaperId \n\
+AND saj.order = j.order\n\
+WHERE \n\
+saj.testPaperId = %d\n\
+AND saj.classId = %d\n\
+AND saj.teacherId = '%s'\n\
+) AS scoreTable\n\
+GROUP BY studentId\n\
+) AS objectiveScore\n\
+ON studentInfo.studentId = objectiveScore.studentId\n\
+LEFT JOIN \n\
+(\n\
+SELECT \n\
+studentId,\n\
+SUM(`score`) AS totalScore\n\
+FROM \n\
+`shortAnswerCorrect`\n\
+WHERE \n\
+`teacherId` = '%s'\n\
+AND `classId` = %d\n\
+AND `testPaperId` = %d\n\
+GROUP BY studentId\n\
+) AS subjectiveScore\n\
+ON studentInfo.studentId = subjectiveScore.studentId\n\
+) AS finalResult\n\
+WHERE objectiveTotalScore <> 0\n\
+LIMIT 8 OFFSET %d;"
+                ,testPaperName,teacherId,teacherId,teacherId,testPaperId,classId,teacherId
+                ,testPaperId,classId,teacherId,testPaperId,classId,teacherId,teacherId,classId,testPaperId,(curIndex - 1) * 8);
     sql = sqlBuf.get();
     return  dbHelper->sqlQuery(sql,"ExamSystem");
 }
