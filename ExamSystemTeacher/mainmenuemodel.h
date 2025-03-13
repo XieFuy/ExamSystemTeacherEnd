@@ -138,6 +138,7 @@ public:
                              ,int& testPaperId,double& keGuanScore
                              ,double& zhuGuanScore);
      bool deleteStudentScoreInfo(const char* teacherId,const char* testPaperName);
+     std::vector<std::vector<std::string>> getSubjectTestPaperRelease(const char* teacherId);
 private:
       HANDLE m_mutex; //因为所有操作都是使用的一个CDBHelper对象，所以要给每一个执行sql的步骤进行上锁
 };

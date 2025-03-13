@@ -10,6 +10,26 @@ CMainMenueModel::~CMainMenueModel()
 
 }
 
+std::vector<std::vector<std::string>> CMainMenueModel::getSubjectTestPaperRelease(const char* teacherId)
+{
+    if(teacherId == nullptr)
+    {
+        return std::vector<std::vector<std::string>>();
+    }
+    std::shared_ptr<CDBHelper> dbHelper = std::make_shared<CDBHelper>();
+    std::unique_ptr<char[]> sqlBuf(new char[1024000]);
+    std::string sql;
+    memset(sqlBuf.get(),'\0',sizeof(char) * 1024000);
+    sprintf(sqlBuf.get(),"SELECT DISTINCT ctp.`testPaperName`,tpr.`testPaperId`\n\
+FROM `commitTestPaper` ctp\n\
+JOIN `testPaperRelease` tpr\n\
+ON ctp.`classId` = tpr.`classId` AND ctp.`testPaperId` = tpr.`testPaperId`\n\
+WHERE ctp.`teacherId` = '%s' AND tpr.`teacherId` = '%s' AND ctp.`correctStatus` = '1';"
+            ,teacherId,teacherId);
+    sql = sqlBuf.get();
+    return dbHelper->sqlQuery(sql,"ExamSystem");
+}
+
 bool CMainMenueModel::deleteStudentScoreInfo(const char* teacherId,const char* testPaperName)
 {
     if(teacherId == nullptr || testPaperName == nullptr)

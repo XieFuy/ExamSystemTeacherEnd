@@ -75,6 +75,7 @@ signals:
     void startShowCorrectMemberUI(QVector<QVector<QString>>* ret);
     void startShowCorrectMemberCount();
     void showEndSignal();
+    void startShowTestPaperName(QVector<QVector<QString>>* ret);
 private:
     QVector<HANDLE> m_deleteTestPaperThread; //进行删除试卷的线程任务
     CTestPaperReleaseDlg* m_testPaperReleaseDlg = nullptr;
@@ -720,6 +721,12 @@ private:
     //进行更新学生成绩记录
     void updateStudentScore(QString teacherId,QString studetId,int classId,int testPaperId,double keGuanScore,double zhuGuanScore);
     static unsigned WINAPI threadUpdateStudentScore(LPVOID arg);
+
+    //进行获取发布了的试卷绑定科目并且已批改的试卷
+    void getSubjectTestPaperRelease();
+    static unsigned WINAPI threadGetSubjectTestPaperRelease(LPVOID arg);
+
+    void showTestPaperNameUI(QVector<QVector<QString>>* ret);
 private:
     Ui::CMainMenueDlg *ui;
 };

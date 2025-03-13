@@ -120,6 +120,9 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
         this->ui->pushButton_4->setStyleSheet("QPushButton{border:none;border:1px solid #faa046;color:#faa046;border-radius:20;}QPushButton:hover{border:1px solid #50b8f7;color:#50b8f7;}");
         this->ui->pushButton_6->setStyleSheet("QPushButton{border:none;border:1px solid #faa046;color:#faa046;border-radius:20;}QPushButton:hover{border:1px solid #50b8f7;color:#50b8f7;}");
         this->ui->pushButton_7->setStyleSheet("QPushButton{border:none;border:1px solid #faa046;color:#faa046;border-radius:20;}QPushButton:hover{border:1px solid #50b8f7;color:#50b8f7;}");
+
+        //进行获取已经批改的试卷
+        this->getSubjectTestPaperRelease();
     });
 
     QObject::connect(this->ui->pushButton_6,&QPushButton::clicked,[=](){
@@ -741,6 +744,63 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
     this->initCorrectMemberTableContorl();
     this->initCorrectShortAnswerTable();
     this->initStudentScoreTable();
+
+    QObject::connect(this,&CMainMenueDlg::startShowTestPaperName,this,&CMainMenueDlg::showTestPaperNameUI);
+}
+
+void CMainMenueDlg::getSubjectTestPaperRelease()
+{
+    _beginthreadex(nullptr,0,&CMainMenueDlg::threadGetSubjectTestPaperRelease,this,0,nullptr);
+}
+
+unsigned WINAPI CMainMenueDlg::threadGetSubjectTestPaperRelease(LPVOID arg)
+{
+    CMainMenueDlg* thiz = (CMainMenueDlg*)arg;
+    std::vector<std::vector<std::string>> ret = thiz->m_mainMenueContorller->getSubjectTestPaperRelease(thiz->m_acount);
+
+    //进行处理返回结果
+    QVector<QVector<QString>>* result = new QVector<QVector<QString>>();
+    for(int i = 0 ; i < ret.size();i++)
+    {
+        QVector<QString> temp;
+        for(int j = 0 ; j < ret.at(i).size();j++)
+        {
+            QString str = QString::fromLocal8Bit(ret.at(i).at(j).c_str());
+            temp.push_back(str);
+        }
+        result->push_back(temp);
+    }
+    //进行发送信号回显
+    emit thiz->startShowTestPaperName(result);
+    return 0;
+}
+
+void CMainMenueDlg::showTestPaperNameUI(QVector<QVector<QString>>* ret)
+{
+    if(ret == nullptr)
+    {
+        return;
+    }
+    for(int i = 0 ; i < ret->size();i++)
+    {
+        QString testPaPerName = ret->at(i).at(0);
+        int testPaperId = ret->at(i).at(1).trimmed().toInt();
+        //进行检查原先的数据集中是否包含有该项，如果有则不进行插入，如果没有则进行插入
+        bool isExist = false;
+        for(int i = 0 ; i < this->ui->comboBox_2->count();i++)
+        {
+          QString text = this->ui->comboBox_2->itemText(i).trimmed();
+          if(text == testPaPerName)
+          {
+              isExist = true;
+          }
+        }
+        if(!isExist)
+        {
+            this->ui->comboBox_2->addItem(testPaPerName,testPaperId);
+        }
+    }
+    delete ret;
 }
 
 void CMainMenueDlg::showLastCorrectMember()

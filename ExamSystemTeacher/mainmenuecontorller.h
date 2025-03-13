@@ -140,6 +140,7 @@ public :
                            ,double& zhuGuanScore);
    bool deleteStudentScoreInfo(QString& teacherId,QString& testPaperName);
    static unsigned WINAPI threadDeleteStudentScoreInfo(LPVOID arg);
+   std::vector<std::vector<std::string>> getSubjectTestPaperRelease(QString& teacherId);
  private:
     CMainMenueModel* m_mainMenueModel = nullptr;
 };
