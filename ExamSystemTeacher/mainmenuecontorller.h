@@ -141,6 +141,7 @@ public :
    bool deleteStudentScoreInfo(QString& teacherId,QString& testPaperName);
    static unsigned WINAPI threadDeleteStudentScoreInfo(LPVOID arg);
    std::vector<std::vector<std::string>> getSubjectTestPaperRelease(QString& teacherId);
+   int getStudentScoreCount(QString& teacherId,int& testPaperId);
  private:
     CMainMenueModel* m_mainMenueModel = nullptr;
 };

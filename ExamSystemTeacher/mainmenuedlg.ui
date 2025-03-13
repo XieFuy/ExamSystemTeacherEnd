@@ -2730,7 +2730,7 @@ border:1px solid #646465;
       <property name="font">
        <font>
         <family>黑体</family>
-        <pointsize>12</pointsize>
+        <pointsize>14</pointsize>
        </font>
       </property>
       <property name="styleSheet">
@@ -2747,7 +2747,7 @@ min-width:30px;
 min-heigth:30px;
 }
 
-QComboBox#comboBox::drop-down:checked
+QComboBox#comboBox_2::drop-down:checked
 {
 border-image:url(:/icons/comboxUp.png);
 }

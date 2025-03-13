@@ -76,6 +76,8 @@ signals:
     void startShowCorrectMemberCount();
     void showEndSignal();
     void startShowTestPaperName(QVector<QVector<QString>>* ret);
+    void startSendStudentScoreCount(int count);
+    void startInitStudentScoreContorlUI(int count);
 private:
     QVector<HANDLE> m_deleteTestPaperThread; //进行删除试卷的线程任务
     CTestPaperReleaseDlg* m_testPaperReleaseDlg = nullptr;
@@ -210,6 +212,14 @@ private:
     //客观题评分界面
     std::shared_ptr<CCorrectSubjectiveQuestionsDlg> m_correctSubjectDlg; //主科对话框
 
+
+    //学生成绩部分
+    QVector<QLabel*> m_studentScoreName;
+    QVector<QLabel*> m_studentScoreId;
+    QVector<QLabel*> m_studentScoreSubject;
+    QVector<QLabel*> m_studentScoreKeGuanScore;
+    QVector<QLabel*> m_studentScoreZhuGuanScore;
+    QVector<QLabel*> m_studentScoreSumScore;
 private:
     void showPageIndex();//显示分页查询的下标页
     void initTableWidgetHeader(); //初始化表头
@@ -727,6 +737,17 @@ private:
     static unsigned WINAPI threadGetSubjectTestPaperRelease(LPVOID arg);
 
     void showTestPaperNameUI(QVector<QVector<QString>>* ret);
+
+    //进行获取该试卷下的所有的学生的记录条数
+    void getStudentScoreCount(int testPaperId,HANDLE& out_handle);
+    static unsigned WINAPI  threadGetStudentScoreCount(LPVOID arg);
+
+    //进行获取该试卷下的所有学生的成绩
+    void getStudentScoreInfo();
+    static unsigned WINAPI threadGetStudentScoreInfo(LPVOID arg);
+
+    //设置成绩表UI
+    void setStudentScoreContorlUI(int rowCount); //进行设置成绩表UI和控件
 private:
     Ui::CMainMenueDlg *ui;
 };

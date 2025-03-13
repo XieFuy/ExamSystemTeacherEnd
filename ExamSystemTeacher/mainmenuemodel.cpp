@@ -10,6 +10,22 @@ CMainMenueModel::~CMainMenueModel()
 
 }
 
+int CMainMenueModel::getStudentScoreCount(const char* teacherId,int& testPaperId)
+{
+    if(teacherId == nullptr)
+    {
+        return -1;
+    }
+    std::shared_ptr<CDBHelper> dbHelper = std::make_shared<CDBHelper>();
+    std::unique_ptr<char[]> sqlBuf(new char[1024000]);
+    std::string sql;
+    memset(sqlBuf.get(),'\0',sizeof(char) * 1024000);
+    sprintf(sqlBuf.get(),"select count(*) from `scoreCount` \
+where `teacherId` = '%s' and `testPaperId` = %d;",teacherId,testPaperId);
+    sql = sqlBuf.get();
+    return dbHelper->sqlQueryCount(sql,"ExamSystem");
+}
+
 std::vector<std::vector<std::string>> CMainMenueModel::getSubjectTestPaperRelease(const char* teacherId)
 {
     if(teacherId == nullptr)

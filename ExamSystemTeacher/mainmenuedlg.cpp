@@ -746,6 +746,230 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
     this->initStudentScoreTable();
 
     QObject::connect(this,&CMainMenueDlg::startShowTestPaperName,this,&CMainMenueDlg::showTestPaperNameUI);
+
+    QObject::connect(this->ui->comboBox_2,static_cast<void(QComboBox::*)(int)>(&QComboBox::activated),[=](int index){
+        int testPaperId = this->ui->comboBox_2->itemData(index).toInt();
+        HANDLE thread = INVALID_HANDLE_VALUE;
+        this->getStudentScoreCount(testPaperId,thread);
+    });
+
+    //在这里监听查询完毕总数后发送的消息
+    QObject::connect(this,&CMainMenueDlg::startSendStudentScoreCount,[=](int count){
+        qDebug()<<"总人数："<<count;
+        //进行设置UI样式
+        emit this->startInitStudentScoreContorlUI(count);
+        //再进行获取表数据
+
+    });
+
+    QObject::connect(this,&CMainMenueDlg::startInitStudentScoreContorlUI,this,&CMainMenueDlg::setStudentScoreContorlUI);
+}
+
+void CMainMenueDlg::setStudentScoreContorlUI(int rowCount)
+{
+
+    this->ui->tableWidget_7->horizontalHeader()->hide();
+    this->ui->tableWidget_7->verticalHeader()->hide();
+    //进行设置每一列的列宽
+    this->ui->tableWidget_7->setColumnCount(6);
+    int width = this->ui->tableWidget_7->width();
+    int heigth = this->ui->tableWidget_7->height();
+    this->ui->tableWidget_7->setColumnWidth(0,width / 4);
+    this->ui->tableWidget_7->setColumnWidth(1,width / 6);
+    this->ui->tableWidget_7->setColumnWidth(2,width / 6);
+    this->ui->tableWidget_7->setColumnWidth(3,width / 6);
+    this->ui->tableWidget_7->setColumnWidth(4,width / 6);
+    this->ui->tableWidget_7->setColumnWidth(5,width / 12);
+
+    //对表行进行清除，并且清除控件容器
+    this->ui->tableWidget_7->setRowCount(0);
+
+    for(QLabel* lab : this->m_studentScoreName)
+    {
+        if(lab != nullptr)
+        {
+            delete lab;
+        }
+    }
+    this->m_studentScoreName.clear();
+
+    for(QLabel* lab : this->m_studentScoreId)
+    {
+        if(lab != nullptr)
+        {
+            delete lab;
+        }
+    }
+    this->m_studentScoreId.clear();
+
+    for(QLabel* lab : this->m_studentScoreId)
+    {
+        if(lab != nullptr)
+        {
+            delete lab;
+        }
+    }
+    this->m_studentScoreId.clear();
+
+    for(QLabel* lab : this->m_studentScoreSubject)
+    {
+        if(lab != nullptr)
+        {
+            delete lab;
+        }
+    }
+    this->m_studentScoreSubject.clear();
+
+    for(QLabel* lab : this->m_studentScoreKeGuanScore)
+    {
+        if(lab != nullptr)
+        {
+            delete lab;
+        }
+    }
+    this->m_studentScoreKeGuanScore.clear();
+
+    for(QLabel* lab : this->m_studentScoreZhuGuanScore)
+    {
+        if(lab != nullptr)
+        {
+            delete lab;
+        }
+    }
+    this->m_studentScoreZhuGuanScore.clear();
+
+    for(QLabel* lab : this->m_studentScoreSumScore)
+    {
+        if(lab != nullptr)
+        {
+            delete lab;
+        }
+    }
+    this->m_studentScoreSumScore.clear();
+
+    //进行设置行
+    this->ui->tableWidget_7->setRowCount(rowCount);
+    for(int i = 0;i < rowCount ;i++)
+    {
+        this->ui->tableWidget_7->setRowHeight(i,heigth/ 12);
+    }
+
+    //给每一格进行添加控件
+    // 学生名称
+    for(int i = 0 ; i < rowCount ; i++)
+    {
+        QLabel* testName = new QLabel();
+        testName->setText("");
+        testName->setFont(QFont("黑体",12));
+        this->ui->tableWidget_7->setCellWidget(i,0,testName);
+        testName->setAlignment(Qt::AlignCenter);
+        this->m_studentScoreName.push_back(testName);
+    }
+
+    //学号
+    for(int i = 0 ; i < rowCount ; i++)
+    {
+        QLabel* testName = new QLabel();
+        testName->setText("");
+        testName->setFont(QFont("黑体",12));
+        this->ui->tableWidget_7->setCellWidget(i,1,testName);
+        testName->setAlignment(Qt::AlignCenter);
+        this->m_studentScoreId.push_back(testName);
+    }
+
+    //科目
+    for(int i = 0 ; i < rowCount ; i++)
+    {
+        QLabel* testName = new QLabel();
+        testName->setText("");
+        testName->setFont(QFont("黑体",12));
+        this->ui->tableWidget_7->setCellWidget(i,2,testName);
+        testName->setAlignment(Qt::AlignCenter);
+        this->m_studentScoreSubject.push_back(testName);
+    }
+
+    //客观题分数
+    for(int i = 0 ; i < rowCount;i++)
+    {
+        QLabel* testName = new QLabel();
+        testName->setText("");
+        testName->setFont(QFont("黑体",12));
+        this->ui->tableWidget_7->setCellWidget(i,3,testName);
+        testName->setAlignment(Qt::AlignCenter);
+        this->m_studentScoreKeGuanScore.push_back(testName);
+    }
+
+    //主观题分数
+    for(int i = 0 ; i < rowCount;i++)
+    {
+        QLabel* testName = new QLabel();
+        testName->setText("");
+        testName->setFont(QFont("黑体",12));
+        this->ui->tableWidget_7->setCellWidget(i,4,testName);
+        testName->setAlignment(Qt::AlignCenter);
+        this->m_studentScoreZhuGuanScore.push_back(testName);
+    }
+
+    //总分
+    for(int i = 0 ; i < rowCount;i++)
+    {
+        QLabel* testName = new QLabel();
+        testName->setText("");
+        testName->setFont(QFont("黑体",12));
+        this->ui->tableWidget_7->setCellWidget(i,5,testName);
+        testName->setAlignment(Qt::AlignCenter);
+        this->m_studentScoreSumScore.push_back(testName);
+    }
+
+    //给每一行根据单双设置样式
+    for(int i = 0 ; i < rowCount ; i++)
+    {
+        //同一行的所有控件都进行设置同样的背景颜色
+        if(i % 2 == 0)//
+        {
+            this->m_studentScoreName.at(i)->setStyleSheet(strSignalLabelStyleSheet);
+            this->m_studentScoreId.at(i)->setStyleSheet(strSignalLabelStyleSheet);
+            this->m_studentScoreSubject.at(i)->setStyleSheet(strSignalLabelStyleSheet);
+            this->m_studentScoreKeGuanScore.at(i)->setStyleSheet(strSignalLabelStyleSheet);
+            this->m_studentScoreZhuGuanScore.at(i)->setStyleSheet(strSignalLabelStyleSheet);
+            this->m_studentScoreSumScore.at(i)->setStyleSheet(strSignalWidgetStyleSheet);
+        }else
+        {
+            this->m_studentScoreName.at(i)->setStyleSheet(strDoubleLabelStyleSheet);
+            this->m_studentScoreId.at(i)->setStyleSheet(strDoubleLabelStyleSheet);
+            this->m_studentScoreSubject.at(i)->setStyleSheet(strDoubleLabelStyleSheet);
+            this->m_studentScoreKeGuanScore.at(i)->setStyleSheet(strDoubleLabelStyleSheet);
+            this->m_studentScoreZhuGuanScore.at(i)->setStyleSheet(strDoubleLabelStyleSheet);
+            this->m_studentScoreSumScore.at(i)->setStyleSheet(strDoubleLabelStyleSheet);
+        }
+    }
+}
+
+typedef struct getStudentScoreCountArg{
+    QString teacherId;
+    int testPaperId;
+    CMainMenueDlg* thiz;
+}GetStudentScoreCountArg;
+
+void CMainMenueDlg::getStudentScoreCount(int testPaperId,HANDLE& out_handle)
+{
+    std::shared_ptr<GetStudentScoreCountArg> arg = std::make_shared<GetStudentScoreCountArg>();
+    arg->thiz = this;
+    arg->teacherId = this->m_acount;
+    arg->testPaperId = testPaperId;
+    std::shared_ptr<GetStudentScoreCountArg>* p = new std::shared_ptr<GetStudentScoreCountArg>(arg);
+    out_handle = (HANDLE)_beginthreadex(nullptr,0,&CMainMenueDlg::threadGetStudentScoreCount,p,0,nullptr);
+}
+
+unsigned WINAPI  CMainMenueDlg::threadGetStudentScoreCount(LPVOID arg)
+{
+    std::shared_ptr<GetStudentScoreCountArg>* p = (std::shared_ptr<GetStudentScoreCountArg>*)arg;
+    std::shared_ptr<GetStudentScoreCountArg> gInfo = *p;
+    int ret =  gInfo->thiz->m_mainMenueContorller->getStudentScoreCount(gInfo->teacherId,gInfo->testPaperId);
+    //进行发送信号进行传递查询结果
+    emit gInfo->thiz->startSendStudentScoreCount(ret);
+    delete p;
+    return 0;
 }
 
 void CMainMenueDlg::getSubjectTestPaperRelease()
@@ -6711,6 +6935,70 @@ CMainMenueDlg::~CMainMenueDlg()
         }
     }
     this->m_correctMemberOperator.clear();
+
+
+    for(QLabel* lab : this->m_studentScoreName)
+    {
+        if(lab != nullptr)
+        {
+            delete lab;
+        }
+    }
+    this->m_studentScoreName.clear();
+
+    for(QLabel* lab : this->m_studentScoreId)
+    {
+        if(lab != nullptr)
+        {
+            delete lab;
+        }
+    }
+    this->m_studentScoreId.clear();
+
+    for(QLabel* lab : this->m_studentScoreId)
+    {
+        if(lab != nullptr)
+        {
+            delete lab;
+        }
+    }
+    this->m_studentScoreId.clear();
+
+    for(QLabel* lab : this->m_studentScoreSubject)
+    {
+        if(lab != nullptr)
+        {
+            delete lab;
+        }
+    }
+    this->m_studentScoreSubject.clear();
+
+    for(QLabel* lab : this->m_studentScoreKeGuanScore)
+    {
+        if(lab != nullptr)
+        {
+            delete lab;
+        }
+    }
+    this->m_studentScoreKeGuanScore.clear();
+
+    for(QLabel* lab : this->m_studentScoreZhuGuanScore)
+    {
+        if(lab != nullptr)
+        {
+            delete lab;
+        }
+    }
+    this->m_studentScoreZhuGuanScore.clear();
+
+    for(QLabel* lab : this->m_studentScoreSumScore)
+    {
+        if(lab != nullptr)
+        {
+            delete lab;
+        }
+    }
+    this->m_studentScoreSumScore.clear();
 
     //如果关闭界面，接收头像信息的线程还在执行的话就等待接收后结束线程
     WaitForSingleObject(this->m_recvHeadThead,INFINITE); //找到退出崩溃的原因，因为关闭界面的时候，接收头像线程还在执行，但是UI已经释放导致异常
