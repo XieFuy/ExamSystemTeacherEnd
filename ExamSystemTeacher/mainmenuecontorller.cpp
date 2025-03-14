@@ -10,6 +10,14 @@ bool CMainMenueContorller::initStudentScoreTable()
     return this->m_mainMenueModel->initStudentScoreTable();
 }
 
+std::vector<std::vector<std::string>> CMainMenueContorller::getStudentScoreInfo(QString& teacherId
+                                                                                ,int& testPaperId)
+{
+    QByteArray teacherIdArr = teacherId.toLocal8Bit();
+    const char* pTeacherId = teacherIdArr.data();
+    return this->m_mainMenueModel->getStudentScoreInfo(pTeacherId,testPaperId);
+}
+
 int CMainMenueContorller::getStudentScoreCount(QString& teacherId,int& testPaperId)
 {
     QByteArray teacherIdArr = teacherId.toLocal8Bit();

@@ -757,13 +757,91 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
     QObject::connect(this,&CMainMenueDlg::startSendStudentScoreCount,[=](int count){
         qDebug()<<"总人数："<<count;
         //进行设置UI样式
-        emit this->startInitStudentScoreContorlUI(count);
-        //再进行获取表数据
-
+        emit this->startInitStudentScoreContorlUI(count);  
     });
 
     QObject::connect(this,&CMainMenueDlg::startInitStudentScoreContorlUI,this,&CMainMenueDlg::setStudentScoreContorlUI);
+
+    QObject::connect(this,&CMainMenueDlg::startGetStudentScoreInfo,this,&CMainMenueDlg::getStudentScoreInfo);
+
+    QObject::connect(this,&CMainMenueDlg::startShowStudentScore,this,&CMainMenueDlg::showStudentScoreUI);
 }
+
+void CMainMenueDlg::showStudentScoreUI(QVector<QVector<QString>>* ret)
+{
+    if(ret == nullptr)
+    {
+        return;
+    }
+    for(int i = 0 ; i < ret->size();i++)
+    {
+        //进行显示学生姓名
+        QString str = ret->at(i).at(0).trimmed();
+        this->m_studentScoreName.at(i)->setText(str);
+
+        //显示学生Id
+        str = ret->at(i).at(1).trimmed();
+        this->m_studentScoreId.at(i)->setText(str);
+
+        //显示科目
+        str = ret->at(i).at(2).trimmed();
+        this->m_studentScoreSubject.at(i)->setText(str);
+
+        //显示客观分数
+        str = ret->at(i).at(3).trimmed();
+        this->m_studentScoreKeGuanScore.at(i)->setText(str);
+
+        //显示主观分数
+        str = ret->at(i).at(4).trimmed();
+        this->m_studentScoreZhuGuanScore.at(i)->setText(str);
+
+        //显示总分
+        str = ret->at(i).at(5).trimmed();
+        this->m_studentScoreSumScore.at(i)->setText(str);
+    }
+    delete ret;
+}
+
+typedef struct getStudentScoreInfoArg{
+    QString teacherId;
+    int testPaperId;
+    CMainMenueDlg* thiz;
+}GetStudentScoreInfoArg;
+
+void CMainMenueDlg::getStudentScoreInfo()
+{
+   std::shared_ptr<GetStudentScoreInfoArg> arg = std::make_shared<GetStudentScoreInfoArg>();
+   arg->teacherId = this->m_acount;
+   int index = this->ui->comboBox_2->currentIndex();
+   arg->testPaperId = this->ui->comboBox_2->itemData(index).toInt();
+   arg->thiz = this;
+   std::shared_ptr<GetStudentScoreInfoArg>* p = new std::shared_ptr<GetStudentScoreInfoArg>(arg);
+   _beginthreadex(nullptr,0,&CMainMenueDlg::threadGetStudentScoreInfo,p,0,nullptr);
+}
+
+unsigned WINAPI CMainMenueDlg::threadGetStudentScoreInfo(LPVOID arg)
+{
+    std::shared_ptr<GetStudentScoreInfoArg>* p = (std::shared_ptr<GetStudentScoreInfoArg>*)arg;
+    std::shared_ptr<GetStudentScoreInfoArg> gInfo = *p;
+    std::vector<std::vector<std::string>> ret =  gInfo->thiz->m_mainMenueContorller->getStudentScoreInfo(gInfo->teacherId
+                                                            ,gInfo->testPaperId);
+    //进行数据处理，并回显数据给表格显示
+    QVector<QVector<QString>>* result = new QVector<QVector<QString>>();
+    for(int i = 0 ; i < ret.size();i++)
+    {
+        QVector<QString> temp;
+        for(int j = 0 ; j < ret.at(i).size();j++)
+        {
+            QString str = QString::fromLocal8Bit(ret.at(i).at(j).c_str());
+            temp.push_back(str);
+        }
+        result->push_back(temp);
+    }
+    emit gInfo->thiz->startShowStudentScore(result);
+    delete p;
+    return 0;
+}
+
 
 void CMainMenueDlg::setStudentScoreContorlUI(int rowCount)
 {
@@ -943,6 +1021,9 @@ void CMainMenueDlg::setStudentScoreContorlUI(int rowCount)
             this->m_studentScoreSumScore.at(i)->setStyleSheet(strDoubleLabelStyleSheet);
         }
     }
+
+    //发送信号，再进行获取表数据
+    emit this->startGetStudentScoreInfo();
 }
 
 typedef struct getStudentScoreCountArg{

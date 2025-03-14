@@ -78,6 +78,8 @@ signals:
     void startShowTestPaperName(QVector<QVector<QString>>* ret);
     void startSendStudentScoreCount(int count);
     void startInitStudentScoreContorlUI(int count);
+    void startGetStudentScoreInfo();
+    void startShowStudentScore(QVector<QVector<QString>>* ret);
 private:
     QVector<HANDLE> m_deleteTestPaperThread; //进行删除试卷的线程任务
     CTestPaperReleaseDlg* m_testPaperReleaseDlg = nullptr;
@@ -748,6 +750,9 @@ private:
 
     //设置成绩表UI
     void setStudentScoreContorlUI(int rowCount); //进行设置成绩表UI和控件
+
+    void showStudentScoreUI(QVector<QVector<QString>>* ret); //进行显示查询到的学生信息
+
 private:
     Ui::CMainMenueDlg *ui;
 };
