@@ -91,6 +91,7 @@ LIBS += -lws2_32
 
 INCLUDEPATH += .\include
 
+include(QXlsx/QXlsx.pri)
 
 win32: LIBS += -L$$PWD/./ -llibmysql
 

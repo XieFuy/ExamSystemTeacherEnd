@@ -24,6 +24,8 @@
 #include "testpaperreleasedlg.h"
 #include "previewtestpaperdlg.h"
 #include "correctsubjectivequestionsdlg.h"
+#include "xlsxdocument.h"
+#include <QFileDialog>
 
 namespace Ui {
 class CMainMenueDlg;  //主菜单管理页面
@@ -752,6 +754,10 @@ private:
     void setStudentScoreContorlUI(int rowCount); //进行设置成绩表UI和控件
 
     void showStudentScoreUI(QVector<QVector<QString>>* ret); //进行显示查询到的学生信息
+
+    /*Excel表格操作接口*/
+    //导出学生成绩
+    void writeStudentScoreToExcel();
 
 private:
     Ui::CMainMenueDlg *ui;

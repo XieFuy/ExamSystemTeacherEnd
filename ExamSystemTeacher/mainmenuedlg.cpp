@@ -765,6 +765,67 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
     QObject::connect(this,&CMainMenueDlg::startGetStudentScoreInfo,this,&CMainMenueDlg::getStudentScoreInfo);
 
     QObject::connect(this,&CMainMenueDlg::startShowStudentScore,this,&CMainMenueDlg::showStudentScoreUI);
+
+    QObject::connect(this->ui->pushButton_92,&QPushButton::clicked,this,&CMainMenueDlg::writeStudentScoreToExcel);
+}
+
+void CMainMenueDlg::writeStudentScoreToExcel()
+{
+    int width = this->ui->tableWidget_7->width();
+    //弹出文件弹框
+    QString filePath = QFileDialog::getSaveFileName(this, "保存文件", "", "所有文件 (*);;文本文件 (*.xlsx)");
+
+    //获取文件路径 检查用户是否选择了文件
+    if (!filePath.isEmpty()) {
+
+        // 创建一个 Xlsx 文档
+           QXlsx::Document xlsx;
+
+           QXlsx::Format headerFormat;
+           headerFormat.setFontBold(true);
+           headerFormat.setPatternBackgroundColor(Qt::yellow);
+
+           //设置表头样式 写入表头
+           QStringList strHeader;
+           strHeader<<"学生姓名"<<"学号"<<"科目"<<"客观总分"<<"主观题总分"<<"总分";
+           for (int col = 0; col < 6; ++col) {
+               xlsx.write(1, col + 1, strHeader.at(col), headerFormat);
+           }
+
+           //导出数据 将二维数据写入 Excel
+           for(int row = 1;row < this->m_studentScoreName.size() + 1;row++)
+           {
+               //写入姓名
+               xlsx.write(row + 1, 1, this->m_studentScoreName.at(row - 1)->text());// 将数据写入单元格（行和列从 1 开始）
+               //写入学号
+               xlsx.write(row + 1, 2, this->m_studentScoreId.at(row - 1)->text());
+               //写入科目
+               xlsx.write(row + 1, 3, this->m_studentScoreSubject.at(row - 1)->text());
+               //写入客观
+               xlsx.write(row + 1, 4, this->m_studentScoreKeGuanScore.at(row - 1)->text());
+               //写入主观
+               xlsx.write(row + 1, 5, this->m_studentScoreZhuGuanScore.at(row - 1)->text());
+               //写入总分
+               xlsx.write(row + 1, 6, this->m_studentScoreSumScore.at(row - 1)->text());
+           }
+
+           // 设置列宽
+           xlsx.setColumnWidth(1, 20);  // 设置第 1 列（A 列）的宽度为 15
+           xlsx.setColumnWidth(2, 20);  // 设置第 2 列（B 列）的宽度为 10
+           xlsx.setColumnWidth(3, 20);  // 设置第 3 列（C 列）的宽度为 20
+           xlsx.setColumnWidth(4, 20);
+           xlsx.setColumnWidth(5, 20);
+           xlsx.setColumnWidth(6, 20);
+
+           // 保存文件
+           if (xlsx.saveAs(filePath)) {
+               qDebug() << "Excel 文件已成功生成！";
+               std::shared_ptr<QMessageBox> box = std::make_shared<QMessageBox>(QMessageBox::Information,"信息提示","数据导出成功！",QMessageBox::Ok);
+               box->exec();
+           } else {
+               qDebug() << "生成 Excel 文件失败！";
+           }
+    }
 }
 
 void CMainMenueDlg::showStudentScoreUI(QVector<QVector<QString>>* ret)
