@@ -26,6 +26,7 @@
 #include "correctsubjectivequestionsdlg.h"
 #include "xlsxdocument.h"
 #include <QFileDialog>
+#include "bar_widget.h"
 
 namespace Ui {
 class CMainMenueDlg;  //主菜单管理页面
@@ -224,6 +225,9 @@ private:
     QVector<QLabel*> m_studentScoreKeGuanScore;
     QVector<QLabel*> m_studentScoreZhuGuanScore;
     QVector<QLabel*> m_studentScoreSumScore;
+
+    //矩形图
+    std::shared_ptr<BarWidget> barWidget;
 private:
     void showPageIndex();//显示分页查询的下标页
     void initTableWidgetHeader(); //初始化表头

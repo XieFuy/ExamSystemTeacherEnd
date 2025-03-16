@@ -767,6 +767,21 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
     QObject::connect(this,&CMainMenueDlg::startShowStudentScore,this,&CMainMenueDlg::showStudentScoreUI);
 
     QObject::connect(this->ui->pushButton_92,&QPushButton::clicked,this,&CMainMenueDlg::writeStudentScoreToExcel);
+
+    QObject::connect(this->ui->pushButton_93,&QPushButton::clicked,[=](){
+        this->ui->stackedWidget->setCurrentIndex(8);
+        this->barWidget = std::make_shared<BarWidget>();
+        this->barWidget->setGeometry(0,0,this->ui->widget_23->width()
+                                     ,this->ui->widget_23->height());
+        this->barWidget->setParent(this->ui->widget_23);
+        this->barWidget->show();
+    });
+
+    QObject::connect(this->ui->pushButton_46,&QPushButton::clicked,[=](){
+        this->ui->stackedWidget->setCurrentIndex(2);
+        this->barWidget.reset();
+    });
+
 }
 
 void CMainMenueDlg::writeStudentScoreToExcel()

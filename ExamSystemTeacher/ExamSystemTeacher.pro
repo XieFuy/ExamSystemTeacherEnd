@@ -1,4 +1,4 @@
-QT       += core gui
+QT       += core gui charts
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -9,6 +9,8 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    bar_widget.cpp \
+    chart_view_x.cpp \
     classsavedlg.cpp \
     clientsocket.cpp \
     correctsubjectivequestionscontorler.cpp \
@@ -16,6 +18,7 @@ SOURCES += \
     correctsubjectivequestionsmodel.cpp \
     datetimeselectdlg.cpp \
     dbhelper.cpp \
+    donut_breakdown_chart.cpp \
     dpihelper.cpp \
     exitlogindlg.cpp \
     logincontorller.cpp \
@@ -26,6 +29,7 @@ SOURCES += \
     mainmenuemodel.cpp \
     namechangedlg.cpp \
     phonenumberchangedlg.cpp \
+    pie_slice_x.cpp \
     previewtestpapercontorller.cpp \
     previewtestpaperdlg.cpp \
     previewtestpapermodel.cpp \
@@ -38,6 +42,8 @@ SOURCES += \
     widget.cpp
 
 HEADERS += \
+    bar_widget.h \
+    chart_view_x.h \
     classsavedlg.h \
     clientsocket.h \
     correctsubjectivequestionscontorler.h \
@@ -45,6 +51,7 @@ HEADERS += \
     correctsubjectivequestionsmodel.h \
     datetimeselectdlg.h \
     dbhelper.h \
+    donut_breakdown_chart.h \
     dpihelper.h \
     exitlogindlg.h \
     logincontorller.h \
@@ -54,6 +61,7 @@ HEADERS += \
     mainmenuemodel.h \
     namechangedlg.h \
     phonenumberchangedlg.h \
+    pie_slice_x.h \
     previewtestpapercontorller.h \
     previewtestpaperdlg.h \
     previewtestpapermodel.h \
