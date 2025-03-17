@@ -228,6 +228,19 @@ private:
 
     //矩形图
     std::shared_ptr<BarWidget> barWidget;
+
+    //各区间中的人数
+    int zoreToTen;
+    int TenToTwoty;
+    int twotyToThirty;
+    int thirtyToForty;
+    int fourtyToFifty;
+    int FiftyToSixty;
+    int SixtyToSeventy;
+    int seventyToEighty;
+    int EightToNighty;
+    int nightyToHunder;
+
 private:
     void showPageIndex();//显示分页查询的下标页
     void initTableWidgetHeader(); //初始化表头

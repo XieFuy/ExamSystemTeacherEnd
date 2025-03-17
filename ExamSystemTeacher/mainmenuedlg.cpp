@@ -50,6 +50,17 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
     this->initTableWidgetHeader();
     this->m_correctMemberCurIndex = 1;
 
+    this->zoreToTen = 0;
+    this->TenToTwoty = 0;
+    this->twotyToThirty = 0;
+    this->thirtyToForty = 0;
+    this->fourtyToFifty = 0;
+    this->FiftyToSixty = 0;
+    this->SixtyToSeventy = 0;
+    this->seventyToEighty = 0;
+    this->EightToNighty = 0;
+    this->nightyToHunder = 0;
+
     //生成控制层
     this->m_mainMenueContorller = new CMainMenueContorller();
     //设置标题栏头像为圆形
@@ -769,12 +780,23 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
     QObject::connect(this->ui->pushButton_92,&QPushButton::clicked,this,&CMainMenueDlg::writeStudentScoreToExcel);
 
     QObject::connect(this->ui->pushButton_93,&QPushButton::clicked,[=](){
+        if(this->m_studentScoreSumScore.size() == 0)
+        {
+            std::shared_ptr<QMessageBox> box = std::make_shared<QMessageBox>(QMessageBox::Warning,"信息提示","当前未选择试卷，不能进行成绩分析！",QMessageBox::Ok);
+            box->exec();
+            return;
+        }
         this->ui->stackedWidget->setCurrentIndex(8);
         this->barWidget = std::make_shared<BarWidget>();
+        this->barWidget->setValue(this->zoreToTen,this->TenToTwoty,this->twotyToThirty
+                                  ,this->thirtyToForty,this->fourtyToFifty,this->FiftyToSixty
+                                  ,this->SixtyToSeventy,this->seventyToEighty,this->EightToNighty
+                                  ,this->nightyToHunder);
         this->barWidget->setGeometry(0,0,this->ui->widget_23->width()
                                      ,this->ui->widget_23->height());
         this->barWidget->setParent(this->ui->widget_23);
         this->barWidget->show();
+        emit this->barWidget->startShowUI();
     });
 
     QObject::connect(this->ui->pushButton_46,&QPushButton::clicked,[=](){
@@ -875,6 +897,39 @@ void CMainMenueDlg::showStudentScoreUI(QVector<QVector<QString>>* ret)
         str = ret->at(i).at(5).trimmed();
         this->m_studentScoreSumScore.at(i)->setText(str);
     }
+
+    //进行统计各个区间总分的人数
+    // 遍历每个 QLabel 对象
+        for (QLabel* label : this->m_studentScoreSumScore) {
+            // 将 QLabel 的文本转换为整数
+            bool ok;
+            double score = label->text().toDouble(&ok);
+
+            // 如果转换成功，根据分数将其分配到相应的区间
+            if (ok) {
+                if (score >= 0.0 && score < 10.0) {
+                    this->zoreToTen++;
+                } else if (score >= 10.0 && score < 20.0) {
+                    this->TenToTwoty++;
+                } else if (score >= 20.0 && score < 30.0) {
+                    this->twotyToThirty++;
+                } else if (score >= 30.0 && score < 40.0) {
+                    this->thirtyToForty++;
+                } else if (score >= 40.0 && score < 50.0) {
+                    this->fourtyToFifty++;
+                } else if (score >= 50.0 && score < 60.0) {
+                    this->FiftyToSixty++;
+                } else if (score >= 60.0 && score < 70.0) {
+                    this->SixtyToSeventy++;
+                } else if (score >= 70.0 && score < 80.0) {
+                    this->seventyToEighty++;
+                } else if (score >= 80.0 && score < 90.0) {
+                    this->EightToNighty++;
+                }else if (score >= 90.0 && score <= 100.0) {
+                    this->nightyToHunder++;
+                }
+            }
+        }
     delete ret;
 }
 

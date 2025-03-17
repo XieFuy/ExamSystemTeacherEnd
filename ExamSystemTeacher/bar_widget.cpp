@@ -31,14 +31,19 @@ BarWidget::BarWidget(QWidget* parent) : QWidget{parent}
 
     mainLayout->addWidget(scrollArea);
 
-    addBars();
+    QObject::connect(this,&BarWidget::startShowUI,[=](){
+        addBars();
+    });
+
 }
 
 void BarWidget::addBars()
 {
     // 1. 创建QBarSet  给图标的数据集
     QBarSet* set = new QBarSet("年销量");
-    *set << 15 << 65 << 19 << 57 << 43 << 68 << 88 << 45 << 77 << 33;
+    *set << this->zoreToTen << this->TenToTwoty << this->twotyToThirty
+         << this->thirtyToForty << this->fourtyToFifty << this->FiftyToSixty
+         << this->SixtyToSeventy << this->seventyToEighty << this->EightToNighty << this->nightyToHunder;
     set->setBrush(QBrush(QColor(230, 100, 100)));
 
     // 2. 创建QBarSeries
@@ -123,4 +128,21 @@ void BarWidget::addBars()
     chartView->setMinimumWidth(900);
 
     gridLayout->addWidget(chartView, 0, 0);
+}
+
+void BarWidget::setValue(int& zoreToTen,int& TenToTwoty,int& twotyToThirty
+              ,int& thirtyToForty,int& fourtyToFifty,int& FiftyToSixty,
+              int& SixtyToSeventy,int& seventyToEighty,int& EightToNighty,
+              int& nightyToHunder)
+{
+    this->zoreToTen = zoreToTen;
+    this->TenToTwoty = TenToTwoty;
+    this->twotyToThirty = twotyToThirty;
+    this->thirtyToForty = thirtyToForty;
+    this->fourtyToFifty = fourtyToFifty;
+    this->FiftyToSixty = FiftyToSixty;
+    this->SixtyToSeventy = SixtyToSeventy;
+    this->seventyToEighty = seventyToEighty;
+    this->EightToNighty = EightToNighty;
+    this->nightyToHunder = nightyToHunder;
 }
