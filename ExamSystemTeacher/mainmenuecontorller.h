@@ -22,13 +22,13 @@ public :
     bool initTestPaperTable();
     bool addSignalChoiceInfo(QString grade,QString question,QString sessionA,
                              QString sessionB,QString sessionC,QString sessionD,
-                             QString correctOptions,int order);
+                             QString correctOptions,QString teacherId,int order);
     bool addMultiChoiceInfo(QString grade,QString question,QString sessionA,
                             QString sessionB,QString sessionC,QString sessionD,
-                            QString sessionE,QString sessionF,QString correctOpetions,int order);
+                            QString sessionE,QString sessionF,QString correctOpetions,QString teacherId,int order);
     bool addJudgeInfo(QString grade,QString question,QString sessionTrue,QString sessionFalse,
-                      QString correctAnswer,int order);
-    bool addShortAnswerInfo(QString grade,QString question,QString referenceAnswer,int order);
+                      QString correctAnswer,QString teacherId,int order);
+    bool addShortAnswerInfo(QString grade,QString question,QString referenceAnswer,QString teacherId,int order);
     QString getTablePageCount(QString acount);
     std::vector<std::vector<std::string>> showCurPageIndexTable(int curPageIndex,QString acount);
     std::vector<std::vector<std::string>> getCurPageIndexTableDataPubulished(int curPageIndex,

@@ -283,7 +283,7 @@ private:
     void initTeacherInfoTable(); //初始化教职工信息数据库表
     static unsigned WINAPI threadInitTeacherInfoTableEntry(LPVOID arg);
 
-    void  showTeacherInfo(QString acount); //显示主页的职工个人姓名和头像
+    void showTeacherInfo(QString acount); //显示主页的职工个人姓名和头像
     void clearTestPaperTableContorl(); //清除表格内容
     void initTestPaperTableContorl();//初始化试卷表格控件
     static unsigned WINAPI threadShowHeadEntry(LPVOID arg); //进行与服务器进行网络通信获取头像数据的线程函数
@@ -303,7 +303,6 @@ private:
 
     void addSignalChoiceInfo(QString grade,QString question,QString sessionA,QString sessionB,QString sessionC,QString sessionD,QString correctOptions,int order);//添加单选题信息
     static unsigned WINAPI threadAddSignalChoiceInfoEntry(LPVOID arg);
-
 
     void clearSignalOption();//清空单选区域
     void clearMultiOption();//清空多选区域

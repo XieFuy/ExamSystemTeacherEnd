@@ -26,15 +26,15 @@ public:
     bool initTestPaperTable();
     bool addSignalChoiceInfo(double grade,const char* question,const char* sessionA,
                              const char* sessionB,const char* sessionC,const char* sessionD,
-                             const char* correctOptions,int order);
+                             const char* correctOptions,const char* teacherId,int order);
     bool addMultiChoiceInfo(double grade,const char* question,const char* sessionA,
                             const char* sessionB,const char* sessionC,const char* sessionD,
                             const char* sessionE,const char* sessionF,const char* correctOpetions,
-                            int order);
+                            const char* teacherId,int order);
     bool addJudgeInfo(double grade,const char* question,const char* sessionTrue,
                       const char* sessionFalse,
-                      const char* correctAnswer,int order);
-    bool addShortAnswerInfo(double grade,const char* question,const char* referenceAnswer,int order);
+                      const char* correctAnswer,const char* teacherId,int order);
+    bool addShortAnswerInfo(double grade,const char* question,const char* referenceAnswer,const char* teacherId,int order);
     QString getTablePageCount(char* acount);
     std::vector<std::vector<std::string>> showCurPageIndexTable(int curPageIndex,char* acount);
     std::vector<std::vector<std::string>> getCurPageIndexTableDataPubulished(int curPageIndex,

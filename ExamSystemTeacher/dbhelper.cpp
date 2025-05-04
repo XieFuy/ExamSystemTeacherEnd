@@ -102,7 +102,7 @@ std::vector<std::vector<std::string>> CDBHelper::sqlQuery(const std::string& sql
     return m_result;
 }
 
-BOOL CDBHelper::sqlExcute(const std::string& sql, const std::string& database, const std::string& user , const std::string& password )
+BOOL CDBHelper::sqlExcute(const std::string& sql,const std::string& database,unsigned long long* pInsertId, const std::string& user , const std::string& password)
 {
     this->initMysql();
     this->ConnectDB(database,user,password);
@@ -117,6 +117,10 @@ BOOL CDBHelper::sqlExcute(const std::string& sql, const std::string& database, c
         this->distoryMysql();
         return FALSE;
     }
+    // 返回自增 ID（如果调用方需要）
+       if (pInsertId != nullptr) {
+           *pInsertId = mysql_insert_id(this->m_mysql);
+       }
     this->disConnectDB();
     this->distoryMysql();
     return TRUE;

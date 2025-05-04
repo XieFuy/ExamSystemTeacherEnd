@@ -6261,6 +6261,7 @@ void CMainMenueDlg::clearTreeItemShortAnswer()
      QString question;
      QString referenceAnswer;
      int order;
+     QString teacherId;
      CMainMenueDlg* thiz;
  }ShortAnswerInfoArg;
 
@@ -6272,6 +6273,7 @@ void CMainMenueDlg::addShortAnswerInfo(QString grade,QString question,QString re
     arg->question = question;
     arg->referenceAnswer = referenceAnswer;
     arg->order = order;
+    arg->teacherId = this->m_acount;
     _beginthreadex(nullptr,0,&CMainMenueDlg::threadAddShortAnswerInfoEntry,arg,0,nullptr);
 }
 
@@ -6279,7 +6281,7 @@ unsigned WINAPI CMainMenueDlg::threadAddShortAnswerInfoEntry(LPVOID arg)
 {
     ShortAnswerInfoArg* pram = (ShortAnswerInfoArg*)arg;
     pram->thiz->m_mainMenueContorller->addShortAnswerInfo(pram->grade,pram->question,pram->referenceAnswer,
-                                                       pram->order);
+                                                       pram->teacherId,pram->order);
     delete pram;
     //_endthreadex(0);
     return 0;
@@ -6309,6 +6311,7 @@ typedef struct addJudgeInfoArg
     QString sessionFalse;
     QString correctAnswer;
     int order;
+    QString teacherId;
     CMainMenueDlg* thiz;
 }AddJudgeInfoArg;
 
@@ -6322,6 +6325,7 @@ void CMainMenueDlg::addJudgeInfo(QString grade,QString question,QString sessionT
     arg->correctAnswer = correctAnswer;
     arg->order = order;
     arg->thiz = this;
+    arg->teacherId = this->m_acount;
     _beginthreadex(nullptr,0,&CMainMenueDlg::threadAddJudgeInfoEntry,arg,0,nullptr);
 }
 
@@ -6329,7 +6333,7 @@ unsigned WINAPI CMainMenueDlg::threadAddJudgeInfoEntry(LPVOID arg)
 {
     AddJudgeInfoArg* aInfo = (AddJudgeInfoArg*)arg;
     aInfo->thiz->m_mainMenueContorller->addJudgeInfo(aInfo->grade,aInfo->question,aInfo->sessionTrue,
-                                                     aInfo->sessionFalse,aInfo->correctAnswer,aInfo->order);
+                                                     aInfo->sessionFalse,aInfo->correctAnswer,aInfo->teacherId,aInfo->order);
     delete aInfo;
     //_endthreadex(0);
     return 0;
@@ -6366,6 +6370,7 @@ typedef struct addMultiChoiceInfoArg
     QString sessionE;
     QString sessionF;
     QString correctOpetions;
+    QString teacherId;
     int order ;
     CMainMenueDlg* thiz;
 }AddMultiChoiceInfoArg;
@@ -6385,6 +6390,7 @@ void CMainMenueDlg::addMultiChoiceInfo(QString grade,QString question,QString se
    arg->sessionD = sessionD;
    arg->sessionE = sessionE;
    arg->sessionF = sessionF;
+   arg->teacherId = this->m_acount;
    arg->correctOpetions = correctOpetions;
    arg->order = order;
    arg->thiz = this;
@@ -6398,7 +6404,7 @@ unsigned WINAPI CMainMenueDlg::threadAddMultiChoiceInfoEntry(LPVOID arg)
     aInfo->thiz->m_mainMenueContorller->addMultiChoiceInfo(aInfo->grade,aInfo->question,aInfo->sessionA,
                                                            aInfo->sessionB,aInfo->sessionC,
                                                         aInfo->sessionD,aInfo->sessionE,aInfo->sessionF,
-                                                        aInfo->correctOpetions,aInfo->order);
+                                                        aInfo->correctOpetions,aInfo->teacherId,aInfo->order);
     delete aInfo;
     //_endthreadex(0);
     return 0;
@@ -6440,6 +6446,7 @@ typedef struct addSignalChoiceInfoArg
    QString sessionD;
    QString correctOptions;
    int order;
+   QString teacherId;
    CMainMenueDlg* thiz;
 }AddSignalChoiceInfoArg;
 
@@ -6455,6 +6462,7 @@ void CMainMenueDlg::addSignalChoiceInfo(QString grade,QString question,QString s
     arg->sessionC = sessionC;
     arg->sessionD = sessionD;
     arg->thiz = this;
+    arg->teacherId = this->m_acount;
     _beginthreadex(nullptr,0,&CMainMenueDlg::threadAddSignalChoiceInfoEntry,arg,0,nullptr);
 }
 
@@ -6464,7 +6472,7 @@ unsigned WINAPI CMainMenueDlg::threadAddSignalChoiceInfoEntry(LPVOID arg)
     aInfo->thiz->m_mainMenueContorller->addSignalChoiceInfo(aInfo->grade,aInfo->question,aInfo->sessionA
                                                             ,aInfo->sessionB,
                                                             aInfo->sessionC,aInfo->sessionD,
-                                                            aInfo->correctOptions,aInfo->order);
+                                                            aInfo->correctOptions,aInfo->teacherId,aInfo->order);
     delete aInfo;
     //_endthreadex(0);
     return 0;

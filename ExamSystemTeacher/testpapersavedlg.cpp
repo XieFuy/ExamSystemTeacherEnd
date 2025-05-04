@@ -27,35 +27,38 @@ CTestPaperSaveDlg::CTestPaperSaveDlg(QWidget *parent) :
             sprintf(sqlBuf,"insert into `testPaperInfo` (`testPaperName`,`saveTime`,`teacherId`)\
  values('%s',NOW(),'%s');",pTestName,pAcount);
             sql = sqlBuf;
-            bool ret =  dbHelper->sqlExcute(sql,"ExamSystem");
+            unsigned long long testPaperId;
+            bool ret =  dbHelper->sqlExcute(sql,"ExamSystem",&testPaperId);
+            int temp = static_cast<int>(testPaperId);
+            std::cout<<"insert_id:"<<testPaperId<<"  "<<temp<<std::endl;
             //获取刚刚插入的试卷的id,一定是最大的id
-            memset(sqlBuf,'\0',sizeof(char) * 1024);
-            sprintf(sqlBuf,"select `testPaperId` from `testPaperInfo` order by `testPaperId` desc limit 1;");
-            sql = sqlBuf;
-            std::vector<std::vector<std::string>> result =  dbHelper->sqlQuery(sql,"ExamSystem");
-            std::cout<<result.at(0).at(0).c_str()<<std::endl;
+//            memset(sqlBuf,'\0',sizeof(char) * 1024);
+//            sprintf(sqlBuf,"select `testPaperId` from `testPaperInfo` order by `testPaperId` desc limit 1;");
+//            sql = sqlBuf;
+//            std::vector<std::vector<std::string>> result =  dbHelper->sqlQuery(sql,"ExamSystem");
+//            std::cout<<result.at(0).at(0).c_str()<<std::endl;
             //更新添加的所有类型的试题的试卷id为新插入的id
             memset(sqlBuf,'\0',sizeof(char) * 1024);
-            sprintf(sqlBuf,"update `singleChoice` set `testPaperId` = %s\
- where  `testPaperId` = 0;",result.at(0).at(0).c_str());
+            sprintf(sqlBuf,"update `singleChoice` set `testPaperId` = %d\
+ where  `testPaperId` = 0 and `teacherId` = '%s';",temp,pAcount);
             sql = sqlBuf;
             dbHelper->sqlExcute(sql,"ExamSystem");
 
             memset(sqlBuf,'\0',sizeof(char) * 1024);
-            sprintf(sqlBuf,"update `multiChoice` set `testPaperId` = %s\
- where  `testPaperId` = 0;",result.at(0).at(0).c_str());
+            sprintf(sqlBuf,"update `multiChoice` set `testPaperId` = %d\
+ where  `testPaperId` = 0 and `teacherId` = '%s';",temp,pAcount);
             sql = sqlBuf;
             dbHelper->sqlExcute(sql,"ExamSystem");
 
             memset(sqlBuf,'\0',sizeof(char) * 1024);
-            sprintf(sqlBuf,"update `judge` set `testPaperId` = %s\
- where  `testPaperId` = 0;",result.at(0).at(0).c_str());
+            sprintf(sqlBuf,"update `judge` set `testPaperId` = %d\
+ where  `testPaperId` = 0 and `teacherId` = '%s';",temp,pAcount);
             sql = sqlBuf;
             dbHelper->sqlExcute(sql,"ExamSystem");
 
             memset(sqlBuf,'\0',sizeof(char) * 1024);
-            sprintf(sqlBuf,"update `shortAnswer` set `testPaperId` = %s\
- where  `testPaperId` = 0;",result.at(0).at(0).c_str());
+            sprintf(sqlBuf,"update `shortAnswer` set `testPaperId` = %d\
+ where  `testPaperId` = 0 and `teacherId` = '%s';",temp,pAcount);
             sql = sqlBuf;
             dbHelper->sqlExcute(sql,"ExamSystem");
             delete dbHelper;

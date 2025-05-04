@@ -2280,18 +2280,17 @@ QString CMainMenueModel::getTablePageCount(char* acount)
 }
 
 bool CMainMenueModel::addShortAnswerInfo(double grade,const char* question,
-                                         const char* referenceAnswer,int order)
+                                         const char* referenceAnswer,const char* teacherId,int order)
 {
-    if(question == nullptr || referenceAnswer == nullptr)
+    if(question == nullptr || referenceAnswer == nullptr|| teacherId == nullptr)
     {
         return false;
     }
-//    CDBHelper* dbHelper = CDBHelper::getInstance();
     CDBHelper* dbHelper = new CDBHelper();
     char* sqlBuf = new char[1024000];
     memset(sqlBuf,'\0',sizeof(char) * 1024000);
-    sprintf(sqlBuf,"insert into  `shortAnswer` (`grade`,`question`,`referenceAnswer`,`order`)\
- values(%lf,'%s','%s',%d);",grade,question,referenceAnswer,order);
+    sprintf(sqlBuf,"insert into  `shortAnswer` (`grade`,`question`,`referenceAnswer`,`order`,`teacherId`)\
+ values(%lf,'%s','%s',%d,'%s');",grade,question,referenceAnswer,order,teacherId);
  std::string sql = sqlBuf;
    delete[] sqlBuf;
    bool ret =   dbHelper->sqlExcute(sql,"ExamSystem");
@@ -2301,19 +2300,18 @@ bool CMainMenueModel::addShortAnswerInfo(double grade,const char* question,
 
 bool CMainMenueModel::addJudgeInfo(double grade,const char* question,const char* sessionTrue,
                   const char* sessionFalse,
-                  const char* correctAnswer,int order)
+                  const char* correctAnswer,const char* teacherId,int order)
 {
     if(question==nullptr || sessionFalse == nullptr
-      ||sessionTrue == nullptr || correctAnswer == nullptr )
+      ||sessionTrue == nullptr || correctAnswer == nullptr ||teacherId == nullptr)
     {
         return false;
     }
-//    CDBHelper* dbHelper = CDBHelper::getInstance();
     CDBHelper* dbHelper = new CDBHelper();
     char* sqlBuf = new char[1024000];
     memset(sqlBuf,'\0',sizeof(char) * 1024000);
-    sprintf(sqlBuf,"insert into  `judge` (`grade`,`question`,`sessionTrue`,`sessionFalse`,`order`,`correctAnswer`)\
-values(%lf,'%s','%s','%s',%d,'%s');",grade,question,sessionTrue,sessionFalse,order,correctAnswer);
+    sprintf(sqlBuf,"insert into  `judge` (`grade`,`question`,`sessionTrue`,`sessionFalse`,`order`,`correctAnswer`,`teacherId`)\
+values(%lf,'%s','%s','%s',%d,'%s','%s');",grade,question,sessionTrue,sessionFalse,order,correctAnswer,teacherId);
  std::string sql = sqlBuf;
     delete[] sqlBuf;
     bool ret =   dbHelper->sqlExcute(sql,"ExamSystem");
@@ -2324,24 +2322,23 @@ values(%lf,'%s','%s','%s',%d,'%s');",grade,question,sessionTrue,sessionFalse,ord
 bool CMainMenueModel::addMultiChoiceInfo(double grade,const char* question,const char* sessionA,
                         const char* sessionB,const char* sessionC,const char* sessionD,
                         const char* sessionE,const char* sessionF,const char* correctOpetions,
-                        int order)
+                        const char* teacherId,int order)
 {
     if(question == nullptr || sessionA == nullptr||
        sessionB == nullptr || sessionC == nullptr||
        sessionD == nullptr || sessionE == nullptr||
-       sessionF == nullptr)
+       sessionF == nullptr || teacherId == nullptr)
     {
         return false;
     }
-//    CDBHelper* dbHelper = CDBHelper::getInstance();
     CDBHelper* dbHelper = new CDBHelper();
     char* sqlBuf = new char[1024000];
     memset(sqlBuf,'\0',sizeof(char) * 1024000);
     sprintf(sqlBuf,"insert into  `multiChoice` (`grade`,`question`,`sessionA`,`sessionB`,\
-`sessionC`,`sessionD`,`sessionE`,`sessionF`,`correctOptions`,`order`)\
- values(%lf,'%s','%s','%s','%s','%s','%s','%s','%s',%d);",grade,question,sessionA,sessionB,
+`sessionC`,`sessionD`,`sessionE`,`sessionF`,`correctOptions`,`order`,`teacherId`)\
+ values(%lf,'%s','%s','%s','%s','%s','%s','%s','%s',%d,'%s');",grade,question,sessionA,sessionB,
     sessionC,sessionD,
-    sessionE,sessionF,correctOpetions,order);
+    sessionE,sessionF,correctOpetions,order,teacherId);
  std::string sql = sqlBuf;
  delete[] sqlBuf;
  bool ret =   dbHelper->sqlExcute(sql,"ExamSystem");
@@ -2508,7 +2505,8 @@ bool CMainMenueModel::initSingleChoiceTable()
 `sessionC` varchar(1000)  not null default '',\
 `sessionD` varchar(1000) not null default '',\
 `correctOptions` varchar(2) not null,\
-`order` integer not null default  0, \
+`order` integer not null default  0,\
+`teacherId` varchar(20) not null , \
 `testPaperId` integer not null default 0,\
 foreign key(`testPaperId`) references `testPaperInfo`(`testPaperId`)\
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;";
@@ -2537,7 +2535,8 @@ bool CMainMenueModel::initMultiChoiceTable()
 `sessionE` varchar(1000) not null default '',\
 `sessionF` varchar(1000) not null default '',\
 `correctOptions` varchar(20) not null,\
-`order` integer not null default  0, \
+`order` integer not null default  0,\
+`teacherId` varchar(20) not null ,\
 `testPaperId` integer not null default 0,\
 foreign key(`testPaperId`) references `testPaperInfo`(`testPaperId`)\
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;";
@@ -2562,7 +2561,8 @@ bool CMainMenueModel::initJudgeTable()
 `sessionTrue` varchar(1000)  not null default '',\
 `sessionFalse` varchar(1000)  not null default '',\
 `correctAnswer` varchar(2) not null,\
-`order` integer not null default  0, \
+`order` integer not null default  0,\
+`teacherId` varchar(20) not null ,\
 `testPaperId` integer not null default 0,\
 foreign key(`testPaperId`) references `testPaperInfo`(`testPaperId`)\
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;";
@@ -2585,7 +2585,8 @@ bool CMainMenueModel::initShortAnswerTable()
 `grade` double default 0.0 not null,\
 `question` varchar(1000)   not null default '',\
 `referenceAnswer` varchar(2000) not null,\
-`order` integer not null default  0,  \
+`order` integer not null default  0,\
+`teacherId` varchar(20) not null ,\
 `testPaperId` integer not null default 0,\
 foreign key(`testPaperId`) references `testPaperInfo`(`testPaperId`)\
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;";
@@ -2620,22 +2621,21 @@ foreign key(`teacherId`) references `Teacher`(`teacherId`)\
 
 bool CMainMenueModel::addSignalChoiceInfo(double grade,const char* question,const char* sessionA,
                          const char* sessionB,const char* sessionC,const char* sessionD,
-                         const char* correctOptions,int order)
+                         const char* correctOptions,const char* teacherId,int order)
 {
     if(question == nullptr||question == nullptr || sessionA == nullptr||
             sessionB == nullptr || sessionC == nullptr
-            ||sessionD == nullptr||correctOptions == nullptr)
+            ||sessionD == nullptr||correctOptions == nullptr|| teacherId == nullptr)
     {
         return false;
     }
-//    CDBHelper* dbHelper = CDBHelper::getInstance();
     CDBHelper* dbHelper = new CDBHelper();
     char* sqlBuf = new char[1024000];
     memset(sqlBuf,'\0',sizeof(char) * 1024000);
     sprintf(sqlBuf,"insert into  `singleChoice` \
-(`grade`,`question`,`sessionA`,`sessionB`,`sessionC`,`sessionD`,`correctOptions`,`order`)\
- values('%lf','%s','%s','%s','%s','%s','%s','%d');",grade,question,sessionA,
-            sessionB,sessionC,sessionD,correctOptions,order);
+(`grade`,`question`,`sessionA`,`sessionB`,`sessionC`,`sessionD`,`correctOptions`,`order`,`teacherId`)\
+ values('%lf','%s','%s','%s','%s','%s','%s','%d','%s');",grade,question,sessionA,
+            sessionB,sessionC,sessionD,correctOptions,order,teacherId);
  std::string sql = sqlBuf;
  delete[] sqlBuf;
  bool ret =   dbHelper->sqlExcute(sql,"ExamSystem");

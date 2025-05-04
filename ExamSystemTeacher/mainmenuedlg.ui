@@ -131,6 +131,9 @@ color:#ffffff;
    <property name="text">
     <string>谢福玉  </string>
    </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
+   </property>
   </widget>
   <widget class="QWidget" name="widget" native="true">
    <property name="geometry">
@@ -194,6 +197,9 @@ color:#ffffff;
     </property>
     <property name="text">
      <string>谢福玉</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
     </property>
    </widget>
    <widget class="QPushButton" name="pushButton">
@@ -465,7 +471,7 @@ color:#50b8f7;
     </rect>
    </property>
    <property name="currentIndex">
-    <number>8</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="page">
     <widget class="QWidget" name="widget_3" native="true">
