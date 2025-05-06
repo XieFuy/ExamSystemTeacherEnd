@@ -735,6 +735,40 @@ color:#50b8f7;
          <string>保存试卷</string>
         </property>
        </widget>
+       <widget class="QPushButton" name="pushButton_47">
+        <property name="geometry">
+         <rect>
+          <x>560</x>
+          <y>20</y>
+          <width>171</width>
+          <height>41</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>黑体</family>
+          <pointsize>12</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">#pushButton_47{
+border:none;
+border:1px solid #faa046;
+color:#faa046;
+border-radius:20;
+}
+
+#pushButton_47:hover{
+border:1px solid #50b8f7;
+color:#50b8f7;
+}</string>
+        </property>
+        <property name="text">
+         <string>客观题导入</string>
+        </property>
+       </widget>
       </widget>
       <widget class="QStackedWidget" name="stackedWidget_2">
        <property name="geometry">
@@ -746,7 +780,7 @@ color:#50b8f7;
         </rect>
        </property>
        <property name="currentIndex">
-        <number>0</number>
+        <number>2</number>
        </property>
        <widget class="QWidget" name="page_6">
         <widget class="QLineEdit" name="lineEdit">

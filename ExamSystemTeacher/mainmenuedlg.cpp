@@ -804,6 +804,278 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
         this->barWidget.reset();
     });
 
+    //进行导入客观题
+    QObject::connect(this->ui->pushButton_47,&QPushButton::clicked,[=](){
+        QString filePath = QFileDialog::getOpenFileName(this, "选择 Word 文档", "", "Word 文档 (*.docx *.doc)");
+           if (filePath.isEmpty()) return;
+
+           QStringList paragraphs = readWordDocument(filePath);
+           QList<Question> questions = parseQuestions(paragraphs);
+
+           // 输出结果
+           for (const Question& q : questions)
+           {
+               qDebug() << "题型:" << q.type;
+               qDebug() << "内容:" << q.content;
+               qDebug() << "分值:" << q.score;
+               if (!q.options.isEmpty()) {
+                   qDebug() << "选项:" << q.options;
+               }
+               qDebug() << "答案:" << q.answers;
+               qDebug() << "------------------";
+
+               //这里进行根据不同的题目类型进行将题目信息存储到数据库中
+               if(q.type == "单选题")
+               {
+                   //进行添加单选题，并且进行UI更新
+                   QString str = "(";
+                   QString num = QString::number(++this->signalCount);
+                   str += num;
+                   str +=")";
+                   QTreeWidgetItem* signalItem = new QTreeWidgetItem(QStringList()<<str);
+                   this->m_signalOperator->addChild(signalItem);
+                   this->m_signalOperatorLst.push_back(signalItem);
+                   this->m_signalMap.insert(str,this->signalCount);
+                   qDebug()<<"正确选项: "<<q.answers.at(0);
+                   QMap<QString,int>::iterator pos = this->m_signalMap.find(str);
+                   if(pos == this->m_signalMap.end())
+                   {
+                       return;
+                   }
+                   int order = pos.value();
+//                   //将数据存储到数据库中
+                    this->addSignalChoiceInfo(QString::number(q.score).trimmed(),
+                                              q.content.trimmed(),
+                                              q.options.at(0).trimmed(),
+                                              q.options.at(1).trimmed(),
+                                              q.options.at(2).trimmed(),
+                                              q.options.at(3).trimmed(),
+                                              q.answers.at(0),order);
+
+               }else if(q.type == "多选题")
+               {
+                   //进行添加多选题，并且进行UI更新
+                   QString str = "(";
+                   QString num = QString::number(++this->multiCount);
+                   str += num;
+                   str +=")";
+                   QTreeWidgetItem* multiItem = new QTreeWidgetItem(QStringList()<<str);
+                   this->m_multiOerator->addChild(multiItem);
+                   this->m_multiOeratorLst.push_back(multiItem);
+                   this->m_multiMap.insert(str,this->multiCount);
+
+                   this->m_multiCorrectOptions = "";
+                   for(int i = 0 ; i < q.answers.size();i++)
+                   {
+                       this->m_multiCorrectOptions += q.answers.at(i).trimmed();
+                       this->m_multiCorrectOptions += ",";
+                   }
+                   qDebug()<<"多选选中的选项："<<this->m_multiCorrectOptions;
+                   QMap<QString,int>::iterator ret = this->m_multiMap.find(str);
+                   if(ret == this->m_multiMap.end())
+                   {
+                       return;
+                   }
+                   int order = ret.value();
+                   //将数据存储到数据库中
+                   this->addMultiChoiceInfo(QString::number(q.score).trimmed(),
+                                            q.content.trimmed(),
+                                            q.options.at(0).trimmed(),
+                                            q.options.at(1).trimmed(),
+                                            q.options.at(2).trimmed(),
+                                            q.options.at(3).trimmed(),
+                                            q.options.at(4).trimmed(),
+                                            q.options.at(5).trimmed(),
+                                            this->m_multiCorrectOptions,order);
+
+               }else if(q.type == "判断题")
+               {
+                   //进行添加判断题，并且更新UI
+                   QString str = "(";
+                   QString num = QString::number(++this->judgeCount);
+                   str += num;
+                   str +=")";
+                   QTreeWidgetItem* judgeItem = new QTreeWidgetItem(QStringList()<<str);
+                   this->m_judge->addChild(judgeItem);
+                   this->m_judgeLst.push_back(judgeItem);
+                   this->m_judgeMap.insert(str,this->judgeCount);
+
+                   QMap<QString,int>::iterator ret = this->m_judgeMap.find(str);
+                   if(ret == this->m_judgeMap.end())
+                   {
+                       return;
+                   }
+                   int order = ret.value();
+
+                   qDebug()<<"正确："<<q.answers.at(0);
+//                   将数据存储到数据库中,判断题
+                   this->addJudgeInfo(QString::number(q.score).trimmed(),
+                                      q.content.trimmed(),
+                                      q.options.at(0).trimmed(),
+                                      q.options.at(1).trimmed(),
+                                      q.answers.at(0).trimmed(),order);
+
+               }
+           }
+    });
+
+}
+
+QList<Question> CMainMenueDlg::parseQuestions(const QStringList& paragraphs) {
+    QList<Question> questions;
+    Question currentQ;
+
+    // 预编译正则表达式，提高效率
+    QRegularExpression typeRegex(
+        R"(\[(单选题|多选题|判断题)\]\s*([^\n]+?)\s*[\(\（](\d+\.?\d*)\s*分[\)\）])"
+    );
+    QRegularExpression optionRegex(R"(^[A-F][\.．、]\s*(\S+.*)$)"); // 支持中文标点
+    QRegularExpression answerRegex(R"(^答案\s*[:：]\s*(\S+.*)$)");  // 兼容中英文冒号
+
+    for (const QString& para : paragraphs) {
+//        qDebug() << "当前段落:" << para;
+
+        // 空行分隔题目
+        if (para.isEmpty()) {
+            if (!currentQ.type.isEmpty()) {
+                questions.append(currentQ);
+                currentQ = Question();
+            }
+            continue;
+        }
+
+        // --- 匹配题型行 ---
+        QRegularExpressionMatch typeMatch = typeRegex.match(para);
+        if (typeMatch.hasMatch()) {
+            if (!currentQ.type.isEmpty()) {
+                questions.append(currentQ);
+                currentQ = Question();
+            }
+            currentQ.type = typeMatch.captured(1);
+            currentQ.content = typeMatch.captured(2).trimmed();
+            currentQ.score = typeMatch.captured(3).toDouble();
+            qDebug() << "检测到新题型:" << currentQ.type << "内容:" << currentQ.content;
+            continue;
+        }
+
+        // --- 处理选项和答案 ---
+        if (!currentQ.type.isEmpty()) {
+            // 匹配答案行
+            QRegularExpressionMatch answerMatch = answerRegex.match(para);
+            if (answerMatch.hasMatch()) {
+                QString answerLine = answerMatch.captured(1).trimmed();
+                if (currentQ.type == "判断题") {
+                    // 支持 "1/0" 或 "对/错" 作为答案
+                    answerLine = answerLine.toLower();
+                    if (answerLine == "1" || answerLine == "对" || answerLine == "正确") {
+                        currentQ.answers.append("1");
+                    } else if (answerLine == "0" || answerLine == "错" || answerLine == "错误") {
+                        currentQ.answers.append("0");
+                    }
+                } else {
+                    // 分割多选题答案（如 "B,C"）
+                    // 修正正则表达式原始字符串语法，并适配 Qt 5.12
+                    currentQ.answers = answerLine.split(
+                                QRegularExpression(R"([,，\s]+)"),  // 正则表达式修正
+                                QString::SkipEmptyParts            // Qt 5.12 兼容写法
+                            );
+                }
+                qDebug() << "提取答案:" << currentQ.answers;
+                continue;
+            }
+
+            // 匹配选项（单选题/多选题）
+            if ((currentQ.type == "单选题" || currentQ.type == "多选题")) {
+                QRegularExpressionMatch optionMatch = optionRegex.match(para);
+                if (optionMatch.hasMatch()) {
+                    currentQ.options.append(optionMatch.captured(1).trimmed()); // 提取选项内容（如 "封装"）
+                    qDebug() << "添加选项:" << optionMatch.captured(1);
+                    continue;
+                }
+            }
+
+            // 处理判断题的选项（如 "对" 或 "错"）
+            if (currentQ.type == "判断题") {
+                if (para == "对" || para == "错") {
+                    currentQ.options.append(para);
+                    qDebug() << "添加判断题选项:" << para;
+                }
+            }
+        }
+    }
+
+    // 添加最后一个题目
+    if (!currentQ.type.isEmpty()) {
+        questions.append(currentQ);
+    }
+
+    return questions;
+}
+
+QStringList CMainMenueDlg::readWordDocument(const QString& filePath) {
+    QAxObject* wordApp = nullptr;
+    QAxObject* documents = nullptr;
+    QAxObject* document = nullptr;
+    QAxObject* paragraphs = nullptr;
+    QStringList paraTexts;
+
+    try {
+        wordApp = new QAxObject("Word.Application");
+        wordApp->setProperty("Visible", false);
+        wordApp->setProperty("DisplayAlerts", false);
+
+        documents = wordApp->querySubObject("Documents");
+        document = documents->querySubObject(
+            "Open(const QString&, bool, bool)",
+            QDir::toNativeSeparators(filePath),
+            true,  // ReadOnly
+            false   // 不添加到最近文件列表
+        );
+        if (!document) {
+            qWarning() << "无法打开文档";
+            wordApp->dynamicCall("Quit()");
+            delete documents;
+            delete wordApp;
+            return paraTexts;
+        }
+
+        paragraphs = document->querySubObject("Paragraphs");
+        int count = paragraphs->property("Count").toInt();
+
+        for (int i = 1; i <= count; ++i) {
+            QScopedPointer<QAxObject> para(paragraphs->querySubObject("Item(int)", i));
+            if (para.isNull()) continue;
+
+            QScopedPointer<QAxObject> range(para->querySubObject("Range"));
+            if (range.isNull()) continue;
+
+            QString text = range->property("Text").toString().trimmed();
+            if (!text.isEmpty()) paraTexts.append(text);
+        }
+
+        // 提前释放子对象
+        delete paragraphs;
+        paragraphs = nullptr;
+
+        // 强制关闭文档且不保存
+        document->dynamicCall("Close(bool)", false);
+        delete document;
+        document = nullptr;
+
+        // 退出 Word 并释放资源
+        wordApp->dynamicCall("Quit()");
+        delete documents;
+        delete wordApp;
+
+        // 强制终止残留进程（可选）
+//        QProcess::execute("taskkill /F /IM WINWORD.EXE /T");
+
+    } catch (...) {
+        qWarning() << "COM 操作异常";
+        QProcess::execute("taskkill /F /IM WINWORD.EXE /T");
+    }
+
+    return paraTexts;
 }
 
 void CMainMenueDlg::writeStudentScoreToExcel()

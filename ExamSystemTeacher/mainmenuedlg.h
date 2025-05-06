@@ -27,10 +27,21 @@
 #include "xlsxdocument.h"
 #include <QFileDialog>
 #include "bar_widget.h"
-
+#include <QAxObject>
+#include <QRegularExpression>
+#include <QProcess>
 namespace Ui {
 class CMainMenueDlg;  //主菜单管理页面
 }
+
+// 题目结构体（仅处理三种题型）
+typedef struct question {
+    QString type;       // "单选题"/"多选题"/"判断题"
+    QString content;    // 题目正文
+    QStringList options; // 选项（仅选择题）
+    QStringList answers; // 正确答案（选择题为选项字母，判断题为"对"/"错"）
+    double score = 0.0;  // 分值
+}Question;
 
 class CMainMenueDlg : public QDialog
 {
@@ -774,6 +785,12 @@ private:
     /*Excel表格操作接口*/
     //导出学生成绩
     void writeStudentScoreToExcel();
+
+    //解析读取word文档后的试题函数
+    QList<Question> parseQuestions(const QStringList& paragraphs);
+
+    //进行读取word文档
+    QStringList readWordDocument(const QString& filePath);
 
 private:
     Ui::CMainMenueDlg *ui;
