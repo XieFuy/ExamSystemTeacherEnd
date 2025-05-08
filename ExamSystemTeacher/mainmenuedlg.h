@@ -35,13 +35,23 @@ class CMainMenueDlg;  //主菜单管理页面
 }
 
 // 题目结构体（仅处理三种题型）
-typedef struct question {
+/*typedef struct question {
     QString type;       // "单选题"/"多选题"/"判断题"
-    QString content;    // 题目正文
+    QString content;    // 题目正文 （可能包含换行符）
     QStringList options; // 选项（仅选择题）
     QStringList answers; // 正确答案（选择题为选项字母，判断题为"对"/"错"）
     double score = 0.0;  // 分值
-}Question;
+}Question;*/
+
+class Question {
+public:
+    QString type;       // 题型：单选题/多选题/判断题
+    QString stem;       // 题干
+    double score;       // 分数
+    QStringList options;// 选项列表（判断题的选项为["对", "错"]）
+    QString answer;     // 答案（如 "B"、"B,C"、"1"）
+    Question() : score(0.0) {}
+};
 
 class CMainMenueDlg : public QDialog
 {
@@ -792,6 +802,7 @@ private:
     //进行读取word文档
     QStringList readWordDocument(const QString& filePath);
 
+    void finalizeQuestion(Question& question, QList<Question>& questions);
 private:
     Ui::CMainMenueDlg *ui;
 };

@@ -816,12 +816,12 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
            for (const Question& q : questions)
            {
                qDebug() << "题型:" << q.type;
-               qDebug() << "内容:" << q.content;
+               qDebug() << "内容:" << q.stem;
                qDebug() << "分值:" << q.score;
                if (!q.options.isEmpty()) {
                    qDebug() << "选项:" << q.options;
                }
-               qDebug() << "答案:" << q.answers;
+               qDebug() << "答案:" << q.answer;
                qDebug() << "------------------";
 
                //这里进行根据不同的题目类型进行将题目信息存储到数据库中
@@ -836,7 +836,7 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
                    this->m_signalOperator->addChild(signalItem);
                    this->m_signalOperatorLst.push_back(signalItem);
                    this->m_signalMap.insert(str,this->signalCount);
-                   qDebug()<<"正确选项: "<<q.answers.at(0);
+                   qDebug()<<"正确选项: "<<q.answer;
                    QMap<QString,int>::iterator pos = this->m_signalMap.find(str);
                    if(pos == this->m_signalMap.end())
                    {
@@ -845,12 +845,12 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
                    int order = pos.value();
 //                   //将数据存储到数据库中
                     this->addSignalChoiceInfo(QString::number(q.score).trimmed(),
-                                              q.content.trimmed(),
+                                              q.stem.trimmed(),
                                               q.options.at(0).trimmed(),
                                               q.options.at(1).trimmed(),
                                               q.options.at(2).trimmed(),
                                               q.options.at(3).trimmed(),
-                                              q.answers.at(0),order);
+                                              q.answer.trimmed(),order);
 
                }else if(q.type == "多选题")
                {
@@ -865,11 +865,14 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
                    this->m_multiMap.insert(str,this->multiCount);
 
                    this->m_multiCorrectOptions = "";
-                   for(int i = 0 ; i < q.answers.size();i++)
+                  /* for(int i = 0 ; i < q.answers.size();i++)
                    {
                        this->m_multiCorrectOptions += q.answers.at(i).trimmed();
                        this->m_multiCorrectOptions += ",";
-                   }
+                   }*/
+                   this->m_multiCorrectOptions = q.answer;
+                   this->m_multiCorrectOptions += ",";
+
                    qDebug()<<"多选选中的选项："<<this->m_multiCorrectOptions;
                    QMap<QString,int>::iterator ret = this->m_multiMap.find(str);
                    if(ret == this->m_multiMap.end())
@@ -879,7 +882,7 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
                    int order = ret.value();
                    //将数据存储到数据库中
                    this->addMultiChoiceInfo(QString::number(q.score).trimmed(),
-                                            q.content.trimmed(),
+                                            q.stem.trimmed(),
                                             q.options.at(0).trimmed(),
                                             q.options.at(1).trimmed(),
                                             q.options.at(2).trimmed(),
@@ -907,13 +910,13 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
                    }
                    int order = ret.value();
 
-                   qDebug()<<"正确："<<q.answers.at(0);
+                   qDebug()<<"正确："<<q.answer;
 //                   将数据存储到数据库中,判断题
                    this->addJudgeInfo(QString::number(q.score).trimmed(),
-                                      q.content.trimmed(),
+                                      q.stem.trimmed(),
                                       q.options.at(0).trimmed(),
                                       q.options.at(1).trimmed(),
-                                      q.answers.at(0).trimmed(),order);
+                                      q.answer.trimmed(),order);
 
                }
            }
@@ -921,7 +924,8 @@ CMainMenueDlg::CMainMenueDlg(QWidget *parent) : //主菜单界面类
 
 }
 
-QList<Question> CMainMenueDlg::parseQuestions(const QStringList& paragraphs) {
+//1.1 传进来的参数是文档中的每一行内容
+/*QList<Question> CMainMenueDlg::parseQuestions(const QStringList& paragraphs) {
     QList<Question> questions;
     Question currentQ;
 
@@ -933,8 +937,6 @@ QList<Question> CMainMenueDlg::parseQuestions(const QStringList& paragraphs) {
     QRegularExpression answerRegex(R"(^答案\s*[:：]\s*(\S+.*)$)");  // 兼容中英文冒号
 
     for (const QString& para : paragraphs) {
-//        qDebug() << "当前段落:" << para;
-
         // 空行分隔题目
         if (para.isEmpty()) {
             if (!currentQ.type.isEmpty()) {
@@ -1010,8 +1012,143 @@ QList<Question> CMainMenueDlg::parseQuestions(const QStringList& paragraphs) {
     }
 
     return questions;
-}
+}*/
 
+//1.2
+/*QList<Question> CMainMenueDlg::parseQuestions(const QStringList& paragraphs) {
+    QList<Question> questions;
+    Question currentQ;
+
+    QRegularExpression typeRegex(
+        R"(\[(单选题|多选题|判断题)\]\s*(.*?)\s*([\(\（]?(\d+\.?\d*)\s*分[\)\）]?))"
+    );
+    QRegularExpression optionRegex(R"(^[A-F][．.、]?\s*(\S+.*)$)");
+    QRegularExpression answerRegex(R"(^答案\s*[:：]\s*([^，,]+(?:[，,]\s*[^，,]+)*))");
+
+    for (const QString& para : paragraphs) {
+        if (para.isEmpty()) {
+            if (!currentQ.type.isEmpty()) {
+                if (currentQ.type == "判断题" && currentQ.options.isEmpty()) {
+                    currentQ.options.append("对");
+                    currentQ.options.append("错");
+                }
+                questions.append(currentQ);
+                currentQ = Question();
+            }
+            continue;
+        }
+
+        QRegularExpressionMatch typeMatch = typeRegex.match(para);
+        if (typeMatch.hasMatch()) {
+            if (!currentQ.type.isEmpty()) {
+                questions.append(currentQ);
+                currentQ = Question();
+            }
+            currentQ.type = typeMatch.captured(1);
+            currentQ.content = typeMatch.captured(2).trimmed();
+            currentQ.score = typeMatch.captured(4).toDouble();
+            continue;
+        }
+
+        if (!currentQ.type.isEmpty()) {
+            bool processed = false;
+
+            // 处理答案
+            QRegularExpressionMatch answerMatch = answerRegex.match(para);
+            if (answerMatch.hasMatch()) {
+                QStringList answers = answerMatch.captured(1)
+                    .split(QRegularExpression(R"([,，\s]+)"), QString::SkipEmptyParts);
+                currentQ.answers = answers;
+                processed = true;
+            }
+
+            // 处理选项
+            if (!processed && (currentQ.type == "单选题" || currentQ.type == "多选题")) {
+                QRegularExpressionMatch optionMatch = optionRegex.match(para);
+                if (optionMatch.hasMatch()) {
+                    currentQ.options.append(optionMatch.captured(1).trimmed());
+                    processed = true;
+                }
+            }
+
+            // 添加题干内容
+            if (!processed) {
+                currentQ.content += (currentQ.content.isEmpty() ? "" : "\n") + para;
+            }
+        }
+    }
+
+    // 添加最后一个题目
+    if (!currentQ.type.isEmpty()) {
+        if (currentQ.type == "判断题" && currentQ.options.isEmpty()) {
+            currentQ.options.append("对");
+            currentQ.options.append("错");
+        }
+        questions.append(currentQ);
+    }
+
+    return questions;
+}*/
+
+QList<Question> CMainMenueDlg::parseQuestions(const QStringList& lines) {
+        QList<Question> questions;
+        Question currentQuestion;
+        enum State { SeekType, CollectStem, CollectOptions };
+        State state = SeekType;
+
+        for (const QString& line : lines) {
+            QString trimmed = line.trimmed();
+            if (trimmed.isEmpty()) continue;
+
+            switch (state) {
+            case SeekType: {
+                // 匹配题型行：例如 "[单选题]..."
+                QRegularExpression typeRegex(R"(\[(\S+?)\])");
+                QRegularExpressionMatch match = typeRegex.match(trimmed);
+                if (match.hasMatch()) {
+                    currentQuestion = Question(); // 重置当前题目
+                    currentQuestion.type = match.captured(1);
+                    // 提取题型后的题干部分（如果有）
+                    currentQuestion.stem = trimmed.mid(match.capturedEnd()).trimmed();
+                    state = CollectStem;
+                }
+                break;
+            }
+
+            case CollectStem: {
+                // 匹配分数行：例如 "（10.0分）"
+                QRegularExpression scoreRegex(R"(（(\d+\.?\d*)分）)");
+                QRegularExpressionMatch match = scoreRegex.match(trimmed);
+                if (match.hasMatch()) {
+                    currentQuestion.score = match.captured(1).toDouble();
+                    state = CollectOptions;
+                } else {
+                    // 合并多行题干
+                    if (!currentQuestion.stem.isEmpty()) currentQuestion.stem += "\n";
+                    currentQuestion.stem += trimmed;
+                }
+                break;
+            }
+
+            case CollectOptions: {
+                // 匹配答案行：例如 "答案: B"
+                if (trimmed.startsWith("答案:") || trimmed.startsWith("答案：")) {
+                    currentQuestion.answer = trimmed.mid(3).trimmed();
+                    questions.append(currentQuestion);
+                    state = SeekType; // 重置状态
+                } else {
+                    // 收集选项（包括判断题的"对"和"错"）
+                    currentQuestion.options.append(trimmed);
+                }
+                break;
+            }
+            }
+        }
+
+        return questions;
+    }
+
+//2.1
 QStringList CMainMenueDlg::readWordDocument(const QString& filePath) {
     QAxObject* wordApp = nullptr;
     QAxObject* documents = nullptr;
@@ -1051,6 +1188,7 @@ QStringList CMainMenueDlg::readWordDocument(const QString& filePath) {
 
             QString text = range->property("Text").toString().trimmed();
             if (!text.isEmpty()) paraTexts.append(text);
+            //paraTexts.append(text);
         }
 
         // 提前释放子对象
@@ -1077,6 +1215,7 @@ QStringList CMainMenueDlg::readWordDocument(const QString& filePath) {
 
     return paraTexts;
 }
+
 
 void CMainMenueDlg::writeStudentScoreToExcel()
 {
